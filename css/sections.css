@@ -336,6 +336,123 @@
   margin-bottom: 0;
 }
 
+/* ────────────────────────────────────────────
+   QUIZ MODES UI (User Facing)
+   ──────────────────────────────────────────── */
+.quiz-mode-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var(--z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.quiz-mode-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.quiz-mode-modal {
+  background: var(--glass-bg);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-10);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  transform: scale(0.95);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+.quiz-mode-overlay.active .quiz-mode-modal {
+  transform: scale(1);
+}
+
+.mode-choices {
+  display: flex;
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+  justify-content: center;
+}
+@media(max-width: 600px) {
+  .mode-choices { flex-direction: column; }
+}
+
+.mode-choice-card {
+  flex: 1;
+  background: var(--bg-alt);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  border: none;
+}
+.mode-choice-card:hover {
+  transform: translateY(-5px);
+  background: var(--primary-surface);
+  box-shadow: var(--shadow-glow);
+}
+.mode-choice-card h3 { font-size: var(--fs-xl); margin-bottom: var(--space-2); color: var(--primary); }
+
+.arena-view {
+  display: none;
+  width: 100%;
+  max-width: 900px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.arena-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.arena-card {
+  background: var(--bg-alt);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.arena-card:hover {
+  background: var(--primary-surface);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.countdown-overlay.active {
+  display: flex;
+}
+.countdown-number {
+  font-size: 120px;
+  font-weight: 800;
+  color: var(--primary);
+  animation: pulse-scale 1s infinite;
+}
+@keyframes pulse-scale {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 
 /* ────────────────────────────────────────────
    DAILY QUESTION SECTION
@@ -545,14 +662,7 @@
 }
 
 .footer-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--gradient-primary);
-  background-size: 200% 100%;
-  animation: gradient-shift 4s ease infinite;
+  display: none;
 }
 
 .footer-inner {

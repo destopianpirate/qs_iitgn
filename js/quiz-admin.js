@@ -310,24 +310,52 @@
     if (!name) { alert('Enter a quiz mode name'); return; }
     if (questions.length === 0) { alert('Add questions first'); return; }
 
+    const visibilityRadios = document.getElementsByName('qm-visibility');
+    let isPublic = true;
+    for (const radio of visibilityRadios) {
+      if (radio.checked) {
+        isPublic = radio.value === 'public';
+        break;
+      }
+    }
+
     const quizMode = {
       name,
       totalTime: time * 60,
       questionIds: questions.map(q => q.id),
       questionCount: questions.length,
+      isPublic: isPublic,
       created_at: new Date().toISOString()
     };
+
+    let accessCode = '';
+    if (!isPublic) {
+      // Generate 8 character random code
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      for (let i = 0; i < 8; i++) {
+        accessCode += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      quizMode.accessCode = accessCode;
+    }
 
     if (db) {
       db.ref('quizModes').push(quizMode)
         .then(() => {
-          alert('Quiz mode "' + name + '" created with ' + questions.length + ' questions!');
+          let msg = 'Quiz mode "' + name + '" created with ' + questions.length + ' questions!';
+          if (!isPublic) {
+            msg += '\n\nTournament Access Code: ' + accessCode;
+          }
+          alert(msg);
           if (els.quizModeName) els.quizModeName.value = '';
           if (els.quizModeTime) els.quizModeTime.value = '';
         });
     } else {
       console.log('Quiz mode created (local):', quizMode);
-      alert('Quiz mode "' + name + '" created (local mode)!');
+      let msg = 'Quiz mode "' + name + '" created (local mode)!';
+      if (!isPublic) {
+        msg += '\n\nTournament Access Code: ' + accessCode;
+      }
+      alert(msg);
     }
   }
 

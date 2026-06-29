@@ -149,6 +149,127 @@
     renderQuestion(currentIndex);
     initFlipCard();
     initNavigation();
+    initQuizModes();
+  }
+
+  function initQuizModes() {
+    const openBtn = document.getElementById('open-quiz-modes-btn');
+    const closeBtn = document.getElementById('close-quiz-mode-btn');
+    const overlay = document.getElementById('quiz-mode-overlay');
+    const modeChoices = document.getElementById('mode-choices');
+    
+    // Tournament
+    const btnTourney = document.getElementById('btn-tournament-mode');
+    const tourneySection = document.getElementById('tournament-input-section');
+    const btnTourneyBack = document.getElementById('btn-tournament-back');
+    const btnTourneyJoin = document.getElementById('btn-tournament-join');
+    const tourneyInput = document.getElementById('tournament-code-input');
+    const tourneyError = document.getElementById('tournament-error');
+
+    // Practice
+    const btnPractice = document.getElementById('btn-practice-mode');
+    const practiceSection = document.getElementById('practice-arena-section');
+    const btnPracticeBack = document.getElementById('btn-arena-back');
+    const arenaGrid = document.getElementById('arena-grid');
+
+    if (!openBtn) return;
+
+    openBtn.addEventListener('click', () => {
+      overlay.classList.add('active');
+      modeChoices.style.display = 'flex';
+      tourneySection.style.display = 'none';
+      practiceSection.style.display = 'none';
+    });
+
+    closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('active');
+    });
+
+    // Tournament Flow
+    btnTourney.addEventListener('click', () => {
+      modeChoices.style.display = 'none';
+      tourneySection.style.display = 'block';
+      tourneyError.style.display = 'none';
+      tourneyInput.value = '';
+      setTimeout(() => tourneyInput.focus(), 100);
+    });
+
+    btnTourneyBack.addEventListener('click', () => {
+      tourneySection.style.display = 'none';
+      modeChoices.style.display = 'flex';
+    });
+
+    btnTourneyJoin.addEventListener('click', () => {
+      const code = tourneyInput.value.trim();
+      if (code.length < 5) {
+        tourneyError.style.display = 'block';
+        return;
+      }
+      tourneyError.style.display = 'none';
+      overlay.classList.remove('active');
+      startCountdown();
+    });
+
+    // Practice Flow
+    btnPractice.addEventListener('click', () => {
+      modeChoices.style.display = 'none';
+      practiceSection.style.display = 'block';
+      loadPracticeArena(arenaGrid);
+    });
+
+    btnPracticeBack.addEventListener('click', () => {
+      practiceSection.style.display = 'none';
+      modeChoices.style.display = 'flex';
+    });
+  }
+
+  function loadPracticeArena(grid) {
+    grid.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1;text-align:center;">Loading public arenas...</p>';
+    
+    // Simulate network or fallback data since Firebase has dummy keys currently
+    setTimeout(() => {
+      const dummyQuizzes = [
+        { name: "Science Trivia Weekly", count: 10, time: 5, creator: "Admin" },
+        { name: "History Buffs Challenge", count: 15, time: 10, creator: "System" },
+        { name: "Pop Culture Mix", count: 8, time: 4, creator: "Admin" }
+      ];
+      
+      grid.innerHTML = dummyQuizzes.map(q => `
+        <div class="arena-card" onclick="window.QSQuiz.startPracticeMatch()">
+          <h4 style="margin-bottom:var(--space-2);color:var(--primary);">${q.name}</h4>
+          <p style="font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:var(--space-1);">⏱️ ${q.time} Minutes</p>
+          <p style="font-size:var(--fs-xs);color:var(--text-tertiary);">By ${q.creator} • ${q.count} Questions</p>
+        </div>
+      `).join('');
+    }, 500);
+  }
+
+  function startCountdown() {
+    const overlay = document.getElementById('countdown-overlay');
+    const numEl = document.getElementById('countdown-number');
+    if (!overlay || !numEl) return;
+
+    overlay.classList.add('active');
+    let count = 5;
+    numEl.textContent = count;
+
+    const interval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        numEl.textContent = count;
+        // Re-trigger animation
+        numEl.style.animation = 'none';
+        numEl.offsetHeight; // trigger reflow
+        numEl.style.animation = null;
+      } else {
+        clearInterval(interval);
+        numEl.textContent = "GO!";
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          alert("Quiz Started! (Match logic to be implemented)");
+        }, 1000);
+      }
+    }, 1000);
   }
 
   if (document.readyState === 'loading') {
@@ -157,6 +278,13 @@
     init();
   }
 
-  // Expose questions for buzzer
-  window.QSQuiz = { QUESTIONS, getRandomQuestion: () => QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)] };
+  // Expose questions for buzzer and quiz start
+  window.QSQuiz = { 
+    QUESTIONS, 
+    getRandomQuestion: () => QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)],
+    startPracticeMatch: () => {
+      document.getElementById('quiz-mode-overlay').classList.remove('active');
+      startCountdown();
+    }
+  };
 })();

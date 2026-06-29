@@ -230,8 +230,7 @@
     setTimeout(() => {
       const dummyQuizzes = [
         { name: "Science Trivia Weekly", count: 10, time: 5, creator: "Admin" },
-        { name: "History Buffs Challenge", count: 15, time: 10, creator: "System" },
-        { name: "Pop Culture Mix", count: 8, time: 4, creator: "Admin" }
+        { name: "History Buffs Challenge", count: 15, time: 10, creator: "System" }
       ];
       
       grid.innerHTML = dummyQuizzes.map(q => `

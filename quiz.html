@@ -153,9 +153,12 @@
             <h3 id="active-quiz-title">Quiz Title</h3>
             <span class="quiz-progress" id="active-quiz-progress">Question 1 of 5</span>
           </div>
-          <div class="quiz-timer" id="active-quiz-timer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span id="timer-text">05:00</span>
+          <div style="display: flex; gap: var(--space-4); align-items: center;">
+            <div class="quiz-timer" id="active-quiz-timer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span id="timer-text">05:00</span>
+            </div>
+            <button class="btn btn-outline" id="btn-quiz-exit" style="border-color: var(--error); color: var(--error);">Exit</button>
           </div>
         </div>
 
@@ -200,6 +203,18 @@
         </div>
 
         <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width: 100%; justify-content: center; margin-top: var(--space-8);">Return to Arena</button>
+      </div>
+    </div>
+
+    <!-- EXIT CONFIRMATION MODAL -->
+    <div class="exit-confirm-overlay" id="exit-confirm-overlay">
+      <div class="exit-confirm-modal">
+        <h3>Are you sure?</h3>
+        <p>If you exit now, your progress will be lost and you will receive a score of 0.</p>
+        <div class="exit-confirm-actions">
+          <button class="btn btn-outline" id="btn-cancel-exit">Resume</button>
+          <button class="btn btn-primary" style="background: var(--error);" id="btn-confirm-exit">Exit Quiz</button>
+        </div>
       </div>
     </div>
 

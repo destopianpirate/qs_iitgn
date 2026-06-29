@@ -1261,17 +1261,30 @@
 .active-quiz-container, .quiz-results-container {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--bg); /* Opaque background for full immersion */
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4);
+  /* Removed padding so modal touches edges */
 }
 
-.active-quiz-modal, .results-modal {
+.active-quiz-modal {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  background: var(--bg);
+  border-radius: 0;
+  padding: var(--space-8) 10vw; /* Keep content centered but modal full width */
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 768px) {
+  .active-quiz-modal { padding: var(--space-4); }
+}
+
+.results-modal {
   width: 100%;
   max-width: 800px;
   background: var(--bg);
@@ -1443,4 +1456,46 @@
 .stat-label {
   font-size: var(--fs-sm);
   color: var(--text-tertiary);
+}
+
+/* Exit Confirmation Modal */
+.exit-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.exit-confirm-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.exit-confirm-modal {
+  background: var(--bg-alt);
+  border: 1px solid var(--glass-border);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  max-width: 400px;
+  box-shadow: var(--shadow-xl);
+}
+.exit-confirm-modal h3 {
+  color: var(--error);
+  font-size: var(--fs-xl);
+  margin-bottom: var(--space-4);
+}
+.exit-confirm-modal p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+.exit-confirm-actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
 }

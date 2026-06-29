@@ -331,15 +331,18 @@
     document.getElementById('active-quiz-container').style.display = 'flex';
     document.getElementById('active-quiz-title').textContent = quizData.name;
     
-    // Navigation bindings
+    // Navigation and Exit bindings
     const nextBtn = document.getElementById('btn-quiz-next');
     const prevBtn = document.getElementById('btn-quiz-prev');
+    const exitBtn = document.getElementById('btn-quiz-exit');
     
     // Clear old listeners
     const newNext = nextBtn.cloneNode(true);
     const newPrev = prevBtn.cloneNode(true);
+    const newExit = exitBtn.cloneNode(true);
     nextBtn.parentNode.replaceChild(newNext, nextBtn);
     prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+    exitBtn.parentNode.replaceChild(newExit, exitBtn);
 
     newNext.addEventListener('click', () => {
       // Save answer
@@ -359,6 +362,32 @@
         activeQuizState.currentIndex--;
         renderActiveQuestion();
       }
+    });
+
+    // Exit logic
+    const confirmOverlay = document.getElementById('exit-confirm-overlay');
+    const btnCancelExit = document.getElementById('btn-cancel-exit');
+    const btnConfirmExit = document.getElementById('btn-confirm-exit');
+
+    newExit.addEventListener('click', () => {
+      confirmOverlay.classList.add('active');
+    });
+
+    // Need to use one-time event listeners for the modal buttons or clone them too
+    const newCancel = btnCancelExit.cloneNode(true);
+    const newConfirm = btnConfirmExit.cloneNode(true);
+    btnCancelExit.parentNode.replaceChild(newCancel, btnCancelExit);
+    btnConfirmExit.parentNode.replaceChild(newConfirm, btnConfirmExit);
+
+    newCancel.addEventListener('click', () => {
+      confirmOverlay.classList.remove('active');
+    });
+
+    newConfirm.addEventListener('click', () => {
+      confirmOverlay.classList.remove('active');
+      clearInterval(timerInterval);
+      document.getElementById('active-quiz-container').style.display = 'none';
+      document.getElementById('mode-choices').style.display = 'flex';
     });
 
     renderActiveQuestion();
@@ -384,7 +413,7 @@
     const state = activeQuizState;
     const q = state.data.questions[state.currentIndex];
     
-    document.getElementById('active-quiz-progress').textContent = \`Question \${state.currentIndex + 1} of \${state.data.questions.length}\`;
+    document.getElementById('active-quiz-progress').textContent = `Question ${state.currentIndex + 1} of ${state.data.questions.length}`;
     document.getElementById('active-question-text').textContent = q.q;
     
     const optionsContainer = document.getElementById('active-options-container');
@@ -398,7 +427,7 @@
         const btn = document.createElement('button');
         btn.className = 'quiz-option-btn' + (savedAns === opt ? ' selected' : '');
         btn.dataset.value = opt;
-        btn.innerHTML = \`<span class="option-label">\${letter}</span> \${opt}\`;
+        btn.innerHTML = `<span class="option-label">${letter}</span> ${opt}`;
         
         btn.onclick = () => {
           document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
@@ -452,7 +481,7 @@
       
       const m = Math.floor(r / 60).toString().padStart(2, '0');
       const s = (r % 60).toString().padStart(2, '0');
-      textEl.textContent = \`\${m}:\${s}\`;
+      textEl.textContent = `${m}:${s}`;
       
       if (r <= 30) {
         timerEl.classList.add('warning');
@@ -482,8 +511,8 @@
     const s = (timeTaken % 60).toString().padStart(2, '0');
 
     document.getElementById('quiz-results-container').style.display = 'flex';
-    document.getElementById('results-score').textContent = \`\${correct}/\${questions.length}\`;
-    document.getElementById('results-time').textContent = \`\${m}:\${s}\`;
+    document.getElementById('results-score').textContent = `${correct}/${questions.length}`;
+    document.getElementById('results-time').textContent = `${m}:${s}`;
     document.getElementById('results-accuracy').textContent = Math.round((correct / questions.length) * 100) + '%';
     
     document.getElementById('btn-return-arena').onclick = () => {

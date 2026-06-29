@@ -3,18 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About | Quizzing Society IITGN</title>
+  <title>Home | Quizzing Society IITGN</title>
+  <meta name="description" content="The Quizzing Society of IIT Gandhinagar — where curiosity meets competition. Join us for weekly quizzes, workshops, and national quiz circuit participation.">
+  <meta name="keywords" content="Quizzing Society, IIT Gandhinagar, IITGN, Quiz Club, Trivia, College Quiz">
+  <meta name="author" content="Quizzing Society, IIT Gandhinagar">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Quizzing Society | IIT Gandhinagar">
+  <meta property="og:description" content="Where curiosity meets competition. The official Quizzing Society of IIT Gandhinagar.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content=".png">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href=".png">
+
+  <!-- Google Sans (via Product Sans fallback) + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/sections.css">
 </head>
-<body class="subpage">
+
+<body>
+
+  <!-- ════════════════════════════════════════
+       PAGE LOADER — Orbiting question marks
+       ════════════════════════════════════════ -->
+  <div class="page-loader" id="page-loader">
+    <div class="loader-content">
+      <div class="loader-orbit">
+        <div class="loader-ring-2" aria-hidden="true"></div>
+        <div class="loader-ring" aria-hidden="true"></div>
+        <img src=".png" alt="Loading..." class="loader-logo">
+      </div>
+      <p class="loader-text">Preparing the Arena</p>
+      <div class="loader-progress"><div class="loader-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Skip Nav -->
+  <a href="#hero" class="skip-nav">Skip to main content</a>
 
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
@@ -50,8 +84,86 @@
     </div>
   </nav>
 
-  <main style="padding-top: var(--navbar-height);">
-    <!-- ABOUT SECTION -->
+  <!-- ════════════════════════════════════════
+       SECTION 1 — HERO
+       ════════════════════════════════════════ -->
+  <main>
+    <section class="hero" id="hero" aria-label="Hero">
+      <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+      <div class="hero-content">
+        <div class="hero-logos">
+          <img src=".png" alt="Quizzing Society Logo" class="hero-logo">
+          <div class="hero-logo-divider" aria-hidden="true"></div>
+          <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="hero-iitgn-logo">
+        </div>
+
+        <h1 class="hero-title">
+          <span class="hero-typewriter" id="typewriter">What do you know?</span>
+        </h1>
+
+        <p class="hero-subtitle">Quizzing Society &mdash; IIT Gandhinagar</p>
+
+        <div class="hero-cta-group">
+          <button class="buzzer-btn" id="buzzer-btn" aria-label="Press the buzzer for a random trivia fact">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>BUZZ</span>
+          </button>
+          <a href="home.html" class="btn btn-secondary btn-lg">Explore</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Buzzer Fact Popup -->
+    <div class="buzzer-fact-overlay" id="buzzer-overlay" aria-hidden="true"></div>
+    <div class="buzzer-fact" id="buzzer-fact" role="dialog" aria-label="Random trivia fact">
+      <p class="buzzer-fact-label">Random Trivia</p>
+      <p class="buzzer-fact-text" id="buzzer-fact-text"></p>
+      <button class="buzzer-fact-close" id="buzzer-close">Press anywhere or ESC to close</button>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         TRIVIA TICKER
+         ════════════════════════════════════════ -->
+    <div class="ticker" id="ticker" aria-label="Trivia facts ticker">
+      <div class="ticker-track">
+        <span class="ticker-item">The first quiz show aired on BBC Radio in 1938</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The word 'quiz' was allegedly coined as a bet in Dublin, 1791</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">India's first organized quiz competition was held in 1967</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">University Challenge is the longest-running quiz show in the UK</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Siddhartha Basu is known as the father of Indian televised quizzing</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The Tata Crucible is India's largest business quiz</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Jeopardy! has been on air since 1964</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">KBC has aired over 700 episodes since 2000</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <!-- Duplicate for seamless loop -->
+        <span class="ticker-item">The first quiz show aired on BBC Radio in 1938</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The word 'quiz' was allegedly coined as a bet in Dublin, 1791</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">India's first organized quiz competition was held in 1967</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">University Challenge is the longest-running quiz show in the UK</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Siddhartha Basu is known as the father of Indian televised quizzing</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The Tata Crucible is India's largest business quiz</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Jeopardy! has been on air since 1964</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">KBC has aired over 700 episodes since 2000</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+      </div>
+    </div>
+  
+<!-- ABOUT SECTION -->
     <section class="section" id="about" aria-label="About us">
       <div class="container">
         <div class="section-decoration decoration-question" style="top: -40px; right: -60px;" aria-hidden="true">?</div>
@@ -112,6 +224,9 @@
     </section>
   </main>
 
+  <!-- ════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════ -->
           <footer class="footer" id="footer" role="contentinfo">
     <div class="container">
       <div class="footer-inner" style="grid-template-columns: 1.5fr 1fr 1.5fr;">
@@ -157,8 +272,14 @@
     </div>
   </footer>
 
+  <!-- ════════════════════════════════════════
+       SCRIPTS
+       ════════════════════════════════════════ -->
+  <script src="js/particles.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="js/scroll.js"></script>
+  <script src="js/buzzer.js"></script>
   <script src="js/main.js"></script>
+
 </body>
 </html>

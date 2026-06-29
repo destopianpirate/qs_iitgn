@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team | Quizzing Society IITGN</title>
+  <link rel="icon" type="image/png" href=".png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+</head>
+<body class="subpage">
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo" aria-label="Quizzing Society Home">
+        <img src=".png" alt="QS" width="32" height="32">
+        <span>QS IITGN</span>
+      </a>
+
+      <div class="pill-nav">
+        <div class="pill-nav-items">
+          <ul class="pill-list" role="menubar">
+            <li role="none"><a href="index.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Home</span><span class="pill-label-hover">Home</span></span></a></li>
+            <li role="none"><a href="events.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Events</span><span class="pill-label-hover">Events</span></span></a></li>
+            <li role="none"><a href="quiz.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Quiz</span><span class="pill-label-hover">Quiz</span></span></a></li>
+            <li role="none"><a href="team.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Team</span><span class="pill-label-hover">Team</span></span></a></li>
+            <li role="none"><a href="resources.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Resources</span><span class="pill-label-hover">Resources</span></span></a></li>
+            <li role="none"><a href="join.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Join</span><span class="pill-label-hover">Join</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="padding-top: var(--navbar-height);">
+    <!-- TEAM SECTION -->
+    <section class="section section-alt" id="team" aria-label="Our Team">
+      <div class="container">
+        <div class="section-decoration decoration-question" style="bottom: -20px; left: -40px;" aria-hidden="true">?</div>
+
+        <div class="section-header" data-scroll="fade-up">
+          <p class="section-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            The Squad
+          </p>
+          <h2 class="section-title">Meet the Team</h2>
+          <p class="section-subtitle">The minds behind the operation. Hover for a peek, click for the full story.</p>
+        </div>
+
+        <div class="team-grid" data-stagger="120">
+          <!-- Member 1 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Coordinator</h4>
+                <p class="team-role">Head Quizmaster</p>
+                <p class="team-quote">"Every great answer begins with an even better question."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Head Quizmaster</p>
+                <h4>The Visionary</h4>
+                <p class="team-quote">Leads the society's strategy, curates flagship events, and represents IITGN at national quiz circuits. The person who turns raw trivia into unforgettable experiences.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member 2 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Co-Coordinator</h4>
+                <p class="team-role">Deputy Quizmaster</p>
+                <p class="team-quote">"The best quiz is one where everyone learns something new."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Deputy Quizmaster</p>
+                <h4>The Strategist</h4>
+                <p class="team-quote">Manages day-to-day operations, mentors new members, and ensures every quiz night runs like clockwork. The glue that holds the team together.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member 3 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Events Head</h4>
+                <p class="team-role">Arena Architect</p>
+                <p class="team-quote">"A quiz is only as good as the atmosphere you create for it."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Arena Architect</p>
+                <h4>The Producer</h4>
+                <p class="team-quote">Designs, plans, and executes all events from intimate quiz nights to large-scale inter-college competitions. Masters logistics so others can focus on the questions.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member 4 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Content Head</h4>
+                <p class="team-role">Question Crafter</p>
+                <p class="team-quote">"A well-researched question can spark a lifelong fascination."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Question Crafter</p>
+                <h4>The Scholar</h4>
+                <p class="team-quote">Researches, writes, and curates questions across all domains. Maintains the quality bar that makes our quizzes stand out. Encyclopedic knowledge meets creative framing.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member 5 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Design Head</h4>
+                <p class="team-role">Visual Storyteller</p>
+                <p class="team-quote">"Good design makes a quiz look as smart as it feels."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Visual Storyteller</p>
+                <h4>The Artist</h4>
+                <p class="team-quote">Creates all visual material -- posters, social media content, presentation decks, and this website. Ensures our brand identity is sharp and recognizable.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member 6 -->
+          <div class="team-card stagger-child">
+            <div class="team-card-inner">
+              <div class="team-card-front">
+                <div class="team-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h4>Outreach Head</h4>
+                <p class="team-role">Community Builder</p>
+                <p class="team-quote">"The more people who quiz, the richer the experience for everyone."</p>
+                <span class="team-card-flip-hint">Click to flip</span>
+              </div>
+              <div class="team-card-back">
+                <p class="team-role">Community Builder</p>
+                <h4>The Connector</h4>
+                <p class="team-quote">Manages social media, partnerships with other clubs and colleges, sponsorship outreach, and member recruitment. The voice of the society to the outside world.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+      <footer class="footer" id="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logos">
+            <img src=".png" alt="Quizzing Society Logo" height="48">
+            <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="footer-iitgn-logo" height="44">
+          </div>
+          <p>The Quizzing Society of IIT Gandhinagar. Where curiosity meets competition, and every question is a doorway to a new world.</p>
+        </div>
+
+        <div class="footer-nav">
+          <h5>Navigate</h5>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="quiz.html">Daily Quiz</a></li>
+            <li><a href="team.html">Team</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h5>Connect</h5>
+          <ul>
+            <li><a href="https://www.instagram.com/quizz_iitgn/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a></li>
+            <li><a href="https://www.linkedin.com/company/quizzing-society-iit-gandhinagar/about/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn</a></li>
+            <li><a href="mailto:quiz.society@iitgn.ac.in" class="footer-email-link" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-email"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email Us</a></li>
+          </ul>
+          
+          <h5 style="margin-top: 1.5rem;">Join the Society</h5>
+          <ul>
+            <li><a href="join.html">Become a Member</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">&copy; <span id="footer-year">2026</span> Quizzing Society, IIT Gandhinagar. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="js/scroll.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

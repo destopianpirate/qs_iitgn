@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join | Quizzing Society IITGN</title>
+  <link rel="icon" type="image/png" href=".png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+</head>
+<body class="subpage">
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo" aria-label="Quizzing Society Home">
+        <img src=".png" alt="QS" width="32" height="32">
+        <span>QS IITGN</span>
+      </a>
+
+      <div class="pill-nav">
+        <div class="pill-nav-items">
+          <ul class="pill-list" role="menubar">
+            <li role="none"><a href="index.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Home</span><span class="pill-label-hover">Home</span></span></a></li>
+            <li role="none"><a href="events.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Events</span><span class="pill-label-hover">Events</span></span></a></li>
+            <li role="none"><a href="quiz.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Quiz</span><span class="pill-label-hover">Quiz</span></span></a></li>
+            <li role="none"><a href="team.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Team</span><span class="pill-label-hover">Team</span></span></a></li>
+            <li role="none"><a href="resources.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Resources</span><span class="pill-label-hover">Resources</span></span></a></li>
+            <li role="none"><a href="join.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Join</span><span class="pill-label-hover">Join</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="padding-top: var(--navbar-height);">
+    <!-- JOIN SECTION -->
+    <section class="section join-section" id="join" aria-label="Join us">
+      <div class="container">
+        <div data-scroll="fade-up">
+          <h2 class="join-question">Think you have what it takes?</h2>
+          <p class="join-subtitle">Prove it. Answer this question and see if you belong.</p>
+        </div>
+
+        <!-- Mini Quiz -->
+        <div class="mini-quiz" data-scroll="scale-up">
+          <p class="mini-quiz-question">In which year was IIT Gandhinagar established?</p>
+          <div class="mini-quiz-options">
+            <button class="mini-quiz-option" data-correct="false">
+              <span class="mini-quiz-option-letter">A.</span>
+              <span>2004</span>
+            </button>
+            <button class="mini-quiz-option" data-correct="true">
+              <span class="mini-quiz-option-letter">B.</span>
+              <span>2008</span>
+            </button>
+            <button class="mini-quiz-option" data-correct="false">
+              <span class="mini-quiz-option-letter">C.</span>
+              <span>2010</span>
+            </button>
+            <button class="mini-quiz-option" data-correct="false">
+              <span class="mini-quiz-option-letter">D.</span>
+              <span>2006</span>
+            </button>
+          </div>
+          <p class="mini-quiz-result" id="mini-quiz-result"></p>
+          <button id="show-join-form-btn" class="btn btn-primary" style="display: none; margin-top: var(--space-4); margin-left: auto; margin-right: auto;">Join the Team, Fill the Form</button>
+        </div>
+
+        <!-- Join Form (Hidden initially) -->
+        <div class="join-form-wrapper" id="join-form-wrapper" style="display: none; margin-top: var(--space-8); max-width: 600px; margin-left: auto; margin-right: auto;" data-scroll="fade-up">
+          <h3 class="section-title" style="font-size: var(--fs-xl); text-align: center; margin-bottom: var(--space-6);">Recruitment Form</h3>
+          <form id="recruitment-form" class="recruitment-form">
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label for="join-name" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">Name</label>
+              <input type="text" id="join-name" name="name" required placeholder="John Doe" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text);">
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label for="join-roll" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">Roll No.</label>
+              <input type="text" id="join-roll" name="roll_no" required placeholder="23110xxx" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text);">
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label for="join-email" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">College Email ID</label>
+              <input type="email" id="join-email" name="email" required placeholder="john.doe@iitgn.ac.in" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text);">
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+              <div class="form-group">
+                <label for="join-programme" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">Programme</label>
+                <select id="join-programme" name="programme" required style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text);">
+                  <option value="" disabled selected>Select...</option>
+                  <option value="BTech">BTech</option>
+                  <option value="MTech">MTech</option>
+                  <option value="MSc">MSc</option>
+                  <option value="BSc">BSc</option>
+                  <option value="PhD">PhD</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="join-year" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">Joining Year</label>
+                <select id="join-year" name="joining_year" required style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text);">
+                  <option value="" disabled selected>Select...</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label for="join-reason" style="display: block; margin-bottom: var(--space-2); font-weight: 500;">Why do you want to join?</label>
+              <textarea id="join-reason" name="reason" required placeholder="Tell us about your quizzing interests..." rows="4" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-alt); color: var(--text); resize: vertical;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Application</button>
+            <p id="form-success-msg" style="display: none; color: var(--primary); text-align: center; margin-top: var(--space-4); font-weight: 500;">Application submitted successfully! We will contact you soon.</p>
+          </form>
+        </div>
+
+        <div data-scroll="fade-up" data-scroll-delay="200">
+          <p class="join-subtitle" style="margin-bottom: var(--space-6);">Ready to join the quest? Reach out to us through any of these channels.</p>
+
+          <div class="join-channels">
+            <a href="https://www.instagram.com/quizz_iitgn/" target="_blank" rel="noopener noreferrer" class="join-channel" aria-label="Follow us on Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              <div>
+                <span>Instagram</span>
+                <span class="join-channel-label">@quizz_iitgn</span>
+              </div>
+            </a>
+
+            <a href="https://www.linkedin.com/company/quizzing-society-iit-gandhinagar/about/" target="_blank" rel="noopener noreferrer" class="join-channel" aria-label="Connect on LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <div>
+                <span>LinkedIn</span>
+                <span class="join-channel-label">Quizzing Society IITGN</span>
+              </div>
+            </a>
+
+            <a href="mailto:quiz.society@iitgn.ac.in" class="join-channel" aria-label="Email us">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <div>
+                <span>Email</span>
+                <span class="join-channel-label">quiz.society@iitgn.ac.in</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+      <footer class="footer" id="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logos">
+            <img src=".png" alt="Quizzing Society Logo" height="48">
+            <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="footer-iitgn-logo" height="44">
+          </div>
+          <p>The Quizzing Society of IIT Gandhinagar. Where curiosity meets competition, and every question is a doorway to a new world.</p>
+        </div>
+
+        <div class="footer-nav">
+          <h5>Navigate</h5>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="quiz.html">Daily Quiz</a></li>
+            <li><a href="team.html">Team</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h5>Connect</h5>
+          <ul>
+            <li><a href="https://www.instagram.com/quizz_iitgn/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a></li>
+            <li><a href="https://www.linkedin.com/company/quizzing-society-iit-gandhinagar/about/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn</a></li>
+            <li><a href="mailto:quiz.society@iitgn.ac.in" class="footer-email-link" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-email"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email Us</a></li>
+          </ul>
+          
+          <h5 style="margin-top: 1.5rem;">Join the Society</h5>
+          <ul>
+            <li><a href="join.html">Become a Member</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">&copy; <span id="footer-year">2026</span> Quizzing Society, IIT Gandhinagar. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="js/scroll.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mini-quiz logic
+      const options = document.querySelectorAll('.mini-quiz-option');
+      const resultText = document.getElementById('mini-quiz-result');
+      const showFormBtn = document.getElementById('show-join-form-btn');
+      const formWrapper = document.getElementById('join-form-wrapper');
+      let answered = false;
+
+      options.forEach(opt => {
+        opt.addEventListener('click', function() {
+          if (answered) return;
+          answered = true;
+          
+          const isCorrect = this.getAttribute('data-correct') === 'true';
+          this.style.background = isCorrect ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+          this.style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+          
+          if (isCorrect) {
+            resultText.textContent = "Correct! You belong here.";
+            resultText.style.color = "var(--success)";
+            resultText.style.display = "block";
+            showFormBtn.style.display = "block";
+          } else {
+            resultText.textContent = "Not quite. But curiosity is what counts! The correct answer is 2008.";
+            resultText.style.color = "var(--error)";
+            resultText.style.display = "block";
+            // Still let them join
+            showFormBtn.style.display = "block";
+          }
+        });
+      });
+
+      // Show form logic
+      if(showFormBtn && formWrapper) {
+        showFormBtn.addEventListener('click', () => {
+          formWrapper.style.display = "block";
+          showFormBtn.style.display = "none";
+          formWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+
+      // Form submission
+      const joinForm = document.getElementById('recruitment-form');
+      if(joinForm) {
+        joinForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          // Log locally
+          const formData = new FormData(joinForm);
+          const data = Object.fromEntries(formData.entries());
+          console.log("Recruitment Form Submitted:", data);
+          
+          // Show success
+          Array.from(joinForm.children).forEach(child => {
+            if(child.id !== 'form-success-msg') {
+              child.style.display = 'none';
+            }
+          });
+          document.getElementById('form-success-msg').style.display = 'block';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

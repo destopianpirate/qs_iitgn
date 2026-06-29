@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizzing Society | IIT Gandhinagar</title>
+  <meta name="description" content="The Quizzing Society of IIT Gandhinagar — where curiosity meets competition. Join us for weekly quizzes, workshops, and national quiz circuit participation.">
+  <meta name="keywords" content="Quizzing Society, IIT Gandhinagar, IITGN, Quiz Club, Trivia, College Quiz">
+  <meta name="author" content="Quizzing Society, IIT Gandhinagar">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Quizzing Society | IIT Gandhinagar">
+  <meta property="og:description" content="Where curiosity meets competition. The official Quizzing Society of IIT Gandhinagar.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content=".png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href=".png">
+
+  <!-- Google Sans (via Product Sans fallback) + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════
+       PAGE LOADER — Orbiting question marks
+       ════════════════════════════════════════ -->
+  <div class="page-loader" id="page-loader">
+    <div class="loader-content">
+      <div class="loader-orbit">
+        <div class="loader-ring-2" aria-hidden="true"></div>
+        <div class="loader-ring" aria-hidden="true"></div>
+        <img src=".png" alt="Loading..." class="loader-logo">
+      </div>
+      <p class="loader-text">Preparing the Arena</p>
+      <div class="loader-progress"><div class="loader-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Skip Nav -->
+  <a href="#hero" class="skip-nav">Skip to main content</a>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo" aria-label="Quizzing Society Home">
+        <img src=".png" alt="QS" width="32" height="32">
+        <span>QS IITGN</span>
+      </a>
+
+      <div class="pill-nav">
+        <div class="pill-nav-items">
+          <ul class="pill-list" role="menubar">
+            <li role="none"><a href="index.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Home</span><span class="pill-label-hover">Home</span></span></a></li>
+            <li role="none"><a href="events.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Events</span><span class="pill-label-hover">Events</span></span></a></li>
+            <li role="none"><a href="quiz.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Quiz</span><span class="pill-label-hover">Quiz</span></span></a></li>
+            <li role="none"><a href="team.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Team</span><span class="pill-label-hover">Team</span></span></a></li>
+            <li role="none"><a href="resources.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Resources</span><span class="pill-label-hover">Resources</span></span></a></li>
+            <li role="none"><a href="join.html" class="pill" role="menuitem"><span class="hover-circle"></span><span class="label-stack"><span class="pill-label">Join</span><span class="pill-label-hover">Join</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════
+       SECTION 1 — HERO
+       ════════════════════════════════════════ -->
+  <main>
+    <section class="hero" id="hero" aria-label="Hero">
+      <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+      <div class="hero-content">
+        <div class="hero-logos">
+          <img src=".png" alt="Quizzing Society Logo" class="hero-logo">
+          <div class="hero-logo-divider" aria-hidden="true"></div>
+          <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="hero-iitgn-logo">
+        </div>
+
+        <h1 class="hero-title">
+          <span class="hero-typewriter" id="typewriter">What do you know?</span>
+        </h1>
+
+        <p class="hero-subtitle">Quizzing Society &mdash; IIT Gandhinagar</p>
+
+        <div class="hero-cta-group">
+          <button class="buzzer-btn" id="buzzer-btn" aria-label="Press the buzzer for a random trivia fact">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>BUZZ</span>
+          </button>
+          <a href="about.html" class="btn btn-secondary btn-lg">Explore</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Buzzer Fact Popup -->
+    <div class="buzzer-fact-overlay" id="buzzer-overlay" aria-hidden="true"></div>
+    <div class="buzzer-fact" id="buzzer-fact" role="dialog" aria-label="Random trivia fact">
+      <p class="buzzer-fact-label">Random Trivia</p>
+      <p class="buzzer-fact-text" id="buzzer-fact-text"></p>
+      <button class="buzzer-fact-close" id="buzzer-close">Press anywhere or ESC to close</button>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         TRIVIA TICKER
+         ════════════════════════════════════════ -->
+    <div class="ticker" id="ticker" aria-label="Trivia facts ticker">
+      <div class="ticker-track">
+        <span class="ticker-item">The first quiz show aired on BBC Radio in 1938</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The word 'quiz' was allegedly coined as a bet in Dublin, 1791</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">India's first organized quiz competition was held in 1967</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">University Challenge is the longest-running quiz show in the UK</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Siddhartha Basu is known as the father of Indian televised quizzing</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The Tata Crucible is India's largest business quiz</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Jeopardy! has been on air since 1964</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">KBC has aired over 700 episodes since 2000</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <!-- Duplicate for seamless loop -->
+        <span class="ticker-item">The first quiz show aired on BBC Radio in 1938</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The word 'quiz' was allegedly coined as a bet in Dublin, 1791</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">India's first organized quiz competition was held in 1967</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">University Challenge is the longest-running quiz show in the UK</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Siddhartha Basu is known as the father of Indian televised quizzing</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">The Tata Crucible is India's largest business quiz</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">Jeopardy! has been on air since 1964</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+        <span class="ticker-item">KBC has aired over 700 episodes since 2000</span>
+        <span class="ticker-dot" aria-hidden="true"></span>
+      </div>
+    </div>
+  
+<!-- ABOUT SECTION -->
+    <section class="section" id="about" aria-label="About us">
+      <div class="container">
+        <div class="section-decoration decoration-question" style="top: -40px; right: -60px;" aria-hidden="true">?</div>
+
+        <div class="section-header" data-scroll="fade-up">
+          <p class="section-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/></svg>
+            About Us
+          </p>
+          <h2 class="section-title">Where Curiosity Meets Competition</h2>
+          <p class="section-subtitle">We are the Quizzing Society of IIT Gandhinagar &mdash; a community of relentlessly curious minds who believe that every question is a doorway to a new world.</p>
+        </div>
+
+        <div class="about-content">
+          <div class="about-visual" data-scroll="fade-right">
+            <div class="about-logo-wrapper">
+              <div class="about-logo-ring" aria-hidden="true"></div>
+              <div class="about-logo-ring-2" aria-hidden="true"></div>
+              <img src=".png" alt="Quizzing Society Emblem">
+            </div>
+          </div>
+
+          <div class="about-text" data-scroll="fade-left">
+            <h3>More Than Just Questions</h3>
+            <p>
+              Born from a shared love of trivia and intellectual sparring, the Quizzing Society has grown into one of the most vibrant communities at IITGN. We don't just ask questions &mdash; we cultivate a culture of curiosity that spans every discipline, from astrophysics to Bollywood, from ancient history to cutting-edge technology.
+            </p>
+            <p>
+              Our weekly quiz nights, themed events, and competitive circuit participation have forged a space where knowledge is celebrated, debate is encouraged, and every "I didn't know that!" moment is a small victory.
+            </p>
+            <p>
+              Whether you're a seasoned quizzer who has competed on the national stage or someone who just enjoys a good trivia round with friends &mdash; there's a seat for you at our table.
+            </p>
+          </div>
+        </div>
+
+        <div class="stats-grid" data-stagger="150">
+          <div class="stat-card stagger-child">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-number" data-count="20" data-count-suffix="+">0</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+          <div class="stat-card stagger-child">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="stat-number" data-count="15" data-count-suffix="+">0</div>
+            <div class="stat-label">Events / Year</div>
+          </div>
+          <div class="stat-card stagger-child">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="stat-number" data-count="5000" data-count-suffix="+">0</div>
+            <div class="stat-label">Questions Asked</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════ -->
+      <footer class="footer" id="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logos">
+            <img src=".png" alt="Quizzing Society Logo" height="48">
+            <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="footer-iitgn-logo" height="44">
+          </div>
+          <p>The Quizzing Society of IIT Gandhinagar. Where curiosity meets competition, and every question is a doorway to a new world.</p>
+        </div>
+
+        <div class="footer-nav">
+          <h5>Navigate</h5>
+          <ul>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="quiz.html">Daily Quiz</a></li>
+            <li><a href="team.html">Team</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h5>Connect</h5>
+          <ul>
+            <li><a href="https://www.instagram.com/quizz_iitgn/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a></li>
+            <li><a href="https://www.linkedin.com/company/quizzing-society-iit-gandhinagar/about/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn</a></li>
+            <li><a href="mailto:quiz.society@iitgn.ac.in" class="footer-email-link" style="display:flex;align-items:center;gap:6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-email"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email Us</a></li>
+          </ul>
+          
+          <h5 style="margin-top: 1.5rem;">Join the Society</h5>
+          <ul>
+            <li><a href="join.html">Become a Member</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">&copy; <span id="footer-year">2026</span> Quizzing Society, IIT Gandhinagar. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ════════════════════════════════════════
+       SCRIPTS
+       ════════════════════════════════════════ -->
+  <script src="js/particles.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="js/scroll.js"></script>
+  <script src="js/buzzer.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

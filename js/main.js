@@ -32,12 +32,12 @@
     const loader = document.getElementById('page-loader');
     if (!loader) return;
     
-    if (sessionStorage.getItem('loaderShown')) {
+    if (localStorage.getItem('loaderShown')) {
       loader.style.display = 'none';
     } else {
       setTimeout(() => {
         loader.classList.add('is-hidden');
-        sessionStorage.setItem('loaderShown', 'true');
+        localStorage.setItem('loaderShown', 'true');
         setTimeout(() => { loader.style.display = 'none'; }, 800);
       }, 1500);
     }

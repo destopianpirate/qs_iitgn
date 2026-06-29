@@ -199,7 +199,7 @@
   --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.06);
 
   /* Footer */
-  --footer-bg:     linear-gradient(180deg, var(--slate-900) 0%, #0a0f1c 100%);
+  --footer-bg:     linear-gradient(180deg, var(--slate-800) 0%, var(--slate-900) 100%);
   --footer-text:   var(--slate-300);
   --footer-heading: #FFFFFF;
   --footer-link:   var(--slate-400);
@@ -264,7 +264,7 @@
   --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* Footer */
-  --footer-bg:     linear-gradient(180deg, var(--navy-800) 0%, #050a14 100%);
+  --footer-bg:     linear-gradient(180deg, var(--slate-800) 0%, var(--slate-900) 100%);
   --footer-text:   var(--slate-400);
   --footer-heading: var(--slate-100);
   --footer-link:   var(--slate-500);

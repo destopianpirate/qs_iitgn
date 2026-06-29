@@ -125,11 +125,8 @@
     if (!el) return;
 
     const phrases = [
-      'What do you know?',
-      'Curiosity starts here.',
-      'Question everything.',
-      'Think. Buzz. Win.',
-      'Knowledge has no limits.'
+      'Where curiosity meets competition.',
+      'Test your wits. Challenge your mind.'
     ];
 
     let phraseIndex = 0;

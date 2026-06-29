@@ -182,7 +182,8 @@ ul, ol {
 
 .section-title {
   margin-bottom: var(--space-4);
-  font-size: clamp(4rem, 12vw, 8rem) !important; /* Made extremely large as requested */
+  font-size: clamp(3rem, 10vw, 6rem) !important;
+  font-weight: 800 !important;
   font-family: 'Google Sans', 'Product Sans', sans-serif !important;
   line-height: 1.1;
   letter-spacing: -0.02em;

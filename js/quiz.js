@@ -201,13 +201,16 @@
 
     btnTourneyJoin.addEventListener('click', () => {
       const code = tourneyInput.value.trim();
+      
+      // Allow any 5+ char code to launch the mock tournament
       if (code.length < 5) {
         tourneyError.style.display = 'block';
         return;
       }
+      
       tourneyError.style.display = 'none';
       overlay.classList.remove('active');
-      startCountdown();
+      startCountdown('tournament_1');
     });
 
     // Practice Flow
@@ -223,40 +226,80 @@
     });
   }
 
+  // ────────────────────────────────────────────
+  // ACTIVE QUIZ INTERFACE LOGIC
+  // ────────────────────────────────────────────
+  
+  const MOCK_QUIZZES = {
+    "practice_1": {
+      name: "Science Trivia Weekly",
+      timeLimit: 300, // 5 minutes in seconds
+      questions: [
+        { type: "mcq", q: "Which planet has the most moons?", options: ["Jupiter", "Saturn", "Uranus", "Neptune"], ans: "Saturn" },
+        { type: "mcq", q: "What is the speed of light in km/s?", options: ["299,792", "150,000", "300,000", "199,792"], ans: "299,792" },
+        { type: "integer", q: "How many bones are in the adult human body?", ans: "206" },
+        { type: "mcq", q: "What is the most abundant gas in Earth's atmosphere?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], ans: "Nitrogen" },
+        { type: "integer", q: "What is the boiling point of water in Celsius?", ans: "100" }
+      ]
+    },
+    "practice_2": {
+      name: "History Buffs Challenge",
+      timeLimit: 600, // 10 minutes
+      questions: [
+        { type: "integer", q: "In what year did World War II end?", ans: "1945" },
+        { type: "mcq", q: "Who was the first President of India?", options: ["Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "B.R. Ambedkar"], ans: "Dr. Rajendra Prasad" },
+        { type: "mcq", q: "Which empire built Machu Picchu?", options: ["Aztec", "Maya", "Inca", "Olmec"], ans: "Inca" },
+        { type: "integer", q: "In what year did India gain independence?", ans: "1947" },
+        { type: "mcq", q: "Who discovered America in 1492?", options: ["Vasco da Gama", "Ferdinand Magellan", "Christopher Columbus", "Marco Polo"], ans: "Christopher Columbus" }
+      ]
+    },
+    "tournament_1": {
+      name: "The Grand IITGN Quiz",
+      timeLimit: 120, // 2 minutes for pressure
+      questions: [
+        { type: "mcq", q: "What is the capital of Mongolia?", options: ["Ulaanbaatar", "Astana", "Tashkent", "Bishkek"], ans: "Ulaanbaatar" },
+        { type: "mcq", q: "Which element has the symbol 'W'?", options: ["Tungsten", "Wolframite", "Water", "White Phosphorus"], ans: "Tungsten" },
+        { type: "integer", q: "How many bytes are in a kilobyte (traditional binary)?", ans: "1024" },
+        { type: "mcq", q: "Who wrote 'One Hundred Years of Solitude'?", options: ["Gabriel Garcia Marquez", "Mario Vargas Llosa", "Jorge Luis Borges", "Julio Cortazar"], ans: "Gabriel Garcia Marquez" },
+        { type: "integer", q: "What year was IIT Gandhinagar established?", ans: "2008" }
+      ]
+    }
+  };
+
+  let activeQuizState = null;
+  let timerInterval = null;
+
   function loadPracticeArena(grid) {
-    grid.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1;text-align:center;">Loading public arenas...</p>';
+    grid.innerHTML = '';
     
-    // Simulate network or fallback data since Firebase has dummy keys currently
-    setTimeout(() => {
-      const dummyQuizzes = [
-        { name: "Science Trivia Weekly", count: 10, time: 5, creator: "Admin" },
-        { name: "History Buffs Challenge", count: 15, time: 10, creator: "System" }
-      ];
-      
-      grid.innerHTML = dummyQuizzes.map(q => `
-        <div class="arena-card" onclick="window.QSQuiz.startPracticeMatch()">
-          <h4 style="margin-bottom:var(--space-2);color:var(--primary);">${q.name}</h4>
-          <p style="font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:var(--space-1);">⏱️ ${q.time} Minutes</p>
-          <p style="font-size:var(--fs-xs);color:var(--text-tertiary);">By ${q.creator} • ${q.count} Questions</p>
-        </div>
-      `).join('');
-    }, 500);
+    // Render only the practice quizzes
+    const quizzes = [
+      { id: "practice_1", data: MOCK_QUIZZES["practice_1"] },
+      { id: "practice_2", data: MOCK_QUIZZES["practice_2"] }
+    ];
+    
+    grid.innerHTML = quizzes.map(q => `
+      <div class="arena-card" onclick="window.QSQuiz.startPracticeMatch('${q.id}')">
+        <h4 style="margin-bottom:var(--space-2);color:var(--primary);">${q.data.name}</h4>
+        <p style="font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:var(--space-1);">⏱️ ${Math.round(q.data.timeLimit/60)} Minutes</p>
+        <p style="font-size:var(--fs-xs);color:var(--text-tertiary);">By System • ${q.data.questions.length} Questions</p>
+      </div>
+    `).join('');
   }
 
-  function startCountdown() {
+  function startCountdown(quizId) {
     const overlay = document.getElementById('countdown-overlay');
     const numEl = document.getElementById('countdown-number');
     if (!overlay || !numEl) return;
 
     overlay.classList.add('active');
-    let count = 5;
+    let count = 3; // Reduced to 3s for faster testing
     numEl.textContent = count;
 
     const interval = setInterval(() => {
       count--;
       if (count > 0) {
         numEl.textContent = count;
-        // Re-trigger animation
         numEl.style.animation = 'none';
         numEl.offsetHeight; // trigger reflow
         numEl.style.animation = null;
@@ -265,10 +308,187 @@
         numEl.textContent = "GO!";
         setTimeout(() => {
           overlay.classList.remove('active');
-          alert("Quiz Started! (Match logic to be implemented)");
-        }, 1000);
+          launchActiveQuiz(quizId);
+        }, 800);
       }
     }, 1000);
+  }
+
+  function launchActiveQuiz(quizId) {
+    const quizData = MOCK_QUIZZES[quizId];
+    if (!quizData) {
+      alert("Quiz not found!");
+      return;
+    }
+
+    activeQuizState = {
+      data: quizData,
+      currentIndex: 0,
+      userAnswers: new Array(quizData.questions.length).fill(null),
+      timeRemaining: quizData.timeLimit
+    };
+
+    document.getElementById('active-quiz-container').style.display = 'flex';
+    document.getElementById('active-quiz-title').textContent = quizData.name;
+    
+    // Navigation bindings
+    const nextBtn = document.getElementById('btn-quiz-next');
+    const prevBtn = document.getElementById('btn-quiz-prev');
+    
+    // Clear old listeners
+    const newNext = nextBtn.cloneNode(true);
+    const newPrev = prevBtn.cloneNode(true);
+    nextBtn.parentNode.replaceChild(newNext, nextBtn);
+    prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+
+    newNext.addEventListener('click', () => {
+      // Save answer
+      saveCurrentAnswer();
+      
+      if (activeQuizState.currentIndex < activeQuizState.data.questions.length - 1) {
+        activeQuizState.currentIndex++;
+        renderActiveQuestion();
+      } else {
+        submitQuiz();
+      }
+    });
+
+    newPrev.addEventListener('click', () => {
+      saveCurrentAnswer();
+      if (activeQuizState.currentIndex > 0) {
+        activeQuizState.currentIndex--;
+        renderActiveQuestion();
+      }
+    });
+
+    renderActiveQuestion();
+    startTimer();
+  }
+
+  function saveCurrentAnswer() {
+    const q = activeQuizState.data.questions[activeQuizState.currentIndex];
+    if (q.type === 'mcq') {
+      const selected = document.querySelector('.quiz-option-btn.selected');
+      if (selected) {
+        activeQuizState.userAnswers[activeQuizState.currentIndex] = selected.dataset.value;
+      }
+    } else if (q.type === 'integer') {
+      const input = document.getElementById('active-int-input');
+      if (input && input.value !== '') {
+        activeQuizState.userAnswers[activeQuizState.currentIndex] = input.value;
+      }
+    }
+  }
+
+  function renderActiveQuestion() {
+    const state = activeQuizState;
+    const q = state.data.questions[state.currentIndex];
+    
+    document.getElementById('active-quiz-progress').textContent = \`Question \${state.currentIndex + 1} of \${state.data.questions.length}\`;
+    document.getElementById('active-question-text').textContent = q.q;
+    
+    const optionsContainer = document.getElementById('active-options-container');
+    optionsContainer.innerHTML = '';
+
+    const savedAns = state.userAnswers[state.currentIndex];
+
+    if (q.type === 'mcq') {
+      q.options.forEach((opt, idx) => {
+        const letter = String.fromCharCode(65 + idx); // A, B, C, D
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn' + (savedAns === opt ? ' selected' : '');
+        btn.dataset.value = opt;
+        btn.innerHTML = \`<span class="option-label">\${letter}</span> \${opt}\`;
+        
+        btn.onclick = () => {
+          document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        };
+        optionsContainer.appendChild(btn);
+      });
+    } else if (q.type === 'integer') {
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'form-field';
+      input.id = 'active-int-input';
+      input.placeholder = 'Enter a number...';
+      input.style.fontSize = 'var(--fs-2xl)';
+      input.style.padding = 'var(--space-6)';
+      if (savedAns !== null) {
+        input.value = savedAns;
+      }
+      optionsContainer.appendChild(input);
+    }
+
+    // Update buttons
+    const nextBtn = document.getElementById('btn-quiz-next');
+    const prevBtn = document.getElementById('btn-quiz-prev');
+    
+    prevBtn.style.visibility = state.currentIndex === 0 ? 'hidden' : 'visible';
+    
+    if (state.currentIndex === state.data.questions.length - 1) {
+      nextBtn.textContent = 'Submit Quiz';
+      nextBtn.style.background = 'var(--success)';
+    } else {
+      nextBtn.textContent = 'Next Question';
+      nextBtn.style.background = 'var(--primary)';
+    }
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    const timerEl = document.getElementById('active-quiz-timer');
+    const textEl = document.getElementById('timer-text');
+    
+    timerInterval = setInterval(() => {
+      activeQuizState.timeRemaining--;
+      const r = activeQuizState.timeRemaining;
+      
+      if (r <= 0) {
+        clearInterval(timerInterval);
+        submitQuiz();
+        return;
+      }
+      
+      const m = Math.floor(r / 60).toString().padStart(2, '0');
+      const s = (r % 60).toString().padStart(2, '0');
+      textEl.textContent = \`\${m}:\${s}\`;
+      
+      if (r <= 30) {
+        timerEl.classList.add('warning');
+      } else {
+        timerEl.classList.remove('warning');
+      }
+    }, 1000);
+  }
+
+  function submitQuiz() {
+    clearInterval(timerInterval);
+    saveCurrentAnswer();
+    document.getElementById('active-quiz-container').style.display = 'none';
+    
+    // Calculate Score
+    let correct = 0;
+    const questions = activeQuizState.data.questions;
+    for (let i = 0; i < questions.length; i++) {
+      // Simple string match for mock purposes
+      if (activeQuizState.userAnswers[i] == questions[i].ans) {
+        correct++;
+      }
+    }
+
+    const timeTaken = activeQuizState.data.timeLimit - activeQuizState.timeRemaining;
+    const m = Math.floor(timeTaken / 60).toString().padStart(2, '0');
+    const s = (timeTaken % 60).toString().padStart(2, '0');
+
+    document.getElementById('quiz-results-container').style.display = 'flex';
+    document.getElementById('results-score').textContent = \`\${correct}/\${questions.length}\`;
+    document.getElementById('results-time').textContent = \`\${m}:\${s}\`;
+    document.getElementById('results-accuracy').textContent = Math.round((correct / questions.length) * 100) + '%';
+    
+    document.getElementById('btn-return-arena').onclick = () => {
+      document.getElementById('quiz-results-container').style.display = 'none';
+    };
   }
 
   if (document.readyState === 'loading') {
@@ -281,9 +501,9 @@
   window.QSQuiz = { 
     QUESTIONS, 
     getRandomQuestion: () => QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)],
-    startPracticeMatch: () => {
+    startPracticeMatch: (quizId) => {
       document.getElementById('quiz-mode-overlay').classList.remove('active');
-      startCountdown();
+      startCountdown(quizId);
     }
   };
 })();

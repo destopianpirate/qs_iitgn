@@ -143,6 +143,66 @@
       <div class="countdown-number" id="countdown-number">5</div>
     </div>
 
+    <!-- ACTIVE QUIZ INTERFACE -->
+    <div class="active-quiz-container" id="active-quiz-container" style="display: none;">
+      <div class="active-quiz-modal glass-card">
+        
+        <!-- Quiz Header -->
+        <div class="quiz-header">
+          <div class="quiz-header-info">
+            <h3 id="active-quiz-title">Quiz Title</h3>
+            <span class="quiz-progress" id="active-quiz-progress">Question 1 of 5</span>
+          </div>
+          <div class="quiz-timer" id="active-quiz-timer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="timer-text">05:00</span>
+          </div>
+        </div>
+
+        <!-- Question Body -->
+        <div class="active-question-body">
+          <p class="question-text" id="active-question-text">Loading question...</p>
+          
+          <div class="options-container" id="active-options-container">
+            <!-- Options or Integer input injected here -->
+          </div>
+        </div>
+
+        <!-- Quiz Footer -->
+        <div class="quiz-footer">
+          <button class="btn" id="btn-quiz-prev" style="visibility: hidden;">Previous</button>
+          <button class="btn btn-primary" id="btn-quiz-next">Next Question</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- QUIZ RESULTS SCREEN -->
+    <div class="quiz-results-container" id="quiz-results-container" style="display: none;">
+      <div class="results-modal glass-card">
+        <h2 style="font-size: var(--fs-3xl); margin-bottom: var(--space-2); color: var(--primary);">Quiz Complete!</h2>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-8);">Here is how you performed.</p>
+        
+        <div class="score-ring">
+          <div class="score-number" id="results-score">0/5</div>
+          <p class="score-label">Correct Answers</p>
+        </div>
+
+        <div class="results-stats">
+          <div class="result-stat">
+            <span class="stat-value" id="results-time">00:00</span>
+            <span class="stat-label">Time Taken</span>
+          </div>
+          <div class="result-stat">
+            <span class="stat-value" id="results-accuracy">0%</span>
+            <span class="stat-label">Accuracy</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width: 100%; justify-content: center; margin-top: var(--space-8);">Return to Arena</button>
+      </div>
+    </div>
+
     <!-- ADMIN SECTION -->
     <section class="section admin-section" id="admin-section">
       <div class="container">

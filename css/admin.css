@@ -131,13 +131,26 @@
 /* ── Admin Panel (post-login) ── */
 .admin-panel {
   display: none;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .admin-panel.active {
   display: block;
   animation: slide-in-up 0.4s var(--ease-out);
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
 }
 
 .admin-header {
@@ -372,6 +385,22 @@
   border: none;
 }
 .btn-delete:hover { background: var(--error); color: white; }
+
+.btn-action-arrow {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: none;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+.btn-action-arrow:hover {
+  background: var(--primary);
+  color: white;
+}
+.q-row:hover .btn-action-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
 
 /* ── Quiz Mode Builder ── */
 .quiz-mode-builder {

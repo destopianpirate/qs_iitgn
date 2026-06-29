@@ -22,7 +22,8 @@
   };
 
   let db = null;
-  if (typeof firebase !== 'undefined') {
+  let useLocalFallback = firebaseConfig.apiKey === "AIzaSyDemoKeyReplace";
+  if (typeof firebase !== 'undefined' && !useLocalFallback) {
     if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
     db = firebase.database();
   }
@@ -226,6 +227,39 @@
     }
   }
 
+  // Reorder questions
+  function moveQuestionUp(index) {
+    if (index > 0) {
+      const temp = questions[index];
+      questions[index] = questions[index - 1];
+      questions[index - 1] = temp;
+      saveOrderToFirebase();
+      renderQuestions();
+    }
+  }
+
+  function moveQuestionDown(index) {
+    if (index < questions.length - 1) {
+      const temp = questions[index];
+      questions[index] = questions[index + 1];
+      questions[index + 1] = temp;
+      saveOrderToFirebase();
+      renderQuestions();
+    }
+  }
+
+  function saveOrderToFirebase() {
+    if (db && !useLocalFallback) {
+      // In a real prod setup, you'd update specific order fields
+      // but replacing the node works for small arrays
+      const updates = {};
+      questions.forEach((q) => {
+        updates[q.id] = q;
+      });
+      db.ref('quizQuestions').set(updates);
+    }
+  }
+
   // Load questions
   function loadQuestions() {
     if (db) {
@@ -246,18 +280,21 @@
     if (els.questionCount) els.questionCount.textContent = questions.length;
 
     if (questions.length === 0) {
-      els.questionsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">No questions yet. Add one above!</td></tr>';
+      els.questionsBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">No questions yet. Add one above!</td></tr>';
       return;
     }
 
-    els.questionsBody.innerHTML = questions.map(q => `
-      <tr>
+    els.questionsBody.innerHTML = questions.map((q, index) => `
+      <tr class="q-row">
+        <td style="font-weight: bold; color: var(--text-secondary);">#${index + 1}</td>
         <td><span class="q-type-badge ${q.type}">${q.type.toUpperCase()}</span></td>
-        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q.question}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q.question}</td>
         <td>${q.category || 'General'}</td>
         <td>${q.timer ? Math.floor(q.timer/60) + 'm ' + (q.timer%60) + 's' : '30s'}</td>
         <td>
           <div class="table-actions">
+            <button class="btn-action-arrow" onclick="window.QSAdmin.moveQuestionUp(${index})" title="Move Up">▲</button>
+            <button class="btn-action-arrow" onclick="window.QSAdmin.moveQuestionDown(${index})" title="Move Down">▼</button>
             <button class="btn-delete" onclick="window.QSAdmin.deleteQuestion('${q.id}')">Delete</button>
           </div>
         </td>
@@ -333,5 +370,5 @@
   }
 
   // Expose for table buttons
-  window.QSAdmin = { deleteQuestion };
+  window.QSAdmin = { deleteQuestion, moveQuestionUp, moveQuestionDown };
 })();

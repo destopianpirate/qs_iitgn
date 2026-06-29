@@ -133,8 +133,10 @@
             <button class="admin-logout-btn" id="admin-logout-btn">Logout</button>
           </div>
 
-          <!-- Add Question Card -->
-          <div class="admin-card">
+          <div class="dashboard-layout">
+            <div class="dashboard-left">
+              <!-- Add Question Card -->
+              <div class="admin-card">
             <h4>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
               Add New Question
@@ -230,7 +232,9 @@
               <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: var(--space-4);">Add Question</button>
             </form>
           </div>
+        </div> <!-- End Dashboard Left -->
 
+        <div class="dashboard-right">
           <!-- Existing Questions -->
           <div class="admin-card">
             <h4>
@@ -274,6 +278,9 @@
             <p style="font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: var(--space-4);">This will bundle all current questions into a timed quiz session.</p>
             <button type="button" class="btn btn-primary" id="create-quiz-btn" style="width: 100%; justify-content: center;">Create Quiz Mode</button>
           </div>
+        </div> <!-- End Dashboard Right -->
+
+          </div> <!-- End Dashboard Layout -->
         </div>
       </div>
     </section>

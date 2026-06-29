@@ -1,16 +1,18 @@
 /* ============================================================
    QUIZZING SOCIETY — DESIGN TOKENS
-   Brand color palette (from uploaded palette image) + Google Sans
+   Brand color palette + Google Sans + Premium Effects
    ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap');
 
 :root {
   /* ── Brand Blues (from palette image) ── */
-  --brand-bright:   #0E8FE0;   /* Top-left: bright blue */
-  --brand-deep:     #0047AB;   /* Top-center: deep navy blue */
-  --brand-ice:      #D6EAFF;   /* Top-right: ice blue / very light */
-  --brand-periwinkle:#A3C7F2;  /* Bottom-left: soft periwinkle */
-  --brand-sky:      #4CB5F5;   /* Bottom-center: sky blue */
-  --brand-cyan:     #00AEEF;   /* Bottom-right: vivid cyan */
+  --brand-bright:   #0E8FE0;
+  --brand-deep:     #0047AB;
+  --brand-ice:      #D6EAFF;
+  --brand-periwinkle:#A3C7F2;
+  --brand-sky:      #4CB5F5;
+  --brand-cyan:     #00AEEF;
 
   /* ── Extended Blue Spectrum ── */
   --blue-50:  #EAF4FF;
@@ -43,6 +45,16 @@
   --slate-700: #334155;
   --slate-800: #1E293B;
   --slate-900: #0F172A;
+
+  /* ── Status Colors ── */
+  --success:    #10B981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --error:      #EF4444;
+  --error-bg:   rgba(239, 68, 68, 0.1);
+  --warning:    #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --info:       #3B82F6;
+  --info-bg:    rgba(59, 130, 246, 0.1);
 
   /* ── Typography ── */
   --font-heading: 'Google Sans', 'Product Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -128,6 +140,18 @@
   --max-width-md:  768px;
   --max-width-lg:  1024px;
   --navbar-height: 64px;
+
+  /* ── Glassmorphism ── */
+  --glass-blur: 20px;
+  --glass-saturate: 1.8;
+
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-bright) 50%, var(--brand-cyan) 100%);
+  --gradient-accent:  linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-warm:    linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-mesh:    radial-gradient(at 40% 20%, var(--blue-100) 0px, transparent 50%),
+                      radial-gradient(at 80% 0%, var(--brand-ice) 0px, transparent 50%),
+                      radial-gradient(at 0% 50%, var(--blue-50) 0px, transparent 50%);
 }
 
 
@@ -160,6 +184,7 @@
   --shadow-lg:   0 8px 24px rgba(0,0,0,0.08);
   --shadow-xl:   0 16px 40px rgba(0,0,0,0.1);
   --shadow-glow: 0 0 24px rgba(14,143,224,0.2);
+  --shadow-neon: 0 0 40px rgba(14,143,224,0.3), 0 0 80px rgba(14,143,224,0.1);
 
   --particle-color:  rgba(0, 71, 171, 0.06);
   --ticker-bg:       var(--brand-deep);
@@ -167,6 +192,19 @@
 
   --hero-gradient:    linear-gradient(180deg, var(--blue-50) 0%, rgba(255,255,255,1) 100%);
   --section-divider:  var(--slate-100);
+
+  /* Glass */
+  --glass-bg:      rgba(255, 255, 255, 0.7);
+  --glass-border:  rgba(255, 255, 255, 0.5);
+  --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.06);
+
+  /* Footer */
+  --footer-bg:     linear-gradient(180deg, var(--slate-900) 0%, #0a0f1c 100%);
+  --footer-text:   var(--slate-300);
+  --footer-heading: #FFFFFF;
+  --footer-link:   var(--slate-400);
+  --footer-link-hover: var(--brand-sky);
+  --footer-border: rgba(255,255,255,0.08);
 
   /* Pill Nav tokens */
   --neo-bg:          rgba(255,255,255,0.95);
@@ -211,6 +249,7 @@
   --shadow-lg:   0 8px 24px rgba(0,0,0,0.4);
   --shadow-xl:   0 16px 40px rgba(0,0,0,0.5);
   --shadow-glow: 0 0 30px rgba(76,181,245,0.25);
+  --shadow-neon: 0 0 40px rgba(76,181,245,0.35), 0 0 80px rgba(76,181,245,0.15);
 
   --particle-color:  rgba(76, 181, 245, 0.08);
   --ticker-bg:       var(--navy-800);
@@ -218,6 +257,19 @@
 
   --hero-gradient:    linear-gradient(180deg, rgba(7,14,26,0.8) 0%, var(--navy-900) 100%);
   --section-divider:  var(--navy-600);
+
+  /* Glass */
+  --glass-bg:      rgba(17, 30, 54, 0.6);
+  --glass-border:  rgba(76, 181, 245, 0.15);
+  --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.3);
+
+  /* Footer */
+  --footer-bg:     linear-gradient(180deg, var(--navy-800) 0%, #050a14 100%);
+  --footer-text:   var(--slate-400);
+  --footer-heading: var(--slate-100);
+  --footer-link:   var(--slate-500);
+  --footer-link-hover: var(--brand-sky);
+  --footer-border: rgba(76,181,245,0.12);
 
   /* Pill Nav tokens */
   --neo-bg:          rgba(17,30,54,0.95);

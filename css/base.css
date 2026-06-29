@@ -1,6 +1,6 @@
 /* ============================================================
    QUIZZING SOCIETY — BASE STYLES
-   Reset, typography, global rules
+   Reset, typography, global rules, premium utilities
    ============================================================ */
 
 /* ── Reset ── */
@@ -182,7 +182,7 @@ ul, ol {
 
 .section-title {
   margin-bottom: var(--space-4);
-  font-size: clamp(3rem, 10vw, 6rem) !important;
+  font-size: clamp(2.5rem, 8vw, 5rem) !important;
   font-weight: 800 !important;
   font-family: 'Google Sans', 'Product Sans', sans-serif !important;
   line-height: 1.1;
@@ -260,7 +260,7 @@ ul, ol {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lighter) 100%);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -268,4 +268,123 @@ ul, ol {
 
 .mono {
   font-family: var(--font-mono);
+}
+
+/* ── Glass Card ── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* ── Gradient Text ── */
+.gradient-text {
+  background: var(--gradient-primary);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ── Glow Border Hover ── */
+.glow-border {
+  position: relative;
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.glow-border:hover {
+  box-shadow: var(--shadow-neon);
+}
+
+/* ── Premium Form Inputs ── */
+.form-field {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--text);
+  background: var(--bg-alt);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  outline: none;
+}
+
+.form-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(14, 143, 224, 0.12);
+}
+
+.form-field::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-field.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 4px var(--error-bg);
+}
+
+.form-label {
+  display: block;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-2);
+  color: var(--text);
+}
+
+.form-error {
+  font-size: var(--fs-xs);
+  color: var(--error);
+  margin-top: var(--space-1);
+  display: none;
+}
+
+.form-error.visible {
+  display: block;
+}
+
+/* ── Page Hero Banner (for subpages) ── */
+.page-hero-banner {
+  position: relative;
+  padding: var(--space-20) 0 var(--space-12);
+  text-align: center;
+  overflow: hidden;
+}
+
+.page-hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-mesh);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.page-hero-banner .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Decoration Elements ── */
+.section-decoration {
+  position: absolute;
+  font-size: 8rem;
+  font-weight: 900;
+  color: var(--primary);
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
 }

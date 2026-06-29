@@ -198,15 +198,25 @@
     }
   }
 
+  /* ── Back to Top ── */
+  function initBackToTop() {
+    const btn = document.getElementById('back-to-top');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   /* ── Initialize ── */
   function init() {
     initTheme();
     initMobileNav();
-      initPageLoader();
+    initPageLoader();
     initPillNavAnimation();
     initTypewriter();
     initLoader();
     initFooterYear();
+    initBackToTop();
   }
 
   if (document.readyState === 'loading') {

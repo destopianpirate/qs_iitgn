@@ -1,0 +1,415 @@
+/* ============================================================
+   QUIZZING SOCIETY — ADMIN PANEL STYLES
+   Login modal, dashboard, question CRUD, quiz mode builder
+   ============================================================ */
+
+/* ── Admin Section ── */
+.admin-section {
+  padding: var(--space-12) 0;
+  border-top: 2px solid var(--section-divider);
+}
+
+.admin-trigger {
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+.admin-trigger h3 {
+  font-size: var(--fs-xl);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.admin-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.admin-login-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.admin-login-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── Login Modal ── */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var(--z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.admin-modal-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.admin-modal {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-10);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+  transform: scale(0.9) translateY(20px);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.admin-modal-overlay.active .admin-modal {
+  transform: scale(1) translateY(0);
+}
+
+.admin-modal h3 {
+  text-align: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-2xl);
+}
+
+.admin-modal .modal-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-8);
+}
+
+.admin-modal .form-group {
+  margin-bottom: var(--space-4);
+}
+
+.admin-modal .login-error {
+  color: var(--error);
+  font-size: var(--fs-sm);
+  text-align: center;
+  margin-top: var(--space-3);
+  display: none;
+}
+
+.admin-modal .login-error.visible {
+  display: block;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* ── Admin Panel (post-login) ── */
+.admin-panel {
+  display: none;
+}
+
+.admin-panel.active {
+  display: block;
+  animation: slide-in-up 0.4s var(--ease-out);
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--section-divider);
+}
+
+.admin-header h3 {
+  font-size: var(--fs-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.admin-header .badge {
+  font-size: var(--fs-xs);
+  padding: var(--space-1) var(--space-3);
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: var(--radius-pill);
+  font-weight: var(--fw-semibold);
+}
+
+.admin-logout-btn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.admin-logout-btn:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* ── Add Question Form ── */
+.admin-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-card h4 {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-card h4 svg {
+  width: 22px;
+  height: 22px;
+  color: var(--primary);
+}
+
+/* ── Question Type Selector ── */
+.type-selector {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.type-btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  background: var(--bg-alt);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.type-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.type-btn.active {
+  background: var(--primary-surface);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(14, 143, 224, 0.1);
+}
+
+.type-btn .type-icon {
+  display: block;
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--space-1);
+}
+
+/* ── Timer Config ── */
+.timer-config {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.timer-config label {
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+
+.timer-config input {
+  width: 80px;
+}
+
+.timer-config span {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* ── MCQ Options ── */
+.option-inputs {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.option-row input[type="text"] {
+  flex: 1;
+}
+
+.option-row input[type="checkbox"],
+.option-row input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.option-row .option-letter {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  width: 24px;
+  text-align: center;
+}
+
+/* ── Questions Table ── */
+.questions-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 var(--space-2);
+}
+
+.questions-table th {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wide);
+  color: var(--text-tertiary);
+}
+
+.questions-table td {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-alt);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.questions-table tr td:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.questions-table tr td:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.questions-table .q-type-badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.q-type-badge.mcq { background: var(--info-bg); color: var(--info); }
+.q-type-badge.single { background: var(--warning-bg); color: var(--warning); }
+.q-type-badge.integer { background: var(--success-bg); color: var(--success); }
+
+.table-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.table-actions button {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.btn-edit {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+.btn-edit:hover { background: var(--info); color: white; }
+
+.btn-delete {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.btn-delete:hover { background: var(--error); color: white; }
+
+/* ── Quiz Mode Builder ── */
+.quiz-mode-builder {
+  margin-top: var(--space-8);
+}
+
+.quiz-mode-builder .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+/* ── Responsive Admin ── */
+@media (max-width: 768px) {
+  .admin-modal {
+    margin: var(--space-4);
+    padding: var(--space-6);
+  }
+
+  .type-selector {
+    flex-direction: column;
+  }
+
+  .questions-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .quiz-mode-builder .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-config {
+    flex-wrap: wrap;
+  }
+}

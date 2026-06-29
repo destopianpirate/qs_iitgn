@@ -182,6 +182,8 @@ ul, ol {
 
 .section-title {
   margin-bottom: var(--space-4);
+  font-size: calc(var(--fs-xxl) * 2);
+  font-family: 'Google Sans', var(--font-heading);
 }
 
 .section-subtitle {

@@ -36,16 +36,23 @@
   const els = {};
 
   function cacheDom() {
-    els.loginBtn = document.getElementById('admin-login-btn');
-    els.modalOverlay = document.getElementById('admin-modal-overlay');
-    els.modalClose = document.getElementById('admin-modal-close');
+    // New admin.html elements
+    els.loginOverlay = document.getElementById('admin-login-overlay');
     els.loginForm = document.getElementById('admin-login-form');
     els.loginError = document.getElementById('admin-login-error');
     els.usernameInput = document.getElementById('admin-username');
     els.passwordInput = document.getElementById('admin-password');
+    els.dashboard = document.getElementById('admin-dashboard');
+    els.logoutBtn = document.getElementById('admin-logout-btn');
+
+    // Legacy quiz.html elements (kept for backwards compatibility)
+    els.loginBtn = document.getElementById('admin-login-btn');
+    els.modalOverlay = document.getElementById('admin-modal-overlay');
+    els.modalClose = document.getElementById('admin-modal-close');
     els.panel = document.getElementById('admin-panel');
     els.trigger = document.getElementById('admin-trigger');
-    els.logoutBtn = document.getElementById('admin-logout-btn');
+
+    // Shared form elements
     els.addForm = document.getElementById('add-question-form');
     els.questionType = document.querySelectorAll('.type-btn');
     els.questionText = document.getElementById('aq-question');
@@ -64,17 +71,47 @@
 
   let currentType = 'mcq';
 
-  // Login
-  function openModal() {
-    if (!els.modalOverlay) return;
-    els.modalOverlay.classList.add('active');
-    setTimeout(() => els.usernameInput && els.usernameInput.focus(), 300);
+  // ── Login / Logout ──
+  function showLoginScreen() {
+    // New admin.html
+    if (els.loginOverlay) {
+      els.loginOverlay.classList.remove('hidden');
+    }
+    // Legacy quiz.html
+    if (els.modalOverlay) {
+      els.modalOverlay.classList.add('active');
+      setTimeout(() => els.usernameInput && els.usernameInput.focus(), 300);
+    }
   }
 
-  function closeModal() {
-    if (!els.modalOverlay) return;
-    els.modalOverlay.classList.remove('active');
+  function hideLoginScreen() {
+    if (els.loginOverlay) {
+      els.loginOverlay.classList.add('hidden');
+    }
+    if (els.modalOverlay) {
+      els.modalOverlay.classList.remove('active');
+    }
     if (els.loginError) els.loginError.classList.remove('visible');
+  }
+
+  function showDashboard() {
+    // New admin.html
+    if (els.dashboard) {
+      els.dashboard.classList.add('active');
+    }
+    // Legacy quiz.html
+    if (els.trigger) els.trigger.style.display = 'none';
+    if (els.panel) els.panel.classList.add('active');
+
+    loadQuestions();
+  }
+
+  function hideDashboard() {
+    if (els.dashboard) {
+      els.dashboard.classList.remove('active');
+    }
+    if (els.trigger) els.trigger.style.display = 'block';
+    if (els.panel) els.panel.classList.remove('active');
   }
 
   function handleLogin(e) {
@@ -85,40 +122,31 @@
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       sessionStorage.setItem('qs_admin', 'true');
       isLoggedIn = true;
-      closeModal();
-      showPanel();
+      hideLoginScreen();
+      showDashboard();
     } else {
-      els.loginError.classList.add('visible');
-      els.passwordInput.value = '';
-      els.passwordInput.focus();
+      if (els.loginError) els.loginError.classList.add('visible');
+      if (els.passwordInput) {
+        els.passwordInput.value = '';
+        els.passwordInput.focus();
+      }
     }
   }
 
   function handleLogout() {
     sessionStorage.removeItem('qs_admin');
     isLoggedIn = false;
-    hidePanel();
+    hideDashboard();
+    showLoginScreen();
   }
 
-  function showPanel() {
-    if (els.trigger) els.trigger.style.display = 'none';
-    if (els.panel) els.panel.classList.add('active');
-    loadQuestions();
-  }
-
-  function hidePanel() {
-    if (els.trigger) els.trigger.style.display = 'block';
-    if (els.panel) els.panel.classList.remove('active');
-  }
-
-  // Question type switching
+  // ── Question type switching ──
   function setQuestionType(type) {
     currentType = type;
     els.questionType.forEach(btn => {
       btn.classList.toggle('active', btn.dataset.type === type);
     });
 
-    // Show/hide fields
     const optC = els.optionsContainer;
     const intC = els.integerAnswer;
     if (!optC || !intC) return;
@@ -129,7 +157,6 @@
     } else {
       optC.style.display = 'block';
       intC.style.display = 'none';
-      // Update radio vs checkbox
       const inputs = optC.querySelectorAll('.correct-marker');
       inputs.forEach(inp => {
         inp.type = type === 'mcq' ? 'checkbox' : 'radio';
@@ -139,7 +166,7 @@
     }
   }
 
-  // Add question
+  // ── Add question ──
   function handleAddQuestion(e) {
     e.preventDefault();
 
@@ -192,7 +219,6 @@
       questionData.correctAnswers = correctAnswers;
     }
 
-    // Save to Firebase or local
     if (db) {
       db.ref('quizQuestions').push(questionData)
         .then(() => {
@@ -201,7 +227,6 @@
         })
         .catch(err => console.error('Error adding question:', err));
     } else {
-      // Local fallback
       questionData.id = 'local_' + Date.now();
       questions.push(questionData);
       renderQuestions();
@@ -215,7 +240,7 @@
     setQuestionType('mcq');
   }
 
-  // Delete question
+  // ── Delete question ──
   function deleteQuestion(id) {
     if (!confirm('Delete this question?')) return;
     if (db && !id.startsWith('local_')) {
@@ -227,7 +252,7 @@
     }
   }
 
-  // Reorder questions
+  // ── Reorder questions ──
   function moveQuestionUp(index) {
     if (index > 0) {
       const temp = questions[index];
@@ -250,8 +275,6 @@
 
   function saveOrderToFirebase() {
     if (db && !useLocalFallback) {
-      // In a real prod setup, you'd update specific order fields
-      // but replacing the node works for small arrays
       const updates = {};
       questions.forEach((q) => {
         updates[q.id] = q;
@@ -260,7 +283,7 @@
     }
   }
 
-  // Load questions
+  // ── Load questions ──
   function loadQuestions() {
     if (db) {
       db.ref('quizQuestions').on('value', snap => {
@@ -302,7 +325,7 @@
     `).join('');
   }
 
-  // Quiz mode
+  // ── Quiz mode ──
   function createQuizMode() {
     const name = els.quizModeName ? els.quizModeName.value.trim() : '';
     const time = els.quizModeTime ? parseInt(els.quizModeTime.value) : 0;
@@ -330,7 +353,6 @@
 
     let accessCode = '';
     if (!isPublic) {
-      // Generate 8 character random code
       const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       for (let i = 0; i < 8; i++) {
         accessCode += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -359,35 +381,47 @@
     }
   }
 
+  // ── Init ──
   function init() {
     cacheDom();
 
-    // Event listeners
-    if (els.loginBtn) els.loginBtn.addEventListener('click', openModal);
-    if (els.modalClose) els.modalClose.addEventListener('click', closeModal);
+    // Login form submit
+    if (els.loginForm) els.loginForm.addEventListener('submit', handleLogin);
+
+    // Legacy modal triggers
+    if (els.loginBtn) els.loginBtn.addEventListener('click', showLoginScreen);
+    if (els.modalClose) els.modalClose.addEventListener('click', hideLoginScreen);
     if (els.modalOverlay) {
       els.modalOverlay.addEventListener('click', (e) => {
-        if (e.target === els.modalOverlay) closeModal();
+        if (e.target === els.modalOverlay) hideLoginScreen();
       });
     }
-    if (els.loginForm) els.loginForm.addEventListener('submit', handleLogin);
+
+    // Logout
     if (els.logoutBtn) els.logoutBtn.addEventListener('click', handleLogout);
+
+    // Add question form
     if (els.addForm) els.addForm.addEventListener('submit', handleAddQuestion);
 
+    // Question type buttons
     els.questionType.forEach(btn => {
       btn.addEventListener('click', () => setQuestionType(btn.dataset.type));
     });
 
+    // Create quiz mode
     if (els.createQuizBtn) els.createQuizBtn.addEventListener('click', createQuizMode);
 
-    // ESC to close modal
+    // ESC to close
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') hideLoginScreen();
     });
 
-    // Check if already logged in
+    // Check session
     if (isLoggedIn) {
-      showPanel();
+      hideLoginScreen();
+      showDashboard();
+    } else {
+      showLoginScreen();
     }
   }
 

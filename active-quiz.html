@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Active Quiz - Quizzing Society IITGN</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css?v=8">
+  <link rel="stylesheet" href="css/base.css?v=8">
+  <link rel="stylesheet" href="css/animations.css?v=8">
+  <link rel="stylesheet" href="css/components.css?v=11">
+  <link rel="stylesheet" href="css/sections.css?v=11">
+
+  <!-- Firebase Compat Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase Config -->
+  <script src="js/firebase.js"></script>
+  
+  <style>
+    /* Dedicated Page Styles — uses dvh for mobile browser chrome */
+    body.quiz-dedicated-page {
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body class="quiz-dedicated-page">
+
+  <!-- PORTAL ENTRY FLOW -->
+  <div class="portal-flow-overlay" id="portal-flow-overlay" style="transition: all 0.5s ease-in-out;">
+    <div style="position: absolute; top: var(--space-6); left: var(--space-6); display: flex; align-items: center; gap: var(--space-3); z-index: 10;">
+      <img src=".png" alt="Quizzing Society" style="height: 40px; width: auto; object-fit: contain;">
+      <span style="font-weight: 800; font-size: var(--fs-xl); color: var(--text-primary); font-family: 'Google Sans', sans-serif;">QS IITGN</span>
+    </div>
+    <div style="position: absolute; top: var(--space-6); right: var(--space-6); z-index: 10;">
+      <a href="admin.html" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: var(--text-secondary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 9999px; font-size: var(--fs-sm); font-weight: 600; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Login as Admin
+      </a>
+    </div>
+    <div class="portal-card" style="box-shadow: none; border: 1px solid var(--section-divider);">
+      <!-- Step 1: Name Entry -->
+      <div id="portal-step-name" class="portal-step active">
+        <h2 style="color: var(--primary); margin-bottom: var(--space-4);">Welcome to the Arena</h2>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">Please enter your name to begin.</p>
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <input type="text" id="quiz-participant-name" placeholder="Enter your full name" autocomplete="off" style="text-align: center; font-size: var(--fs-lg); border-radius: 9999px; border: none; background: #f3f4f6; padding: 16px 24px; width: 100%; box-sizing: border-box; outline: none; color: #111827;">
+        </div>
+        <button id="btn-name-next" style="width: 100%; justify-content: center; border-radius: 9999px; background: #0ea5e9; color: #ffffff; border: none; padding: 16px 24px; font-size: var(--fs-lg); cursor: pointer; font-weight: 600;">Continue</button>
+      </div>
+
+      <!-- Step 2: Mode Selection -->
+      <div id="portal-step-mode" class="portal-step" style="display: none;">
+        <h3 style="font-size: var(--fs-2xl); margin-bottom: var(--space-2);" id="greeting-title">Hi there!</h3>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">What would you like to play today?</p>
+        
+        <div class="mode-choices" id="mode-choices">
+          <button class="mode-choice-card" id="btn-portal-tournament" style="background: #f1f5f9; border: none; border-radius: 20px; padding: 28px 20px;">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" style="vertical-align: middle; margin-right: 8px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Tournament</h3>
+            <p style="color: var(--text-tertiary); font-size: var(--fs-sm);">Private matches with access code.</p>
+          </button>
+          <button class="mode-choice-card" id="btn-portal-practice" style="background: #f1f5f9; border: none; border-radius: 20px; padding: 28px 20px;">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" style="vertical-align: middle; margin-right: 8px;"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>Practice Match</h3>
+            <p style="color: var(--text-tertiary); font-size: var(--fs-sm);">Enter the arena for public quizzes.</p>
+          </button>
+        </div>
+        <div style="margin-top: var(--space-4); text-align: center;">
+          <button class="btn" id="btn-mode-back" style="display: none; background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #475569; font-weight: 600;">Back</button>
+        </div>
+      </div>
+
+      <!-- Step 3A: Practice Arena -->
+      <div id="portal-step-practice" class="portal-step arena-view" style="display: none;">
+        <h4 style="margin-bottom: var(--space-4); text-align: center; font-size: 2rem; font-weight: 800;">Public Arena</h4>
+        <div class="arena-grid" id="arena-grid">
+          <!-- Public quiz cards will be injected here -->
+        </div>
+        <div style="margin-top: var(--space-6); display: flex; justify-content: center; gap: var(--space-4);">
+          <button class="btn" id="btn-practice-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 16px 32px; font-size: 1.1rem; color: #475569; font-weight: 600;">Back</button>
+          <button class="btn btn-primary" id="btn-practice-next" style="background: #0ea5e9; border: none; border-radius: 9999px; padding: 16px 32px; font-size: 1.1rem; color: #ffffff; font-weight: 600; display: none;">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 3B: Tournament Input -->
+      <div id="portal-step-tournament" class="portal-step" style="display: none;">
+        <h4 style="margin-bottom: var(--space-4); text-align: center; font-size: 2rem; font-weight: 800;">Enter Tournament Code</h4>
+        <input type="text" class="form-field" id="tournament-code-input" placeholder="e.g. XaB8yL2" style="max-width: 300px; margin: 0 auto; text-align: center; letter-spacing: 2px; font-weight: bold; font-size: var(--fs-xl); background: #f3f4f6; border: none; border-radius: 9999px; outline: none; padding: 16px 24px; color: #111827;">
+        <p id="tournament-error" style="color: var(--error); font-size: var(--fs-sm); margin-top: var(--space-2); display: none;">Invalid code.</p>
+        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-4); justify-content: center;">
+          <button class="btn" id="btn-tournament-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #475569; font-weight: 600;">Back</button>
+          <button class="btn btn-primary" id="btn-tournament-join" style="background: #0ea5e9; border: none; border-radius: 9999px; padding: 12px 24px; color: #ffffff; font-weight: 600;">Join Match</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Rules -->
+      <div id="portal-step-rules" class="portal-step" style="display: none;">
+        <h2 style="color: var(--primary); margin-bottom: var(--space-4);">Match Rules</h2>
+        <div class="rules-list" style="text-align: left; background: var(--bg-alt); padding: var(--space-4); border-radius: var(--radius-lg); margin-bottom: var(--space-6);">
+          <ul style="color: var(--text-secondary); font-size: var(--fs-sm); list-style-type: disc; margin-left: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2);">
+            <li>Once a question's timer runs out, it is locked and you cannot change your answer.</li>
+            <li>You can navigate back and forth between questions as long as they have time remaining.</li>
+            <li>Do not refresh the page, or your progress will be lost.</li>
+            <li>When time expires for all questions, the quiz will automatically submit.</li>
+          </ul>
+        </div>
+        <div style="display: flex; gap: var(--space-4);">
+          <button class="btn" id="btn-rules-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #475569; font-weight: 600;">Back</button>
+          <button class="btn btn-primary btn-lg" id="btn-rules-start" style="flex: 1; justify-content: center; background: #0ea5e9; border-color: #0ea5e9; color: #ffffff; border-radius: 9999px;">Start Countdown</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COUNTDOWN OVERLAY -->
+  <div class="countdown-overlay" id="countdown-overlay">
+    <h2 style="font-size: var(--fs-2xl); margin-bottom: var(--space-6);">Get Ready!</h2>
+    <div class="countdown-number" id="countdown-number" style="color: #0ea5e9;">5</div>
+  </div>
+
+  <!-- ACTIVE QUIZ INTERFACE -->
+  <!-- Note: We removed the overlay classes and made it the main content of this page -->
+  <div class="active-quiz-dedicated-container" id="active-quiz-container" style="display: none; flex-direction: column; height: 100%;">
+    
+    <!-- TOP MOST SECTION -->
+    <div class="quiz-dedicated-header">
+      <div class="qdh-left">
+        <h3 id="active-quiz-title" class="qdh-title">Quiz Title</h3>
+        <span class="qdh-progress" id="active-quiz-progress">Question 1 of 5</span>
+      </div>
+      <div class="qdh-right">
+        <!-- Timer injected here by JS? Actually wait, user said timer is set according to admin, let's keep timer in right side too -->
+        <div class="quiz-timer" id="active-quiz-timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="timer-text" style="font-family: 'Google Sans', sans-serif;">05:00</span>
+        </div>
+        <button class="theme-toggle" id="quiz-theme-toggle" aria-label="Toggle dark mode" style="padding: var(--space-2); background: var(--surface); border-radius: var(--radius-full); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--section-divider);">
+          <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="btn btn-outline btn-exit" id="btn-quiz-exit">Exit the test</button>
+      </div>
+    </div>
+
+    <!-- MAIN LAYOUT WRAPPER -->
+    <div class="active-quiz-main-layout">
+      
+      <!-- HORIZONTAL QUESTION NAVIGATOR -->
+      <div class="quiz-dedicated-nav-strip">
+      <div class="quiz-question-nav-horizontal" id="quiz-question-nav">
+        <!-- Dynamically injected .q-nav-box-horizontal elements -->
+      </div>
+    </div>
+
+      <!-- QUESTION CONTENT AREA -->
+      <div class="active-quiz-content-area">
+        
+        <!-- QUESTION BODY -->
+        <div class="quiz-dedicated-body">
+      <p class="question-text" id="active-question-text">Loading question...</p>
+      <div class="options-scroll-container">
+        <div class="options-container" id="active-options-container">
+          <!-- Options or Integer input injected here -->
+        </div>
+      </div>
+    </div>
+
+        <!-- BOTTOM MOST SECTION -->
+        <div class="quiz-dedicated-footer">
+          <button class="btn btn-nav" id="btn-quiz-prev">Previous Question</button>
+          <button class="btn btn-primary btn-nav" id="btn-quiz-next">Next Question</button>
+        </div>
+        
+      </div> <!-- End .active-quiz-content-area -->
+    </div> <!-- End .active-quiz-main-layout -->
+
+  </div>
+
+  <!-- SUBMIT REVIEW OVERLAY -->
+  <div class="submit-review-overlay" id="submit-review-overlay">
+    <div class="submit-review-modal glass-card">
+      <h3 style="font-size: var(--fs-2xl); font-weight: 800; color: #0ea5e9; margin-bottom: var(--space-3);">Submit Quiz</h3>
+      <p id="review-message" style="margin-bottom: var(--space-5); color: var(--text-secondary);"></p>
+      
+      <div class="review-question-grid" id="review-question-grid">
+        <!-- Injected review boxes -->
+      </div>
+
+      <div style="display: flex; gap: var(--space-4); margin-top: var(--space-6);">
+        <button class="btn btn-outline" style="flex: 1; justify-content: center;" onclick="document.getElementById('submit-review-overlay').classList.remove('active')">Go Back</button>
+        <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="QSQuiz.finalSubmit()">Confirm Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL ANALYSIS DASHBOARD CONTAINER -->
+  <div id="quiz-results-container" style="display: none; flex: 1; width: 100%; overflow-y: auto; background: var(--bg); padding-bottom: 100px;">
+    <div id="analysis-dashboard" class="analysis-dashboard" style="max-width: 900px; margin: 0 auto; padding: var(--space-6); width: 100%; box-sizing: border-box;">
+      <!-- Dashboard injected by JS -->
+    </div>
+  </div>
+
+  <!-- EXIT CONFIRMATION MODAL -->
+  <div class="exit-confirm-overlay" id="exit-confirm-overlay">
+    <div class="exit-confirm-modal">
+      <h3>Are you sure you want to exit the test?</h3>
+      <p>If you exit now, your progress will be lost and you will receive a score of 0.</p>
+      <div class="exit-confirm-actions">
+        <button class="btn btn-outline" id="btn-cancel-exit">Resume</button>
+        <button class="btn btn-primary" style="background: var(--error);" id="btn-confirm-exit">Exit the test</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ RESULTS SCREEN — Duplicate removed to prevent DOM ID conflict -->
+
+  <script src="js/quiz.js?v=9999"></script>
+  <!-- Main js is used for theme toggle mostly, we'll keep it simple by adding theme logic locally if needed, or include main.js -->
+  <script src="js/main.js"></script>
+</body>
+</html>

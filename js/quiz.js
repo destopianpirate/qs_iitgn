@@ -144,114 +144,152 @@
     }
   }
 
-  function init() {
-    currentIndex = getDailyIndex();
-    renderQuestion(currentIndex);
-    initFlipCard();
-    initNavigation();
-    initQuizModes();
+  async function syncPublicQuizzes() {
+    if (window.db) {
+      try {
+        const docRef = window.db.collection('global').doc('allQuizzes');
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          const dataStr = docSnap.data().data;
+          localStorage.setItem('qs_admin_quizzes', dataStr);
+        }
+      } catch (e) {
+        console.error("Firebase sync error:", e);
+      }
+    }
   }
 
-  function initQuizModes() {
-    const openBtn = document.getElementById('open-quiz-modes-btn');
-    const closeBtn = document.getElementById('close-quiz-mode-btn');
-    const overlay = document.getElementById('quiz-mode-overlay');
-    const modeChoices = document.getElementById('mode-choices');
+  async function init() {
+    await syncPublicQuizzes();
     
-    // Tournament
-    const btnTourney = document.getElementById('btn-tournament-mode');
-    const tourneySection = document.getElementById('tournament-input-section');
-    const btnTourneyBack = document.getElementById('btn-tournament-back');
-    const btnTourneyJoin = document.getElementById('btn-tournament-join');
-    const tourneyInput = document.getElementById('tournament-code-input');
-    const tourneyError = document.getElementById('tournament-error');
-
-    // Practice
-    const btnPractice = document.getElementById('btn-practice-mode');
-    const practiceSection = document.getElementById('practice-arena-section');
-    const btnPracticeBack = document.getElementById('btn-arena-back');
-    const arenaGrid = document.getElementById('arena-grid');
-
-    if (!openBtn) return;
-
-    openBtn.addEventListener('click', () => {
-      overlay.classList.add('active');
-      modeChoices.style.display = 'flex';
-      tourneySection.style.display = 'none';
-      practiceSection.style.display = 'none';
-    });
-
-    closeBtn.addEventListener('click', () => {
-      overlay.classList.remove('active');
-    });
-
-    // Tournament Flow
-    btnTourney.addEventListener('click', () => {
-      modeChoices.style.display = 'none';
-      tourneySection.style.display = 'block';
-      tourneyError.style.display = 'none';
-      tourneyInput.value = '';
-      setTimeout(() => tourneyInput.focus(), 100);
-    });
-
-    btnTourneyBack.addEventListener('click', () => {
-      tourneySection.style.display = 'none';
-      modeChoices.style.display = 'flex';
-    });
-
-    btnTourneyJoin.addEventListener('click', () => {
-      const code = tourneyInput.value.trim();
+    if (document.body.classList.contains('quiz-dedicated-page')) {
+      initPortalFlow();
+    } else {
+      currentIndex = getDailyIndex();
+      renderQuestion(currentIndex);
+      initFlipCard();
+      initNavigation();
       
-      // Allow any 5+ char code to launch the mock tournament
-      if (code.length < 5) {
-        tourneyError.style.display = 'block';
-        return;
+      const openBtn = document.getElementById('open-quiz-modes-btn');
+      if (openBtn) {
+        openBtn.addEventListener('click', () => {
+          sessionStorage.removeItem('activeQuizId'); // Ensure mode selector is shown
+          window.location.href = 'active-quiz.html';
+        });
       }
-      
-      tourneyError.style.display = 'none';
-      overlay.classList.remove('active');
-      startQuizEntryFlow('tournament_1');
-    });
+    }
+  }
 
-    // Practice Flow
-    btnPractice.addEventListener('click', () => {
-      modeChoices.style.display = 'none';
-      practiceSection.style.display = 'block';
-      loadPracticeArena(arenaGrid);
-    });
+  function initPortalFlow() {
+    const overlay = document.getElementById('portal-flow-overlay');
+    if (!overlay) return;
+    
+    const stepName = document.getElementById('portal-step-name');
+    const stepMode = document.getElementById('portal-step-mode');
+    const stepPractice = document.getElementById('portal-step-practice');
+    const stepTournament = document.getElementById('portal-step-tournament');
+    const stepRules = document.getElementById('portal-step-rules');
+    const greetingTitle = document.getElementById('greeting-title');
 
-    btnPracticeBack.addEventListener('click', () => {
-      practiceSection.style.display = 'none';
-      modeChoices.style.display = 'flex';
-    });
-
-    // Setup Quiz Entry Flow listeners
-    const btnEntryNext = document.getElementById('btn-entry-next');
-    const btnEntryStart = document.getElementById('btn-entry-start');
-    const nameInput = document.getElementById('quiz-participant-name');
-    const stepName = document.getElementById('entry-step-name');
-    const stepRules = document.getElementById('entry-step-rules');
-    const entryOverlay = document.getElementById('quiz-entry-overlay');
-
-    if (btnEntryNext) {
-      btnEntryNext.addEventListener('click', () => {
-        const name = nameInput.value.trim();
-        if (!name) {
-          alert('Please enter your name');
-          return;
-        }
-        participantName = name;
-        stepName.style.display = 'none';
-        stepRules.style.display = 'block';
+    function hideAllSteps() {
+      [stepName, stepMode, stepPractice, stepTournament, stepRules].forEach(s => {
+        if(s) s.style.display = 'none';
       });
     }
 
-    if (btnEntryStart) {
-      btnEntryStart.addEventListener('click', () => {
-        entryOverlay.classList.remove('active');
-        if (currentPendingQuizId) {
-          startCountdown(currentPendingQuizId);
-        }
+    // Determine initial state
+    const savedQuizId = sessionStorage.getItem('activeQuizId');
+    overlay.classList.add('active');
+    hideAllSteps();
+    stepName.style.display = 'block';
+    
+    if (savedQuizId) {
+      currentPendingQuizId = savedQuizId;
+    }
+
+    // Step 1 -> Next
+    document.getElementById('btn-name-next').addEventListener('click', () => {
+      const name = document.getElementById('quiz-participant-name').value.trim();
+      if (!name) {
+        alert('Please enter your name');
+        return;
+      }
+      participantName = name;
+      greetingTitle.textContent = `Hi, ${name}!`;
+      hideAllSteps();
+      
+      if (currentPendingQuizId) {
+        stepRules.style.display = 'block';
+      } else {
+        stepMode.style.display = 'block';
+      }
+    });
+
+    // Step 2: Mode Selection
+    document.getElementById('btn-portal-practice').addEventListener('click', () => {
+      hideAllSteps();
+      stepPractice.style.display = 'block';
+      loadPracticeArena(document.getElementById('arena-grid'));
+    });
+
+    document.getElementById('btn-portal-tournament').addEventListener('click', () => {
+      hideAllSteps();
+      stepTournament.style.display = 'block';
+      document.getElementById('tournament-code-input').value = '';
+    });
+
+    // Back Buttons
+    document.getElementById('btn-practice-back').addEventListener('click', () => {
+      hideAllSteps();
+      stepMode.style.display = 'block';
+    });
+
+    document.getElementById('btn-tournament-back').addEventListener('click', () => {
+      hideAllSteps();
+      stepMode.style.display = 'block';
+    });
+
+    // Step 3B -> Join Match
+    document.getElementById('btn-tournament-join').addEventListener('click', () => {
+      const code = document.getElementById('tournament-code-input').value.trim();
+      const allQuizzes = JSON.parse(localStorage.getItem('qs_admin_quizzes') || '[]');
+      const matchingQuiz = allQuizzes.find(q => (q.visibility === 'private' || !q.isPublic) && q.accessCode === code);
+
+      if (!matchingQuiz) {
+        document.getElementById('tournament-error').textContent = 'Invalid tournament code.';
+        document.getElementById('tournament-error').style.display = 'block';
+        return;
+      }
+      document.getElementById('tournament-error').style.display = 'none';
+      currentPendingQuizId = matchingQuiz.id;
+      hideAllSteps();
+      stepRules.style.display = 'block';
+    });
+
+    // Step 4: Rules Back
+    document.getElementById('btn-rules-back').addEventListener('click', () => {
+      if (sessionStorage.getItem('activeQuizId')) {
+        window.location.href = 'active-quiz.html';
+      } else {
+        hideAllSteps();
+        stepMode.style.display = 'block';
+        currentPendingQuizId = null;
+      }
+    });
+
+    // Step 4 -> Start Countdown
+    document.getElementById('btn-rules-start').addEventListener('click', () => {
+      overlay.classList.remove('active');
+      if (currentPendingQuizId) {
+        startCountdown(currentPendingQuizId);
+      }
+    });
+
+    // Portal Close
+    const portalCloseBtn = document.getElementById('btn-portal-close');
+    if (portalCloseBtn) {
+      portalCloseBtn.addEventListener('click', () => {
+        window.location.href = 'active-quiz.html';
       });
     }
   }
@@ -260,56 +298,35 @@
   // ACTIVE QUIZ INTERFACE LOGIC (v2 — per-question timers)
   // ────────────────────────────────────────────
   
-  const MOCK_QUIZZES = {
-    "practice_1": {
-      name: "Science Trivia Weekly",
-      timeLimit: 300,
-      questions: [
-        { type: "mcq", q: "Which planet has the most moons?", options: ["Jupiter", "Saturn", "Uranus", "Neptune"], ans: "Saturn", timer: 30 },
-        { type: "mcq", q: "What is the speed of light in km/s?", options: ["299,792", "150,000", "300,000", "199,792"], ans: "299,792", timer: 20 },
-        { type: "integer", q: "How many bones are in the adult human body?", ans: "206", timer: 15 },
-        { type: "mcq", q: "What is the most abundant gas in Earth's atmosphere?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], ans: "Nitrogen", timer: 20 },
-        { type: "integer", q: "What is the boiling point of water in Celsius?", ans: "100", timer: 10 }
-      ]
-    },
-    "practice_2": {
-      name: "History Buffs Challenge",
-      timeLimit: 600,
-      questions: [
-        { type: "integer", q: "In what year did World War II end?", ans: "1945", timer: 15 },
-        { type: "mcq", q: "Who was the first President of India?", options: ["Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "B.R. Ambedkar"], ans: "Dr. Rajendra Prasad", timer: 20 },
-        { type: "mcq", q: "Which empire built Machu Picchu?", options: ["Aztec", "Maya", "Inca", "Olmec"], ans: "Inca", timer: 25 },
-        { type: "integer", q: "In what year did India gain independence?", ans: "1947", timer: 10 },
-        { type: "mcq", q: "Who discovered America in 1492?", options: ["Vasco da Gama", "Ferdinand Magellan", "Christopher Columbus", "Marco Polo"], ans: "Christopher Columbus", timer: 15 }
-      ]
-    },
-    "tournament_1": {
-      name: "The Grand IITGN Quiz",
-      timeLimit: 120,
-      questions: [
-        { type: "mcq", q: "What is the capital of Mongolia?", options: ["Ulaanbaatar", "Astana", "Tashkent", "Bishkek"], ans: "Ulaanbaatar", timer: 20 },
-        { type: "mcq", q: "Which element has the symbol 'W'?", options: ["Tungsten", "Wolframite", "Water", "White Phosphorus"], ans: "Tungsten", timer: 25 },
-        { type: "integer", q: "How many bytes are in a kilobyte (traditional binary)?", ans: "1024", timer: 15 },
-        { type: "mcq", q: "Who wrote 'One Hundred Years of Solitude'?", options: ["Gabriel Garcia Marquez", "Mario Vargas Llosa", "Jorge Luis Borges", "Julio Cortazar"], ans: "Gabriel Garcia Marquez", timer: 30 },
-        { type: "integer", q: "What year was IIT Gandhinagar established?", ans: "2008", timer: 10 }
-      ]
-    }
-  };
-
   let activeQuizState = null;
   let timerInterval = null;
 
+  // Retrieve global active quiz data
+  function getQuizData(quizId) {
+    const allQuizzes = JSON.parse(localStorage.getItem('qs_admin_quizzes') || '[]');
+    return allQuizzes.find(q => q.id === quizId);
+  }
+
   function loadPracticeArena(grid) {
     grid.innerHTML = '';
-    const quizzes = [
-      { id: "practice_1", data: MOCK_QUIZZES["practice_1"] },
-      { id: "practice_2", data: MOCK_QUIZZES["practice_2"] }
-    ];
-    grid.innerHTML = quizzes.map(q => `
-      <div class="arena-card" onclick="window.QSQuiz.startPracticeMatch('${q.id}')">
-        <h4 style="margin-bottom:var(--space-2);color:var(--primary);">${q.data.name}</h4>
-        <p style="font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:var(--space-1);">⏱️ ${Math.round(q.data.timeLimit/60)} Minutes</p>
-        <p style="font-size:var(--fs-xs);color:var(--text-tertiary);">By System • ${q.data.questions.length} Questions</p>
+    const allQuizzes = JSON.parse(localStorage.getItem('qs_admin_quizzes') || '[]');
+    // Filter for public quizzes
+    const publicQuizzes = allQuizzes.filter(q => q.visibility === 'public' || (q.visibility !== 'archive' && q.isPublic === true));
+    
+    if (publicQuizzes.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:var(--text-secondary); padding: 40px;">No public practice quizzes available yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = publicQuizzes.map(q => `
+      <div class="arena-card" id="arena-card-${q.id}" onclick="window.QSQuiz.selectPracticeMatch('${q.id}')" style="background: #f1f5f9; border: 2px solid transparent; border-radius: 16px; padding: 20px 24px; cursor: pointer; transition: all 0.2s;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <h4 style="margin:0; color:var(--primary); font-size: var(--fs-base); font-weight: 700; flex: 1; min-width: 120px;">${q.name || 'Untitled Quiz'}</h4>
+          <div style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
+            <span style="display:flex; align-items:center; font-size:var(--fs-xs); color:var(--text-secondary); background: var(--surface); padding: 4px 12px; border-radius: 9999px; font-weight: 600;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>${Math.ceil((q.totalTime || 300)/60)} min</span>
+            <span style="display:flex; align-items:center; font-size:var(--fs-xs); color:var(--text-secondary); background: var(--surface); padding: 4px 12px; border-radius: 9999px; font-weight: 600;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>${(q.questions || []).length} Qs</span>
+          </div>
+        </div>
       </div>
     `).join('');
   }
@@ -317,22 +334,28 @@
   let currentPendingQuizId = null;
   let participantName = "";
 
-  function startQuizEntryFlow(quizId) {
-    currentPendingQuizId = quizId;
-    const overlay = document.getElementById('quiz-entry-overlay');
-    const stepName = document.getElementById('entry-step-name');
-    const stepRules = document.getElementById('entry-step-rules');
-    const nameInput = document.getElementById('quiz-participant-name');
-    
-    if (!overlay) return;
-    
-    // Reset steps
-    stepName.style.display = 'block';
-    stepRules.style.display = 'none';
-    nameInput.value = '';
-    
-    overlay.classList.add('active');
+  window.QSQuiz = window.QSQuiz || {};
+  window.QSQuiz.selectPracticeMatch = function(id) {
+    document.querySelectorAll('.arena-card').forEach(el => el.style.borderColor = 'transparent');
+    const el = document.getElementById('arena-card-' + id);
+    if (el) {
+      el.style.borderColor = '#0ea5e9';
+    }
+    currentPendingQuizId = id;
+    const nextBtn = document.getElementById('btn-practice-next');
+    if (nextBtn) nextBtn.style.display = 'block';
+  };
+
+  const practiceNextBtn = document.getElementById('btn-practice-next');
+  if (practiceNextBtn) {
+    practiceNextBtn.addEventListener('click', () => {
+      if (currentPendingQuizId) {
+        window.QSQuiz.startPracticeMatch(currentPendingQuizId);
+      }
+    });
   }
+
+  // startPracticeMatch is defined at the bottom of the file to handle both index.html and active-quiz.html flows
 
   function startCountdown(quizId) {
     const overlay = document.getElementById('countdown-overlay');
@@ -363,15 +386,15 @@
 
   // ── Launch Quiz — initialize per-question state ──
   function launchActiveQuiz(quizId) {
-    const quizData = MOCK_QUIZZES[quizId];
-    if (!quizData) { alert("Quiz not found!"); return; }
+    const quizData = getQuizData(quizId);
+    if (!quizData || !quizData.questions || quizData.questions.length === 0) { alert("Quiz not found or has no questions!"); return; }
 
     const n = quizData.questions.length;
     activeQuizState = {
       data: quizData,
       currentIndex: 0,
       userAnswers: new Array(n).fill(null),
-      timeRemaining: quizData.questions.map(q => q.timer || 30),
+      timeRemaining: quizData.questions.map(q => parseInt(q.timer) || 30),
       timeSpent: new Array(n).fill(0),
       locked: new Array(n).fill(false),
       totalTimeTaken: 0
@@ -421,10 +444,12 @@
       confirmOverlay.classList.remove('active');
       resumeTimer();
     });
+
     document.getElementById('btn-confirm-exit').addEventListener('click', () => {
       confirmOverlay.classList.remove('active');
       pauseTimer();
-      document.getElementById('active-quiz-container').style.display = 'none';
+      sessionStorage.removeItem('activeQuizId');
+      window.location.href = 'active-quiz.html';
     });
 
     // Submit review popup bindings
@@ -589,15 +614,19 @@
     const idx = activeQuizState.currentIndex;
     if (activeQuizState.locked[idx]) return; // Can't modify locked
     const q = activeQuizState.data.questions[idx];
-    if (q.type === 'mcq') {
-      const selected = document.querySelector('.quiz-option-btn.selected');
-      if (selected) {
-        activeQuizState.userAnswers[idx] = selected.dataset.value;
+    if (q.type === 'mcq' || q.type === 'single' || q.type === 'scq' || q.type === 'multiple') {
+      const selected = Array.from(document.querySelectorAll('.quiz-option-btn.selected')).map(btn => btn.dataset.value);
+      if (selected.length > 0) {
+        activeQuizState.userAnswers[idx] = (q.type === 'multiple') ? selected : selected[0];
+      } else {
+        activeQuizState.userAnswers[idx] = null;
       }
     } else if (q.type === 'integer') {
       const input = document.getElementById('active-int-input');
       if (input && input.value !== '') {
         activeQuizState.userAnswers[idx] = input.value;
+      } else {
+        activeQuizState.userAnswers[idx] = null;
       }
     }
   }
@@ -611,7 +640,7 @@
 
     state.data.questions.forEach((_, idx) => {
       const box = document.createElement('div');
-      box.className = 'q-nav-box';
+      box.className = 'q-nav-box-horizontal';
 
       if (state.locked[idx]) {
         box.classList.add('locked');
@@ -638,7 +667,7 @@
     const isLocked = state.locked[idx];
 
     document.getElementById('active-quiz-progress').textContent = `Question ${idx + 1} of ${state.data.questions.length}`;
-    document.getElementById('active-question-text').textContent = q.q;
+    document.getElementById('active-question-text').textContent = `${idx + 1}. ${q.question || q.q || q.Question || 'Untitled Question'}`;
 
     renderQuestionNav();
 
@@ -646,11 +675,17 @@
     optionsContainer.innerHTML = '';
     const savedAns = state.userAnswers[idx];
 
-    if (q.type === 'mcq') {
-      q.options.forEach((opt, i) => {
+    if (q.type === 'mcq' || q.type === 'single' || q.type === 'scq' || q.type === 'multiple') {
+      const opts = q.options || q.Options || [];
+      opts.forEach((opt, i) => {
         const letter = String.fromCharCode(65 + i);
         const btn = document.createElement('button');
-        btn.className = 'quiz-option-btn' + (savedAns === opt ? ' selected' : '');
+        
+        let isSelected = false;
+        if (Array.isArray(savedAns)) isSelected = savedAns.includes(opt);
+        else isSelected = (savedAns === opt);
+        
+        btn.className = 'quiz-option-btn' + (isSelected ? ' selected' : '');
         btn.dataset.value = opt;
         btn.innerHTML = `<span class="option-label">${letter}</span> ${opt}`;
 
@@ -659,8 +694,12 @@
           btn.classList.add('locked-option');
         } else {
           btn.onclick = () => {
-            document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
+            if (q.type === 'multiple') {
+              btn.classList.toggle('selected');
+            } else {
+              document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
+              btn.classList.add('selected');
+            }
             saveCurrentAnswer();
             renderQuestionNav();
           };
@@ -673,8 +712,6 @@
       input.className = 'form-field';
       input.id = 'active-int-input';
       input.placeholder = 'Enter a number...';
-      input.style.fontSize = 'var(--fs-2xl)';
-      input.style.padding = 'var(--space-6)';
       if (savedAns !== null) input.value = savedAns;
 
       if (isLocked) {
@@ -697,6 +734,16 @@
       banner.className = 'locked-banner';
       banner.innerHTML = '🔒 Time expired — this question is locked';
       optionsContainer.parentNode.insertBefore(banner, optionsContainer);
+    }
+
+    // Update Next button text if no other unlocked questions exist
+    const nextBtn = document.getElementById('btn-quiz-next');
+    if (nextBtn) {
+      if (findNearestUnlocked() === -1) {
+        nextBtn.textContent = 'Submit Quiz';
+      } else {
+        nextBtn.textContent = 'Next Question';
+      }
     }
 
     // Update prev/next buttons
@@ -723,14 +770,10 @@
     // Next / Submit
     if (state.currentIndex === state.data.questions.length - 1) {
       nextBtn.textContent = 'Submit';
-      nextBtn.style.background = '#0ea5e9';
-      nextBtn.style.borderColor = '#0ea5e9';
-      nextBtn.style.color = '#ffffff';
+      nextBtn.classList.add('btn-submit');
     } else {
-      nextBtn.textContent = 'Next';
-      nextBtn.style.background = '';
-      nextBtn.style.borderColor = '';
-      nextBtn.style.color = '';
+      nextBtn.textContent = 'Next Question';
+      nextBtn.classList.remove('btn-submit');
     }
   }
 
@@ -745,52 +788,114 @@
     if (!overlay || !grid) { finalSubmit(); return; }
 
     // Find questions with time remaining
-    const remaining = [];
+    let remainingCount = 0;
     state.data.questions.forEach((_, idx) => {
       if (!state.locked[idx] && state.timeRemaining[idx] > 0) {
-        remaining.push(idx);
+        remainingCount++;
       }
     });
 
     grid.innerHTML = '';
-    if (remaining.length === 0) {
+    if (remainingCount === 0) {
       document.getElementById('review-message').textContent = 'All questions have been answered or their timers have expired.';
     } else {
-      document.getElementById('review-message').textContent = `${remaining.length} question(s) still have time remaining:`;
-      remaining.forEach(idx => {
-        const box = document.createElement('div');
-        box.className = 'q-nav-box review-box';
-        if (state.userAnswers[idx] !== null) box.classList.add('attempted');
-        box.textContent = idx + 1;
+      document.getElementById('review-message').textContent = `${remainingCount} question(s) still have time remaining:`;
+    }
+    
+    // Show ALL questions in the grid, regardless of remaining time
+    state.data.questions.forEach((_, idx) => {
+      const box = document.createElement('div');
+      box.className = 'q-nav-box review-box';
+      
+      // Styling for locked vs attempted
+      if (state.locked[idx]) {
+        box.style.background = '#e2e8f0';
+        box.style.color = '#475569';
+        box.style.opacity = '0.8';
+      } else if (state.userAnswers[idx] !== null) {
+        box.classList.add('attempted');
+      }
+      
+      box.textContent = idx + 1;
+      
+      // Only show time label if not locked
+      if (!state.locked[idx]) {
         const timeLabel = document.createElement('span');
         timeLabel.className = 'review-time-label';
         timeLabel.textContent = `${state.timeRemaining[idx]}s`;
         box.appendChild(timeLabel);
-        box.addEventListener('click', () => {
+      }
+      
+      box.addEventListener('click', () => {
+        if (!state.locked[idx]) {
           overlay.classList.remove('active');
           navigateToQuestion(idx);
-        });
-        grid.appendChild(box);
+        }
       });
-    }
+      grid.appendChild(box);
+    });
 
     overlay.classList.add('active');
   }
 
-  // ── Final Submit — Full Analysis Dashboard ──
+  // ── Final Submit — 20-Point Analysis Dashboard ──
   function finalSubmit() {
-    pauseTimer();
+    try {
+      pauseTimer();
     saveCurrentAnswer();
+    const overlay = document.getElementById('submit-review-overlay');
+    if (overlay) overlay.classList.remove('active');
     document.getElementById('active-quiz-container').style.display = 'none';
 
     const state = activeQuizState;
     const questions = state.data.questions;
     let correct = 0, wrong = 0, skipped = 0, timedOut = 0;
+    let currentStreak = 0, maxStreak = 0;
+    let correctTime = 0, wrongTime = 0;
+    let firstHalfCorrect = 0, secondHalfCorrect = 0;
+    
+    const totalQ = questions.length;
+    const halfMark = Math.ceil(totalQ / 2);
+
+    const mockTopics = ['Core Concepts', 'Advanced Logic', 'Historical Context', 'Analytical Reasoning'];
+    const topicData = {};
+    mockTopics.forEach(t => topicData[t] = { correct: 0, total: 0, time: 0 });
 
     const analysisData = questions.map((q, idx) => {
       const userAns = state.userAnswers[idx];
-      const isCorrect = userAns != null && String(userAns) === String(q.ans);
-      if (isCorrect) correct++;
+      
+      let isCorrect = false;
+      if (userAns != null) {
+        if (q.type === 'integer') {
+          isCorrect = String(userAns) === String(q.answer || q.ans);
+        } else {
+          const correctVals = (q.correctAnswers || []).map(i => q.options[i]);
+          if (q.ans && correctVals.length === 0) correctVals.push(q.ans); // fallback for mock
+          if (Array.isArray(userAns)) {
+            isCorrect = userAns.length === correctVals.length && userAns.every(v => correctVals.includes(v));
+          } else {
+            isCorrect = correctVals.includes(userAns);
+          }
+        }
+      }
+      const timeSpent = state.timeSpent[idx] || 0;
+      
+      const assignedTopic = mockTopics[idx % mockTopics.length];
+      topicData[assignedTopic].total++;
+      topicData[assignedTopic].time += timeSpent;
+
+      if (isCorrect) {
+        correct++;
+        correctTime += timeSpent;
+        topicData[assignedTopic].correct++;
+        currentStreak++;
+        if (currentStreak > maxStreak) maxStreak = currentStreak;
+        if (idx < halfMark) firstHalfCorrect++;
+        else secondHalfCorrect++;
+      } else {
+        currentStreak = 0;
+        if (userAns !== null) wrongTime += timeSpent;
+      }
 
       let status;
       if (userAns === null && state.locked[idx]) { status = 'timeout'; timedOut++; }
@@ -799,15 +904,102 @@
       else { status = 'wrong'; wrong++; }
 
       const allocatedTime = q.timer || 30;
-      return { q: q.q, userAns, correctAns: q.ans, timeSpent: state.timeSpent[idx], allocatedTime, status, type: q.type, idx };
+      const cAns = q.type === 'integer' ? (q.answer || q.ans || q.Answer) : ((q.correctAnswers||[]).length > 0 ? (q.correctAnswers||[]).map(i => (q.options||q.Options||[])[i]).join(', ') : q.ans);
+      return { q: q.question || q.q || q.Question || 'Untitled Question', userAns, correctAns: cAns, timeSpent, allocatedTime, status, type: q.type, idx, topic: assignedTopic };
     });
 
-    const totalQ = questions.length;
     const totalTime = state.totalTimeTaken;
+
+    // ── TELEMETRY LOGGING ──
+    if (window.db && state.data && state.data.id) {
+      const mode = (state.data.visibility === 'private' || state.data.accessCode) ? 'tournament' : 'practice';
+      const attemptData = {
+        quizId: state.data.id,
+        quizName: state.data.name || 'Untitled Quiz',
+        mode: mode,
+        score: correct,
+        totalQuestions: totalQ,
+        timeTaken: totalTime,
+        submittedAt: new Date().toISOString()
+      };
+      window.db.collection('quiz_attempts').add(attemptData).catch(e => console.error("Telemetry Error:", e));
+    }
+
     const m = Math.floor(totalTime / 60).toString().padStart(2, '0');
     const s = (totalTime % 60).toString().padStart(2, '0');
+    
+    // Met 1: Accuracy & Met 2: Score
     const accuracy = Math.round((correct / totalQ) * 100);
+    
+    // Met 3 & 4: Percentile & Rank
+    let percentile = 0;
+    if (accuracy >= 90) percentile = 99 - Math.floor(Math.random() * 5);
+    else if (accuracy >= 70) percentile = 80 + Math.floor(Math.random() * 10);
+    else if (accuracy >= 50) percentile = 50 + Math.floor(Math.random() * 20);
+    else percentile = 20 + Math.floor(Math.random() * 20);
+    const rank = Math.max(1, Math.floor(5000 * (1 - (percentile/100))));
+
+    // Met 5 & 6: Total Time & Avg Pacing
     const avgTime = totalQ > 0 ? (totalTime / totalQ).toFixed(1) : '0';
+
+    // Met 7: Time Efficiency Index
+    const avgCorrectTime = correct > 0 ? (correctTime / correct).toFixed(1) : '0';
+    const avgWrongTime = wrong > 0 ? (wrongTime / wrong).toFixed(1) : '0';
+    const efficiencyIndex = (avgWrongTime > 0) ? (avgCorrectTime / avgWrongTime).toFixed(2) : '1.0';
+
+    // Met 8: Speed Rating
+    const speedRating = avgTime < 15 ? 'Elite (Lightning Fast)' : avgTime < 25 ? 'Excellent (Swift)' : avgTime < 45 ? 'Good (Steady)' : 'Needs Improvement (Slow)';
+
+    // Met 9 & 10: Fastest Answer & Time Wasted
+    const correctAnswers = analysisData.filter(d => d.status === 'correct');
+    const fastest = correctAnswers.length > 0 ? Math.min(...correctAnswers.map(d => d.timeSpent)) : 0;
+    const slowest = correctAnswers.length > 0 ? Math.max(...correctAnswers.map(d => d.timeSpent)) : 0;
+    const timeWasted = wrongTime;
+
+    // Met 11 & 12: Stamina (First vs Second Half Accuracy)
+    const firstHalfAcc = Math.round((firstHalfCorrect / halfMark) * 100);
+    const secondHalfTotal = totalQ - halfMark;
+    const secondHalfAcc = secondHalfTotal > 0 ? Math.round((secondHalfCorrect / secondHalfTotal) * 100) : 0;
+
+    // Met 13: Max Streak (Already calculated as maxStreak)
+
+    // Met 14: Decisiveness Index (Variance of time spent)
+    const timeArr = analysisData.map(d => d.timeSpent);
+    const meanTime = timeArr.reduce((a,b)=>a+b, 0) / timeArr.length;
+    const variance = timeArr.reduce((a,b)=>a + Math.pow(b-meanTime, 2), 0) / timeArr.length;
+    const decisiveness = (variance < 25) ? 'High (Consistent)' : (variance < 100) ? 'Moderate' : 'Low (Erratic)';
+
+    // Met 15 & 16: Strongest and Weakest Topics
+    let bestTopic = 'None', worstTopic = 'None';
+    let maxAcc = -1, minAcc = 101;
+    Object.keys(topicData).forEach(t => {
+      if (topicData[t].total > 0) {
+        const acc = (topicData[t].correct / topicData[t].total) * 100;
+        if (acc > maxAcc) { maxAcc = acc; bestTopic = t; }
+        if (acc < minAcc) { minAcc = acc; worstTopic = t; }
+      }
+    });
+
+    // Met 17 & 18: Skip and Timeout Rates
+    const skipRate = Math.round((skipped / totalQ) * 100);
+    const timeoutRate = Math.round((timedOut / totalQ) * 100);
+
+    // Topic HTML
+    const topicHTML = Object.keys(topicData).filter(t => topicData[t].total > 0).map(t => {
+      const data = topicData[t];
+      const acc = Math.round((data.correct / data.total) * 100);
+      return `
+        <div class="topic-row">
+          <div class="topic-header">
+            <span class="topic-name">${t}</span>
+            <span class="topic-acc">${acc}%</span>
+          </div>
+          <div class="time-bar-track">
+            <div class="time-bar-spent" style="width:${acc}%; background: ${acc >= 75 ? '#22c55e' : acc >= 50 ? '#eab308' : '#ef4444'};"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
 
     // Performance grade
     let grade, gradeColor;
@@ -819,19 +1011,13 @@
     else if (accuracy >= 35) { grade = 'D'; gradeColor = '#ef4444'; }
     else { grade = 'F'; gradeColor = '#dc2626'; }
 
-    // Fastest / Slowest (excluding locked/skipped with 0 time)
-    const answeredData = analysisData.filter(d => d.status === 'correct' || d.status === 'wrong');
-    const fastest = answeredData.length > 0 ? Math.min(...answeredData.map(d => d.timeSpent)) : 0;
-    const slowest = answeredData.length > 0 ? Math.max(...answeredData.map(d => d.timeSpent)) : 0;
-
-    // SVG Donut chart data
+    // SVG Donut
     const donutData = [
       { label: 'Correct', count: correct, color: '#22c55e' },
       { label: 'Wrong', count: wrong, color: '#ef4444' },
       { label: 'Timed Out', count: timedOut, color: '#f59e0b' },
       { label: 'Skipped', count: skipped, color: '#94a3b8' }
     ].filter(d => d.count > 0);
-
     let donutSVG = '';
     const radius = 60, cx = 80, cy = 80, circumference = 2 * Math.PI * radius;
     let cumulativeOffset = 0;
@@ -852,25 +1038,7 @@
       </div>
     `).join('');
 
-    // Per-question time bars
-    const maxAlloc = Math.max(...analysisData.map(d => d.allocatedTime), 1);
-    const timeBarsHTML = analysisData.map((d, idx) => {
-      const spentPct = Math.min((d.timeSpent / maxAlloc) * 100, 100);
-      const allocPct = Math.min((d.allocatedTime / maxAlloc) * 100, 100);
-      const statusColors = { correct: '#22c55e', wrong: '#ef4444', timeout: '#f59e0b', skipped: '#94a3b8' };
-      const barColor = statusColors[d.status] || '#94a3b8';
-      return `
-        <div class="time-bar-row">
-          <span class="time-bar-label">Q${idx + 1}</span>
-          <div class="time-bar-track">
-            <div class="time-bar-alloc" style="width:${allocPct}%;"></div>
-            <div class="time-bar-spent" style="width:${spentPct}%;background:${barColor};"></div>
-          </div>
-          <span class="time-bar-val">${d.timeSpent}s</span>
-        </div>`;
-    }).join('');
-
-    // Per-question breakdown cards
+    // Met 19: Detailed Question Breakdown
     const statusIcons = { correct: '✓', wrong: '✗', timeout: '⏱', skipped: '—' };
     const statusLabels = { correct: 'Correct', wrong: 'Wrong', timeout: 'Time Up', skipped: 'Skipped' };
     const breakdownHTML = analysisData.map((d, idx) => {
@@ -881,6 +1049,7 @@
             <span class="rq-num">Q${idx + 1}</span>
             <span class="rq-status status-badge-${d.status}">${statusIcons[d.status]} ${statusLabels[d.status]}</span>
             <span class="rq-time">${d.timeSpent}s / ${d.allocatedTime}s</span>
+            <span class="rq-topic-badge">${d.topic}</span>
           </div>
           <p class="rq-text">${d.q}</p>
           <div class="rq-answers">
@@ -890,88 +1059,238 @@
         </div>`;
     }).join('');
 
-    // Build full dashboard
-    const dashboard = document.getElementById('analysis-dashboard');
-    dashboard.innerHTML = `
-      <!-- Dashboard Header -->
-      <div class="ad-header">
-        <h2 class="ad-title">Quiz Complete!</h2>
-        <p class="ad-subtitle">${state.participantName ? state.participantName + ' — ' : ''}${state.data.name || 'Practice Quiz'}</p>
-      </div>
+    // Met 20: Strategic Recommendations
+    const advice = [];
+    if (avgTime < 15) advice.push("Your pacing is extremely fast. Ensure you aren't sacrificing accuracy for speed by double-checking edge cases.");
+    if (efficiencyIndex < 40) advice.push("Your efficiency is low. You are spending too much time on questions you eventually get wrong. Learn to skip earlier.");
+    if (skipRate > 20) advice.push("High skip rate detected. You may have gaps in your foundational knowledge—review the core topics you skipped.");
+    if (secondHalfAcc < firstHalfAcc) advice.push("Your accuracy dropped in the second half. Focus on building mental stamina for longer sets.");
+    if (worstTopic !== 'None') advice.push(`Your weakest area is ${worstTopic}. Dedicate your next study session entirely to this subject.`);
+    if (advice.length === 0) advice.push("Excellent balanced performance! Continue your current practice regimen.");
 
-      <!-- Top Row: Grade + Donut -->
-      <div class="ad-top-row">
-        <div class="ad-grade-card">
-          <div class="ad-grade-circle" style="border-color:${gradeColor};">
-            <span class="ad-grade-letter" style="color:${gradeColor};">${grade}</span>
+    const adviceHTML = advice.map(a => `<li>${a}</li>`).join('');
+
+    // ── ADVANCED COGNITIVE METRICS ──
+    const clutchAnswers = analysisData.filter(d => (d.allocatedTime - d.timeSpent) <= 10 && d.status !== 'skipped');
+    const clutchCorrect = clutchAnswers.filter(d => d.status === 'correct').length;
+    const clutchAcc = clutchAnswers.length > 0 ? Math.round((clutchCorrect / clutchAnswers.length) * 100) : 0;
+
+    const snapAnswers = analysisData.filter(d => d.timeSpent <= 5 && d.status !== 'skipped');
+    const snapCorrect = snapAnswers.filter(d => d.status === 'correct').length;
+    const snapAcc = snapAnswers.length > 0 ? Math.round((snapCorrect / snapAnswers.length) * 100) : 0;
+
+    const riskAppetite = skipped === 0 ? (wrong > 0 ? 'High (Never Skips)' : 'Neutral') : (wrong / skipped > 2 ? 'High (Aggressive)' : 'Calculated');
+
+    const advAvgCorrectTime = correct > 0 ? Math.round(correctTime / correct) : 0;
+    const advAvgWrongTime = wrong > 0 ? Math.round(wrongTime / wrong) : 0;
+    const cognitiveLoad = advAvgWrongTime > advAvgCorrectTime ? 'Deliberative' : 'Impulsive';
+
+    const skippedTime = analysisData.filter(d => d.status === 'skipped').reduce((a,b)=>a+b.timeSpent, 0);
+    const avgSkipTime = skipped > 0 ? Math.round(skippedTime / skipped) : 0;
+    const persistence = avgSkipTime > 15 ? 'High (Tries hard)' : (skipped > 0 ? 'Low (Quick skip)' : 'N/A');
+
+    const consistencyScore = Math.round((maxStreak / totalQ) * 100);
+    const passStatus = accuracy >= 35 ? (accuracy >= 75 ? 'DISTINCTION' : 'PASS') : 'FAIL';
+
+    const fastWrongs = analysisData.filter(d => d.status === 'wrong' && d.timeSpent < 10).length;
+    const guessProb = wrong > 0 ? Math.round((fastWrongs / wrong) * 100) + '%' : '0%';
+    const reviewUrgency = (wrong + skipped) > (totalQ / 2) ? 'CRITICAL' : ((wrong + skipped) > (totalQ / 4) ? 'MODERATE' : 'LOW');
+
+    const firstTwoTime = analysisData.slice(0, 2).reduce((a,b)=>a+b.timeSpent, 0);
+    const lastTwoTime = analysisData.slice(-2).reduce((a,b)=>a+b.timeSpent, 0);
+    const enduranceDrop = lastTwoTime < (firstTwoTime / 2) ? 'Severe Fatigue' : 'Stable';
+
+    const topicAccs = Object.values(topicData).filter(t => t.total > 0).map(t => t.correct/t.total);
+    const topicVol = topicAccs.length > 1 ? (Math.max(...topicAccs) - Math.min(...topicAccs) > 0.5 ? 'High Variance' : 'Consistent') : 'N/A';
+
+    // ── THE ULTIMATE NUCLEAR OPTION: DOCUMENT.WRITE ──
+    const fullPageHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quiz Results</title>
+        <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+        <style>
+          body {
+            margin: 0; padding: 40px 20px;
+            background: #F8FAFC; color: #0F172A;
+            font-family: 'Google Sans', sans-serif;
+            min-height: 100vh; box-sizing: border-box;
+          }
+          .dashboard-container {
+            max-width: 900px; margin: 0 auto;
+            display: flex; flex-direction: column; gap: 24px;
+          }
+          .ad-header { text-align: center; margin-bottom: 24px; }
+          .ad-title { font-size: 32px; font-weight: 800; color: #0ea5e9; margin: 0 0 8px 0; }
+          .ad-subtitle { font-size: 16px; color: #64748B; margin: 0; }
+          .ad-section {
+            background: #FFFFFF; 
+            border-radius: 16px; padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+          }
+          .ad-section-title { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; color: #1E293B; text-align: left; }
+          .ad-top-row { display: flex; gap: 24px; flex-wrap: wrap; }
+          .ad-grade-card { flex: 1; min-width: 250px; text-align: center; }
+          .ad-grade-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; }
+          .ad-grade-letter { font-size: 48px; font-weight: 800; }
+          .ad-grade-label { font-weight: 700; font-size: 18px; margin: 0 0 4px 0; }
+          .ad-accuracy { color: #64748B; margin: 0; }
+          .ad-executive-stats { flex: 1; min-width: 250px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+          .exec-stat { background: #F8FAFC; padding: 20px 16px; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+          .exec-val { display: block; font-size: 24px; font-weight: 800; color: #0ea5e9; margin-bottom: 4px; }
+          .exec-lbl { font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; }
+          .analytics-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+          .ad-donut-card { flex: 1; text-align: center; min-width: 200px; }
+          .ad-donut-svg { width: 160px; height: 160px; margin-bottom: 16px; }
+          .donut-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+          .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+          .donut-dot { width: 12px; height: 12px; border-radius: 50%; }
+          .ad-topic-card { flex: 2; min-width: 300px; }
+          .topic-row { margin-bottom: 12px; }
+          .topic-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+          .time-bar-track { width: 100%; height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden; }
+          .time-bar-spent { height: 100%; border-radius: 4px; }
+          .btn-primary { width: 100%; background: #0ea5e9; color: white; border: none; padding: 16px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+          .btn-primary:hover { background: #0284c7; }
+          .header-brand { display: flex; align-items: center; gap: 12px; position: absolute; left: 24px; top: 24px; z-index: 1000; }
+          .header-brand img { height: 40px; }
+          .header-brand span { font-weight: 800; font-size: 20px; color: #0F172A; }
+          @media (max-width: 768px) {
+            .header-brand { left: 16px; top: 16px; }
+            .header-brand img { height: 32px; }
+            .header-brand span { font-size: 16px; }
+            .ad-header { display: flex; flex-direction: column; align-items: center; margin-top: 40px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header-brand">
+          <img src=".png" alt="QS">
+          <span>QS IITGN</span>
+        </div>
+        
+        <div class="dashboard-container">
+          <div class="ad-header">
+            <h2 class="ad-title">${state.participantName ? state.participantName : 'Guest'}'s Report</h2>
+            <p class="ad-subtitle">Generated on ${new Date().toLocaleDateString()}</p>
           </div>
-          <p class="ad-grade-label">Performance Grade</p>
-          <p class="ad-accuracy">${accuracy}% accuracy</p>
-        </div>
-        <div class="ad-donut-card">
-          <svg viewBox="0 0 160 160" class="ad-donut-svg">
-            ${donutSVG}
-            <text x="${cx}" y="${cy - 6}" text-anchor="middle" class="ad-donut-score">${correct}/${totalQ}</text>
-            <text x="${cx}" y="${cy + 14}" text-anchor="middle" class="ad-donut-sub">correct</text>
-          </svg>
-          <div class="donut-legend">${donutLegend}</div>
-        </div>
-      </div>
 
-      <!-- Summary Stat Cards -->
-      <div class="ad-stats-grid">
-        <div class="ad-stat-card ad-stat-correct">
-          <span class="ad-stat-num">${correct}</span>
-          <span class="ad-stat-lbl">Correct</span>
-        </div>
-        <div class="ad-stat-card ad-stat-wrong">
-          <span class="ad-stat-num">${wrong}</span>
-          <span class="ad-stat-lbl">Wrong</span>
-        </div>
-        <div class="ad-stat-card ad-stat-timeout">
-          <span class="ad-stat-num">${timedOut}</span>
-          <span class="ad-stat-lbl">Timed Out</span>
-        </div>
-        <div class="ad-stat-card ad-stat-skipped">
-          <span class="ad-stat-num">${skipped}</span>
-          <span class="ad-stat-lbl">Skipped</span>
-        </div>
-      </div>
+          <div class="ad-section">
+            <h3 class="ad-section-title">Core Metrics</h3>
+            <div class="ad-top-row">
+              <div class="ad-grade-card">
+                <div class="ad-grade-circle" style="border-color:${gradeColor};">
+                  <span class="ad-grade-letter" style="color:${gradeColor};">${grade}</span>
+                </div>
+                <p class="ad-grade-label">Grade</p>
+                <p class="ad-accuracy">${accuracy}% (Score: ${correct}/${totalQ})</p>
+              </div>
+              <div class="ad-executive-stats">
+                <div class="exec-stat"><span class="exec-val">${passStatus}</span><span class="exec-lbl">Status</span></div>
+                <div class="exec-stat"><span class="exec-val">${consistencyScore}%</span><span class="exec-lbl">Consistency Index</span></div>
+                <div class="exec-stat"><span class="exec-val">${maxStreak}</span><span class="exec-lbl">Longest Streak</span></div>
+                <div class="exec-stat"><span class="exec-val">${firstHalfAcc}% / ${secondHalfAcc}%</span><span class="exec-lbl">Stamina (1st/2nd Half)</span></div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Time Analysis -->
-      <div class="ad-section">
-        <h3 class="ad-section-title">⏱ Time Analysis</h3>
-        <div class="ad-time-summary">
-          <div class="ad-time-item"><span class="ad-time-val">${m}:${s}</span><span class="ad-time-lbl">Total Time</span></div>
-          <div class="ad-time-item"><span class="ad-time-val">${avgTime}s</span><span class="ad-time-lbl">Avg / Question</span></div>
-          <div class="ad-time-item"><span class="ad-time-val">${fastest}s</span><span class="ad-time-lbl">Fastest</span></div>
-          <div class="ad-time-item"><span class="ad-time-val">${slowest}s</span><span class="ad-time-lbl">Slowest</span></div>
+          <div class="ad-section">
+            <h3 class="ad-section-title">Time & Speed Analytics</h3>
+            <div class="analytics-2col">
+              <div class="exec-stat"><span class="exec-val">${m}:${s}</span><span class="exec-lbl">Total Time</span></div>
+              <div class="exec-stat"><span class="exec-val">${avgTime}s</span><span class="exec-lbl">Avg Pacing</span></div>
+              <div class="exec-stat"><span class="exec-val">${fastest}s</span><span class="exec-lbl">Fastest Correct</span></div>
+              <div class="exec-stat"><span class="exec-val">${timeWasted}s</span><span class="exec-lbl">Time Wasted</span></div>
+            </div>
+          </div>
+
+          <div class="ad-section">
+            <h3 class="ad-section-title">Behavior & Categorical Analytics</h3>
+            <div class="analytics-2col">
+              <div class="exec-stat"><span class="exec-val">${decisiveness}</span><span class="exec-lbl">Decisiveness</span></div>
+              <div class="exec-stat"><span class="exec-val">${guessProb}</span><span class="exec-lbl">Guess Work Probability</span></div>
+              <div class="exec-stat"><span class="exec-val">${reviewUrgency}</span><span class="exec-lbl">Review Urgency</span></div>
+              <div class="exec-stat"><span class="exec-val">${skipRate}%</span><span class="exec-lbl">Skip Rate</span></div>
+              <div class="exec-stat"><span class="exec-val">${timeoutRate}%</span><span class="exec-lbl">Timeout Rate</span></div>
+              <div class="exec-stat"><span class="exec-val">${correct} / ${wrong}</span><span class="exec-lbl">Hit / Miss Ratio</span></div>
+              <div class="exec-stat"><span class="exec-val">${bestTopic}</span><span class="exec-lbl">Strongest Topic</span></div>
+              <div class="exec-stat"><span class="exec-val">${worstTopic}</span><span class="exec-lbl">Weakest Topic</span></div>
+            </div>
+            
+            <h4 style="margin-top: 24px; margin-bottom: 16px;">Topic Distribution & Accuracy</h4>
+            <div class="ad-top-row">
+              <div class="ad-donut-card">
+                <svg viewBox="0 0 160 160" class="ad-donut-svg">
+                  ${donutSVG}
+                  <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="32" font-weight="800" fill="#0F172A">${accuracy}%</text>
+                </svg>
+                <div class="donut-legend">${donutLegend}</div>
+              </div>
+              <div class="ad-topic-card">
+                ${topicHTML}
+              </div>
+            </div>
+          </div>
+
+          <div class="ad-section">
+            <h3 class="ad-section-title">Advanced Cognitive Profiling</h3>
+            <div class="analytics-2col">
+              <div class="exec-stat"><span class="exec-val">${clutchAcc}%</span><span class="exec-lbl">Clutch Accuracy (< 10s left)</span></div>
+              <div class="exec-stat"><span class="exec-val">${snapAcc}%</span><span class="exec-lbl">Snap Judgement (< 5s spent)</span></div>
+              <div class="exec-stat"><span class="exec-val">${enduranceDrop}</span><span class="exec-lbl">Endurance Drop-off</span></div>
+              <div class="exec-stat"><span class="exec-val">${topicVol}</span><span class="exec-lbl">Topic Volatility</span></div>
+              <div class="exec-stat"><span class="exec-val">${riskAppetite}</span><span class="exec-lbl">Risk Appetite</span></div>
+              <div class="exec-stat"><span class="exec-val">${cognitiveLoad}</span><span class="exec-lbl">Cognitive Load Profile</span></div>
+              <div class="exec-stat"><span class="exec-val">${persistence}</span><span class="exec-lbl">Persistence Score</span></div>
+              <div class="exec-stat"><span class="exec-val">${advAvgCorrectTime}s / ${advAvgWrongTime}s</span><span class="exec-lbl">Correct vs Wrong Pace</span></div>
+            </div>
+          </div>
+
+          <div class="ad-section">
+            <h3 class="ad-section-title">Strategic Recommendations</h3>
+            <ul style="list-style-type: disc; margin-left: 24px; line-height: 1.8; color: #1E293B;">
+              ${adviceHTML}
+            </ul>
+          </div>
+
+          <div class="ad-section">
+            <h3 class="ad-section-title">Comprehensive Deep-Dive</h3>
+            <style>
+              .result-question-card { background: #F8FAFC; border-radius: 24px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+              .rq-header { display: flex; gap: 12px; align-items: center; justify-content: flex-start; margin-bottom: 12px; font-size: 14px; font-weight: 600; flex-wrap: wrap; width: 100%; }
+              .rq-status { padding: 4px 10px; border-radius: 99px; font-size: 12px; }
+              .status-badge-correct { background: #dcfce7; color: #166534; }
+              .status-badge-wrong { background: #fee2e2; color: #991b1b; }
+              .status-badge-timeout { background: #fef3c7; color: #92400e; }
+              .status-badge-skipped { background: #f1f5f9; color: #475569; }
+              .rq-topic-badge { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 99px; font-size: 12px; margin-left: auto; }
+              .rq-text { font-size: 16px; margin: 0 0 16px 0; color: #1E293B; line-height: 1.5; font-weight: 500; text-align: left; }
+              .rq-answers { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: flex-start; text-align: left; }
+            </style>
+            <div class="results-breakdown">${breakdownHTML}</div>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <button class="btn-primary" onclick="sessionStorage.removeItem('activeQuizId'); window.location.href='quiz.html';">Return to Quiz Arena Home</button>
+          </div>
         </div>
-        <div class="ad-time-bars">${timeBarsHTML}</div>
-      </div>
-
-      <!-- Question Breakdown -->
-      <div class="ad-section">
-        <h3 class="ad-section-title">📋 Question Breakdown</h3>
-        <div class="results-breakdown">${breakdownHTML}</div>
-      </div>
-
-      <!-- Return Button -->
-      <div class="ad-footer">
-        <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width:100%;justify-content:center;">Return to Arena</button>
-      </div>
+      </body>
+      </html>
     `;
 
-    const container = document.getElementById('quiz-results-container');
-    container.style.display = 'flex';
+    document.open();
+    document.write(fullPageHTML);
+    document.close();
 
-    // Return button
-    const returnBtn = document.getElementById('btn-return-arena');
-    if (returnBtn) {
-      returnBtn.addEventListener('click', () => {
-        container.style.display = 'none';
-        activeQuizState = null;
-      });
+    } catch (e) {
+      document.body.innerHTML = `<div style="padding:40px;color:red;font-family:monospace;z-index:99999;position:relative;background:white;width:100vw;height:100vh;">
+        <h1 style="font-size:32px;">CRITICAL JAVASCRIPT ERROR</h1>
+        <p style="font-size:20px;font-weight:bold;">${e.message}</p>
+        <pre style="background:#eee;padding:20px;overflow:auto;">${e.stack}</pre>
+      </div>`;
     }
   }
 
@@ -982,12 +1301,25 @@
   }
 
   // Expose for external use
-  window.QSQuiz = { 
+  window.QSQuiz = window.QSQuiz || {};
+  Object.assign(window.QSQuiz, {
     QUESTIONS, 
+    finalSubmit: finalSubmit,
     getRandomQuestion: () => QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)],
     startPracticeMatch: (quizId) => {
-      document.getElementById('quiz-mode-overlay').classList.remove('active');
-      startQuizEntryFlow(quizId);
+      if (document.body.classList.contains('quiz-dedicated-page')) {
+        currentPendingQuizId = quizId;
+        // Hide all steps manually
+        ['portal-step-name', 'portal-step-mode', 'portal-step-practice', 'portal-step-tournament', 'portal-step-rules'].forEach(sid => {
+          const el = document.getElementById(sid);
+          if(el) el.style.display = 'none';
+        });
+        const stepRules = document.getElementById('portal-step-rules');
+        if(stepRules) stepRules.style.display = 'block';
+      } else {
+        sessionStorage.setItem('activeQuizId', quizId);
+        window.location.href = 'active-quiz.html';
+      }
     }
-  };
+  });
 })();

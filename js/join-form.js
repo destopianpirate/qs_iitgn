@@ -6,23 +6,7 @@
 (function () {
   'use strict';
 
-  // Firebase config — replace with your own project keys
-  const firebaseConfig = {
-    apiKey: "AIzaSyDemoKeyReplace",
-    authDomain: "qs-iitgn.firebaseapp.com",
-    databaseURL: "https://qs-iitgn-default-rtdb.firebaseio.com",
-    projectId: "qs-iitgn",
-    storageBucket: "qs-iitgn.appspot.com",
-    messagingSenderId: "000000000000",
-    appId: "1:000000000000:web:abcdef123456"
-  };
 
-  // Initialize Firebase only if SDK is loaded
-  let db = null;
-  if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-  }
 
   // Validators
   function validatePhone(phone) {
@@ -130,8 +114,8 @@
       };
 
       try {
-        if (db) {
-          await db.ref('applications').push(data);
+        if (window.db) {
+          await window.db.collection('applications').add(data);
         } else {
           console.log('Firebase not configured. Form data:', data);
         }

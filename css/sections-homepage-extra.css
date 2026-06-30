@@ -1,0 +1,247 @@
+/* ════════════════════════════════════════════
+   HOMEPAGE EXTRAS — Animated Elements & Fills
+   ════════════════════════════════════════════ */
+
+/* ── Floating Category Icons Section ── */
+.floating-icons-section {
+  position: relative;
+  padding: var(--space-8) 0;
+  overflow: hidden;
+  min-height: 120px;
+}
+.floating-icons-track {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+.float-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  animation: iconFloat 3s ease-in-out infinite;
+  opacity: 0.7;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.float-icon:hover {
+  opacity: 1;
+  transform: scale(1.15) !important;
+}
+.float-icon:nth-child(1) { animation-delay: 0s; }
+.float-icon:nth-child(2) { animation-delay: 0.4s; }
+.float-icon:nth-child(3) { animation-delay: 0.8s; }
+.float-icon:nth-child(4) { animation-delay: 1.2s; }
+.float-icon:nth-child(5) { animation-delay: 1.6s; }
+.float-icon:nth-child(6) { animation-delay: 2.0s; }
+
+.float-icon svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  fill: none;
+  filter: drop-shadow(0 4px 12px rgba(76,181,245,0.2));
+}
+.float-icon-label {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ── How It Works Section ── */
+.how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  position: relative;
+}
+.hiw-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--bg-alt);
+  border-radius: var(--radius-xl);
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.hiw-step:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+.hiw-number {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #0ea5e9);
+  color: #ffffff;
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(76,181,245,0.3);
+}
+.hiw-step h4 {
+  font-size: var(--fs-lg);
+  color: var(--text);
+  margin: 0;
+}
+.hiw-step p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Connecting arrows between steps */
+.hiw-arrow {
+  position: absolute;
+  top: 50%;
+  right: -28px;
+  transform: translateY(-50%);
+  color: var(--primary);
+  font-size: 1.5rem;
+  z-index: 2;
+  opacity: 0.6;
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse {
+  0%, 100% { opacity: 0.4; transform: translateY(-50%) translateX(0); }
+  50% { opacity: 0.8; transform: translateY(-50%) translateX(4px); }
+}
+
+/* ── Decorative Floating Question Marks ── */
+.section-deco-float {
+  position: absolute;
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--primary);
+  opacity: 0.04;
+  pointer-events: none;
+  animation: decoSpin 20s linear infinite;
+  z-index: 0;
+}
+@keyframes decoSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Knowledge Pulse Badges ── */
+.knowledge-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+.k-badge {
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-alt);
+  border: 1px solid var(--section-divider);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+  cursor: default;
+}
+.k-badge:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: scale(1.08);
+}
+
+/* ── Fun Facts Grid (replaces empty space) ── */
+.fun-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+.fun-fact-card {
+  background: var(--bg-alt);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.fun-fact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), #22c55e);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.fun-fact-card:hover {
+  border-color: var(--primary-border);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.fun-fact-card:hover::before {
+  opacity: 1;
+}
+.fun-fact-emoji {
+  font-size: 1.8rem;
+}
+.fun-fact-text {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.fun-fact-text strong {
+  color: var(--text);
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE — Homepage Extras
+   ════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .floating-icons-track {
+    gap: var(--space-6);
+  }
+  .float-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+  .float-icon-label {
+    font-size: 10px;
+  }
+
+  .how-it-works-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .hiw-arrow {
+    display: none;
+  }
+
+  .fun-facts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-badges {
+    gap: var(--space-2);
+  }
+}

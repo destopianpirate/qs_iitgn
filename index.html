@@ -23,11 +23,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=3">
-  <link rel="stylesheet" href="css/base.css?v=3">
-  <link rel="stylesheet" href="css/animations.css?v=3">
-  <link rel="stylesheet" href="css/components.css?v=3">
-  <link rel="stylesheet" href="css/sections.css?v=3">
+  <link rel="stylesheet" href="css/variables.css?v=8">
+  <link rel="stylesheet" href="css/base.css?v=8">
+  <link rel="stylesheet" href="css/animations.css?v=8">
+  <link rel="stylesheet" href="css/components.css?v=8">
+  <link rel="stylesheet" href="css/sections.css?v=8">
 </head>
 
 <body>
@@ -89,21 +89,6 @@
   <main>
     <section class="hero" id="hero" aria-label="Hero">
       <canvas id="particle-canvas" aria-hidden="true"></canvas>
-
-      <!-- Background Animated Blobs -->
-      <div class="hero-blobs" aria-hidden="true">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-      </div>
-
-      <!-- Floating Thematic SVGs -->
-      <div class="hero-decorations" aria-hidden="true">
-        <svg class="decor-icon decor-bulb anim-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21h6"/><path d="M10 21v-2c0-1.5-1-3-2-4-1.5-1.5-2-3.5-2-5.5a6 6 0 0 1 12 0c0 2-.5 4-2 5.5-1 1-2 2.5-2 4v2"/><path d="M12 2v2"/><path d="M12 10a2 2 0 0 0-2 2"/></svg>
-        <svg class="decor-icon decor-brain anim-float-delayed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></svg>
-        <svg class="decor-icon decor-question anim-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1"/></svg>
-        <svg class="decor-icon decor-star anim-float-fast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </div>
 
       <div class="hero-content">
         <div class="hero-logos">
@@ -177,6 +162,39 @@
       </div>
     </div>
   
+    <!-- ════════════════════════════════════════
+         FLOATING CATEGORY ICONS
+         ════════════════════════════════════════ -->
+    <div class="floating-icons-section" aria-hidden="true">
+      <div class="container">
+        <div class="floating-icons-track">
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span class="float-icon-label">Trivia</span>
+          </div>
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span class="float-icon-label">Literature</span>
+          </div>
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="float-icon-label">Geography</span>
+          </div>
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            <span class="float-icon-label">Sports</span>
+          </div>
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span class="float-icon-label">Tech</span>
+          </div>
+          <div class="float-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+            <span class="float-icon-label">Science</span>
+          </div>
+        </div>
+      </div>
+    </div>
 <!-- ABOUT SECTION -->
     <section class="section" id="about" aria-label="About us">
       <div class="container">
@@ -278,6 +296,53 @@
 
     <!-- ════════════════════════════════════════
          SECTION 4 — FEATURED EVENTS
+         ════════════════════════════════════════ -->
+
+    <!-- ════════════════════════════════════════
+         HOW IT WORKS
+         ════════════════════════════════════════ -->
+    <section class="section" id="how-it-works" aria-label="How It Works">
+      <div class="container">
+        <div class="section-header" data-scroll="fade-up">
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-subtitle">Three simple steps to start your quizzing journey.</p>
+        </div>
+        <div class="how-it-works-grid" data-scroll="fade-up">
+          <div class="hiw-step">
+            <div class="hiw-number">1</div>
+            <h4>Join the Community</h4>
+            <p>Sign up, introduce yourself, and connect with fellow trivia enthusiasts on our Discord server.</p>
+            <span class="hiw-arrow" aria-hidden="true">→</span>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-number">2</div>
+            <h4>Practice Daily</h4>
+            <p>Attempt the question of the day, solve timed quizzes, and sharpen your skills across 10+ categories.</p>
+            <span class="hiw-arrow" aria-hidden="true">→</span>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-number">3</div>
+            <h4>Compete & Win</h4>
+            <p>Participate in weekly tournaments, inter-college contests, and climb the hall of fame leaderboard.</p>
+          </div>
+        </div>
+        <div class="knowledge-badges" data-scroll="fade-up">
+          <span class="k-badge">Science</span>
+          <span class="k-badge">History</span>
+          <span class="k-badge">Geography</span>
+          <span class="k-badge">Pop Culture</span>
+          <span class="k-badge">Sports</span>
+          <span class="k-badge">Literature</span>
+          <span class="k-badge">Technology</span>
+          <span class="k-badge">Arts</span>
+          <span class="k-badge">Mathematics</span>
+          <span class="k-badge">IITGN Special</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 5 — FEATURED EVENTS
          ════════════════════════════════════════ -->
     <section class="section" id="events" aria-label="Featured Events">
       <div class="container">
@@ -393,6 +458,44 @@
                 <p>Current Member</p>
               </div>
             </div>
+          </div>
+          <div class="testimonial-card" data-scroll="fade-up" data-scroll-delay="300">
+            <p class="testimonial-quote">"From barely knowing the rules to captaining our college team at nationals — the society's mentorship and practice sessions made it all possible."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">R</div>
+              <div class="testimonial-info">
+                <h4>Rahul Krishnan</h4>
+                <p>Team Captain, 2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fun Facts Grid -->
+        <div class="fun-facts-grid" data-scroll="fade-up">
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">🧠</span>
+            <p class="fun-fact-text"><strong>Did you know?</strong> The human brain can store an estimated 2.5 petabytes of information — enough to hold 3 million hours of TV.</p>
+          </div>
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">🏆</span>
+            <p class="fun-fact-text"><strong>Quiz record:</strong> IITGN teams have participated in 15+ national quiz tournaments, placing in the top 5 multiple times.</p>
+          </div>
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">⚡</span>
+            <p class="fun-fact-text"><strong>Speed matters:</strong> The fastest buzzer response ever recorded in a college quiz was 0.3 seconds after the question was read.</p>
+          </div>
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">📚</span>
+            <p class="fun-fact-text"><strong>Archive:</strong> Our question bank has over 5,000 curated questions spanning 10+ categories and difficulty levels.</p>
+          </div>
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">🌍</span>
+            <p class="fun-fact-text"><strong>Global reach:</strong> QS members have competed in quiz leagues spanning 12 countries and 3 continents.</p>
+          </div>
+          <div class="fun-fact-card">
+            <span class="fun-fact-emoji">🎯</span>
+            <p class="fun-fact-text"><strong>Weekly practice:</strong> We host 2-3 quiz sessions per week covering everything from science to pop culture.</p>
           </div>
         </div>
       </div>

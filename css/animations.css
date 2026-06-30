@@ -220,24 +220,3 @@
   opacity: 1;
   transform: translateY(0);
 }
-
-/* ── Hero Blobs & Decorations Keyframes ── */
-@keyframes blobFloat {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(20px, -20px) scale(1.05); }
-  100% { transform: translate(-20px, 20px) scale(0.95); }
-}
-
-.anim-float {
-  animation: float-gentle 6s ease-in-out infinite;
-}
-.anim-float-delayed {
-  animation: float-gentle 8s ease-in-out infinite alternate-reverse;
-  animation-delay: 1s;
-}
-.anim-float-fast {
-  animation: float-gentle 4s ease-in-out infinite;
-}
-.anim-pulse {
-  animation: scale-bounce 3s infinite alternate;
-}

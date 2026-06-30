@@ -777,7 +777,7 @@
     overlay.classList.add('active');
   }
 
-  // ── Final Submit — detailed analysis ──
+  // ── Final Submit — Full Analysis Dashboard ──
   function finalSubmit() {
     pauseTimer();
     saveCurrentAnswer();
@@ -785,80 +785,190 @@
 
     const state = activeQuizState;
     const questions = state.data.questions;
-    let correct = 0, wrong = 0, skipped = 0, timeout = 0;
+    let correct = 0, wrong = 0, skipped = 0, timedOut = 0;
 
-    // Build per-question analysis
     const analysisData = questions.map((q, idx) => {
       const userAns = state.userAnswers[idx];
       const isCorrect = userAns != null && String(userAns) === String(q.ans);
+      if (isCorrect) correct++;
 
       let status;
-      if (userAns === null && state.locked[idx]) { status = 'timeout'; timeout++; }
+      if (userAns === null && state.locked[idx]) { status = 'timeout'; timedOut++; }
       else if (userAns === null) { status = 'skipped'; skipped++; }
-      else if (isCorrect) { status = 'correct'; correct++; }
+      else if (isCorrect) { status = 'correct'; }
       else { status = 'wrong'; wrong++; }
 
-      return { q: q.q, userAns, correctAns: q.ans, timeSpent: state.timeSpent[idx], status, type: q.type };
+      const allocatedTime = q.timer || 30;
+      return { q: q.q, userAns, correctAns: q.ans, timeSpent: state.timeSpent[idx], allocatedTime, status, type: q.type, idx };
     });
 
+    const totalQ = questions.length;
     const totalTime = state.totalTimeTaken;
-    const avgTime = Math.round(totalTime / questions.length);
     const m = Math.floor(totalTime / 60).toString().padStart(2, '0');
     const s = (totalTime % 60).toString().padStart(2, '0');
-    const accuracy = Math.round((correct / questions.length) * 100);
+    const accuracy = Math.round((correct / totalQ) * 100);
+    const avgTime = totalQ > 0 ? (totalTime / totalQ).toFixed(1) : '0';
 
-    // Populate results
+    // Performance grade
+    let grade, gradeColor;
+    if (accuracy >= 95) { grade = 'A+'; gradeColor = '#22c55e'; }
+    else if (accuracy >= 85) { grade = 'A'; gradeColor = '#22c55e'; }
+    else if (accuracy >= 75) { grade = 'B+'; gradeColor = '#84cc16'; }
+    else if (accuracy >= 65) { grade = 'B'; gradeColor = '#eab308'; }
+    else if (accuracy >= 50) { grade = 'C'; gradeColor = '#f59e0b'; }
+    else if (accuracy >= 35) { grade = 'D'; gradeColor = '#ef4444'; }
+    else { grade = 'F'; gradeColor = '#dc2626'; }
+
+    // Fastest / Slowest (excluding locked/skipped with 0 time)
+    const answeredData = analysisData.filter(d => d.status === 'correct' || d.status === 'wrong');
+    const fastest = answeredData.length > 0 ? Math.min(...answeredData.map(d => d.timeSpent)) : 0;
+    const slowest = answeredData.length > 0 ? Math.max(...answeredData.map(d => d.timeSpent)) : 0;
+
+    // SVG Donut chart data
+    const donutData = [
+      { label: 'Correct', count: correct, color: '#22c55e' },
+      { label: 'Wrong', count: wrong, color: '#ef4444' },
+      { label: 'Timed Out', count: timedOut, color: '#f59e0b' },
+      { label: 'Skipped', count: skipped, color: '#94a3b8' }
+    ].filter(d => d.count > 0);
+
+    let donutSVG = '';
+    const radius = 60, cx = 80, cy = 80, circumference = 2 * Math.PI * radius;
+    let cumulativeOffset = 0;
+    donutData.forEach(seg => {
+      const pct = seg.count / totalQ;
+      const dashLen = pct * circumference;
+      const dashGap = circumference - dashLen;
+      const rotation = (cumulativeOffset / totalQ) * 360 - 90;
+      donutSVG += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${seg.color}" stroke-width="18" stroke-dasharray="${dashLen} ${dashGap}" transform="rotate(${rotation} ${cx} ${cy})" stroke-linecap="round" style="transition: stroke-dasharray 1s ease;"/>`;
+      cumulativeOffset += seg.count;
+    });
+
+    const donutLegend = donutData.map(d => `
+      <div class="donut-legend-item">
+        <span class="donut-dot" style="background:${d.color};"></span>
+        <span class="donut-legend-label">${d.label}</span>
+        <span class="donut-legend-value">${d.count}</span>
+      </div>
+    `).join('');
+
+    // Per-question time bars
+    const maxAlloc = Math.max(...analysisData.map(d => d.allocatedTime), 1);
+    const timeBarsHTML = analysisData.map((d, idx) => {
+      const spentPct = Math.min((d.timeSpent / maxAlloc) * 100, 100);
+      const allocPct = Math.min((d.allocatedTime / maxAlloc) * 100, 100);
+      const statusColors = { correct: '#22c55e', wrong: '#ef4444', timeout: '#f59e0b', skipped: '#94a3b8' };
+      const barColor = statusColors[d.status] || '#94a3b8';
+      return `
+        <div class="time-bar-row">
+          <span class="time-bar-label">Q${idx + 1}</span>
+          <div class="time-bar-track">
+            <div class="time-bar-alloc" style="width:${allocPct}%;"></div>
+            <div class="time-bar-spent" style="width:${spentPct}%;background:${barColor};"></div>
+          </div>
+          <span class="time-bar-val">${d.timeSpent}s</span>
+        </div>`;
+    }).join('');
+
+    // Per-question breakdown cards
+    const statusIcons = { correct: '✓', wrong: '✗', timeout: '⏱', skipped: '—' };
+    const statusLabels = { correct: 'Correct', wrong: 'Wrong', timeout: 'Time Up', skipped: 'Skipped' };
+    const breakdownHTML = analysisData.map((d, idx) => {
+      const userDisplay = d.userAns !== null ? d.userAns : '—';
+      return `
+        <div class="result-question-card status-${d.status}">
+          <div class="rq-header">
+            <span class="rq-num">Q${idx + 1}</span>
+            <span class="rq-status status-badge-${d.status}">${statusIcons[d.status]} ${statusLabels[d.status]}</span>
+            <span class="rq-time">${d.timeSpent}s / ${d.allocatedTime}s</span>
+          </div>
+          <p class="rq-text">${d.q}</p>
+          <div class="rq-answers">
+            <div class="rq-ans"><span class="rq-label">Your answer:</span> <span class="rq-val rq-user-${d.status}">${userDisplay}</span></div>
+            <div class="rq-ans"><span class="rq-label">Correct:</span> <span class="rq-val rq-correct">${d.correctAns}</span></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Build full dashboard
+    const dashboard = document.getElementById('analysis-dashboard');
+    dashboard.innerHTML = `
+      <!-- Dashboard Header -->
+      <div class="ad-header">
+        <h2 class="ad-title">Quiz Complete!</h2>
+        <p class="ad-subtitle">${state.participantName ? state.participantName + ' — ' : ''}${state.data.name || 'Practice Quiz'}</p>
+      </div>
+
+      <!-- Top Row: Grade + Donut -->
+      <div class="ad-top-row">
+        <div class="ad-grade-card">
+          <div class="ad-grade-circle" style="border-color:${gradeColor};">
+            <span class="ad-grade-letter" style="color:${gradeColor};">${grade}</span>
+          </div>
+          <p class="ad-grade-label">Performance Grade</p>
+          <p class="ad-accuracy">${accuracy}% accuracy</p>
+        </div>
+        <div class="ad-donut-card">
+          <svg viewBox="0 0 160 160" class="ad-donut-svg">
+            ${donutSVG}
+            <text x="${cx}" y="${cy - 6}" text-anchor="middle" class="ad-donut-score">${correct}/${totalQ}</text>
+            <text x="${cx}" y="${cy + 14}" text-anchor="middle" class="ad-donut-sub">correct</text>
+          </svg>
+          <div class="donut-legend">${donutLegend}</div>
+        </div>
+      </div>
+
+      <!-- Summary Stat Cards -->
+      <div class="ad-stats-grid">
+        <div class="ad-stat-card ad-stat-correct">
+          <span class="ad-stat-num">${correct}</span>
+          <span class="ad-stat-lbl">Correct</span>
+        </div>
+        <div class="ad-stat-card ad-stat-wrong">
+          <span class="ad-stat-num">${wrong}</span>
+          <span class="ad-stat-lbl">Wrong</span>
+        </div>
+        <div class="ad-stat-card ad-stat-timeout">
+          <span class="ad-stat-num">${timedOut}</span>
+          <span class="ad-stat-lbl">Timed Out</span>
+        </div>
+        <div class="ad-stat-card ad-stat-skipped">
+          <span class="ad-stat-num">${skipped}</span>
+          <span class="ad-stat-lbl">Skipped</span>
+        </div>
+      </div>
+
+      <!-- Time Analysis -->
+      <div class="ad-section">
+        <h3 class="ad-section-title">⏱ Time Analysis</h3>
+        <div class="ad-time-summary">
+          <div class="ad-time-item"><span class="ad-time-val">${m}:${s}</span><span class="ad-time-lbl">Total Time</span></div>
+          <div class="ad-time-item"><span class="ad-time-val">${avgTime}s</span><span class="ad-time-lbl">Avg / Question</span></div>
+          <div class="ad-time-item"><span class="ad-time-val">${fastest}s</span><span class="ad-time-lbl">Fastest</span></div>
+          <div class="ad-time-item"><span class="ad-time-val">${slowest}s</span><span class="ad-time-lbl">Slowest</span></div>
+        </div>
+        <div class="ad-time-bars">${timeBarsHTML}</div>
+      </div>
+
+      <!-- Question Breakdown -->
+      <div class="ad-section">
+        <h3 class="ad-section-title">📋 Question Breakdown</h3>
+        <div class="results-breakdown">${breakdownHTML}</div>
+      </div>
+
+      <!-- Return Button -->
+      <div class="ad-footer">
+        <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width:100%;justify-content:center;">Return to Arena</button>
+      </div>
+    `;
+
     const container = document.getElementById('quiz-results-container');
     container.style.display = 'flex';
-
-    document.getElementById('results-score').textContent = `${correct}/${questions.length}`;
-    document.getElementById('results-time').textContent = `${m}:${s}`;
-    document.getElementById('results-accuracy').textContent = accuracy + '%';
-    document.getElementById('results-avg-time').textContent = avgTime + 's';
-
-    // Populate chart
-    const totalQ = questions.length;
-    document.getElementById('chart-correct').style.width = (correct / totalQ * 100) + '%';
-    document.getElementById('chart-wrong').style.width = (wrong / totalQ * 100) + '%';
-    document.getElementById('chart-skipped').style.width = (skipped / totalQ * 100) + '%';
-    document.getElementById('chart-timeout').style.width = (timeout / totalQ * 100) + '%';
-
-    document.getElementById('legend-c').textContent = correct;
-    document.getElementById('legend-w').textContent = wrong;
-    document.getElementById('legend-s').textContent = skipped;
-    document.getElementById('legend-t').textContent = timeout;
-
-    // Per-question breakdown
-    const breakdown = document.getElementById('results-breakdown');
-    if (breakdown) {
-      breakdown.innerHTML = analysisData.map((d, idx) => {
-        const statusIcons = { correct: '✓', wrong: '✗', timeout: '⏱', skipped: '—' };
-        const statusLabels = { correct: 'Correct', wrong: 'Wrong', timeout: 'Time Up', skipped: 'Skipped' };
-        const userDisplay = d.userAns !== null ? d.userAns : '—';
-        return `
-          <div class="result-question-card status-${d.status}">
-            <div class="rq-header">
-              <span class="rq-num">Q${idx + 1}</span>
-              <span class="rq-status status-badge-${d.status}">${statusIcons[d.status]} ${statusLabels[d.status]}</span>
-              <span class="rq-time">${d.timeSpent}s</span>
-            </div>
-            <p class="rq-text">${d.q}</p>
-            <div class="rq-answers">
-              <div class="rq-ans"><span class="rq-label">Your answer:</span> <span class="rq-val rq-user-${d.status}">${userDisplay}</span></div>
-              <div class="rq-ans"><span class="rq-label">Correct:</span> <span class="rq-val rq-correct">${d.correctAns}</span></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
 
     // Return button
     const returnBtn = document.getElementById('btn-return-arena');
     if (returnBtn) {
-      const clone = returnBtn.cloneNode(true);
-      returnBtn.parentNode.replaceChild(clone, returnBtn);
-      clone.addEventListener('click', () => {
+      returnBtn.addEventListener('click', () => {
         container.style.display = 'none';
         activeQuizState = null;
       });

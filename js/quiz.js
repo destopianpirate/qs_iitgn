@@ -210,7 +210,7 @@
       
       tourneyError.style.display = 'none';
       overlay.classList.remove('active');
-      startCountdown('tournament_1');
+      startQuizEntryFlow('tournament_1');
     });
 
     // Practice Flow
@@ -224,44 +224,74 @@
       practiceSection.style.display = 'none';
       modeChoices.style.display = 'flex';
     });
+
+    // Setup Quiz Entry Flow listeners
+    const btnEntryNext = document.getElementById('btn-entry-next');
+    const btnEntryStart = document.getElementById('btn-entry-start');
+    const nameInput = document.getElementById('quiz-participant-name');
+    const stepName = document.getElementById('entry-step-name');
+    const stepRules = document.getElementById('entry-step-rules');
+    const entryOverlay = document.getElementById('quiz-entry-overlay');
+
+    if (btnEntryNext) {
+      btnEntryNext.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        if (!name) {
+          alert('Please enter your name');
+          return;
+        }
+        participantName = name;
+        stepName.style.display = 'none';
+        stepRules.style.display = 'block';
+      });
+    }
+
+    if (btnEntryStart) {
+      btnEntryStart.addEventListener('click', () => {
+        entryOverlay.classList.remove('active');
+        if (currentPendingQuizId) {
+          startCountdown(currentPendingQuizId);
+        }
+      });
+    }
   }
 
   // ────────────────────────────────────────────
-  // ACTIVE QUIZ INTERFACE LOGIC
+  // ACTIVE QUIZ INTERFACE LOGIC (v2 — per-question timers)
   // ────────────────────────────────────────────
   
   const MOCK_QUIZZES = {
     "practice_1": {
       name: "Science Trivia Weekly",
-      timeLimit: 300, // 5 minutes in seconds
+      timeLimit: 300,
       questions: [
-        { type: "mcq", q: "Which planet has the most moons?", options: ["Jupiter", "Saturn", "Uranus", "Neptune"], ans: "Saturn" },
-        { type: "mcq", q: "What is the speed of light in km/s?", options: ["299,792", "150,000", "300,000", "199,792"], ans: "299,792" },
-        { type: "integer", q: "How many bones are in the adult human body?", ans: "206" },
-        { type: "mcq", q: "What is the most abundant gas in Earth's atmosphere?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], ans: "Nitrogen" },
-        { type: "integer", q: "What is the boiling point of water in Celsius?", ans: "100" }
+        { type: "mcq", q: "Which planet has the most moons?", options: ["Jupiter", "Saturn", "Uranus", "Neptune"], ans: "Saturn", timer: 30 },
+        { type: "mcq", q: "What is the speed of light in km/s?", options: ["299,792", "150,000", "300,000", "199,792"], ans: "299,792", timer: 20 },
+        { type: "integer", q: "How many bones are in the adult human body?", ans: "206", timer: 15 },
+        { type: "mcq", q: "What is the most abundant gas in Earth's atmosphere?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], ans: "Nitrogen", timer: 20 },
+        { type: "integer", q: "What is the boiling point of water in Celsius?", ans: "100", timer: 10 }
       ]
     },
     "practice_2": {
       name: "History Buffs Challenge",
-      timeLimit: 600, // 10 minutes
+      timeLimit: 600,
       questions: [
-        { type: "integer", q: "In what year did World War II end?", ans: "1945" },
-        { type: "mcq", q: "Who was the first President of India?", options: ["Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "B.R. Ambedkar"], ans: "Dr. Rajendra Prasad" },
-        { type: "mcq", q: "Which empire built Machu Picchu?", options: ["Aztec", "Maya", "Inca", "Olmec"], ans: "Inca" },
-        { type: "integer", q: "In what year did India gain independence?", ans: "1947" },
-        { type: "mcq", q: "Who discovered America in 1492?", options: ["Vasco da Gama", "Ferdinand Magellan", "Christopher Columbus", "Marco Polo"], ans: "Christopher Columbus" }
+        { type: "integer", q: "In what year did World War II end?", ans: "1945", timer: 15 },
+        { type: "mcq", q: "Who was the first President of India?", options: ["Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "B.R. Ambedkar"], ans: "Dr. Rajendra Prasad", timer: 20 },
+        { type: "mcq", q: "Which empire built Machu Picchu?", options: ["Aztec", "Maya", "Inca", "Olmec"], ans: "Inca", timer: 25 },
+        { type: "integer", q: "In what year did India gain independence?", ans: "1947", timer: 10 },
+        { type: "mcq", q: "Who discovered America in 1492?", options: ["Vasco da Gama", "Ferdinand Magellan", "Christopher Columbus", "Marco Polo"], ans: "Christopher Columbus", timer: 15 }
       ]
     },
     "tournament_1": {
       name: "The Grand IITGN Quiz",
-      timeLimit: 120, // 2 minutes for pressure
+      timeLimit: 120,
       questions: [
-        { type: "mcq", q: "What is the capital of Mongolia?", options: ["Ulaanbaatar", "Astana", "Tashkent", "Bishkek"], ans: "Ulaanbaatar" },
-        { type: "mcq", q: "Which element has the symbol 'W'?", options: ["Tungsten", "Wolframite", "Water", "White Phosphorus"], ans: "Tungsten" },
-        { type: "integer", q: "How many bytes are in a kilobyte (traditional binary)?", ans: "1024" },
-        { type: "mcq", q: "Who wrote 'One Hundred Years of Solitude'?", options: ["Gabriel Garcia Marquez", "Mario Vargas Llosa", "Jorge Luis Borges", "Julio Cortazar"], ans: "Gabriel Garcia Marquez" },
-        { type: "integer", q: "What year was IIT Gandhinagar established?", ans: "2008" }
+        { type: "mcq", q: "What is the capital of Mongolia?", options: ["Ulaanbaatar", "Astana", "Tashkent", "Bishkek"], ans: "Ulaanbaatar", timer: 20 },
+        { type: "mcq", q: "Which element has the symbol 'W'?", options: ["Tungsten", "Wolframite", "Water", "White Phosphorus"], ans: "Tungsten", timer: 25 },
+        { type: "integer", q: "How many bytes are in a kilobyte (traditional binary)?", ans: "1024", timer: 15 },
+        { type: "mcq", q: "Who wrote 'One Hundred Years of Solitude'?", options: ["Gabriel Garcia Marquez", "Mario Vargas Llosa", "Jorge Luis Borges", "Julio Cortazar"], ans: "Gabriel Garcia Marquez", timer: 30 },
+        { type: "integer", q: "What year was IIT Gandhinagar established?", ans: "2008", timer: 10 }
       ]
     }
   };
@@ -271,13 +301,10 @@
 
   function loadPracticeArena(grid) {
     grid.innerHTML = '';
-    
-    // Render only the practice quizzes
     const quizzes = [
       { id: "practice_1", data: MOCK_QUIZZES["practice_1"] },
       { id: "practice_2", data: MOCK_QUIZZES["practice_2"] }
     ];
-    
     grid.innerHTML = quizzes.map(q => `
       <div class="arena-card" onclick="window.QSQuiz.startPracticeMatch('${q.id}')">
         <h4 style="margin-bottom:var(--space-2);color:var(--primary);">${q.data.name}</h4>
@@ -287,13 +314,33 @@
     `).join('');
   }
 
+  let currentPendingQuizId = null;
+  let participantName = "";
+
+  function startQuizEntryFlow(quizId) {
+    currentPendingQuizId = quizId;
+    const overlay = document.getElementById('quiz-entry-overlay');
+    const stepName = document.getElementById('entry-step-name');
+    const stepRules = document.getElementById('entry-step-rules');
+    const nameInput = document.getElementById('quiz-participant-name');
+    
+    if (!overlay) return;
+    
+    // Reset steps
+    stepName.style.display = 'block';
+    stepRules.style.display = 'none';
+    nameInput.value = '';
+    
+    overlay.classList.add('active');
+  }
+
   function startCountdown(quizId) {
     const overlay = document.getElementById('countdown-overlay');
     const numEl = document.getElementById('countdown-number');
     if (!overlay || !numEl) return;
 
     overlay.classList.add('active');
-    let count = 3; // Reduced to 3s for faster testing
+    let count = 3;
     numEl.textContent = count;
 
     const interval = setInterval(() => {
@@ -301,7 +348,7 @@
       if (count > 0) {
         numEl.textContent = count;
         numEl.style.animation = 'none';
-        numEl.offsetHeight; // trigger reflow
+        numEl.offsetHeight;
         numEl.style.animation = null;
       } else {
         clearInterval(interval);
@@ -314,125 +361,310 @@
     }, 1000);
   }
 
+  // ── Launch Quiz — initialize per-question state ──
   function launchActiveQuiz(quizId) {
     const quizData = MOCK_QUIZZES[quizId];
-    if (!quizData) {
-      alert("Quiz not found!");
-      return;
-    }
+    if (!quizData) { alert("Quiz not found!"); return; }
 
+    const n = quizData.questions.length;
     activeQuizState = {
       data: quizData,
       currentIndex: 0,
-      userAnswers: new Array(quizData.questions.length).fill(null),
-      timeRemaining: quizData.timeLimit
+      userAnswers: new Array(n).fill(null),
+      timeRemaining: quizData.questions.map(q => q.timer || 30),
+      timeSpent: new Array(n).fill(0),
+      locked: new Array(n).fill(false),
+      totalTimeTaken: 0
     };
 
     document.getElementById('active-quiz-container').style.display = 'flex';
     document.getElementById('active-quiz-title').textContent = quizData.name;
-    
-    // Navigation and Exit bindings
-    const nextBtn = document.getElementById('btn-quiz-next');
-    const prevBtn = document.getElementById('btn-quiz-prev');
+
+    // Bind buttons (clone to remove old listeners)
+    ['btn-quiz-next', 'btn-quiz-prev', 'btn-quiz-exit'].forEach(id => {
+      const el = document.getElementById(id);
+      const clone = el.cloneNode(true);
+      el.parentNode.replaceChild(clone, el);
+    });
+
+    document.getElementById('btn-quiz-next').addEventListener('click', handleNext);
+    document.getElementById('btn-quiz-prev').addEventListener('click', handlePrev);
+
+    // Theme toggle
+    const themeBtn = document.getElementById('quiz-theme-toggle');
+    if (themeBtn) {
+      const newTheme = themeBtn.cloneNode(true);
+      themeBtn.parentNode.replaceChild(newTheme, themeBtn);
+      newTheme.addEventListener('click', () => {
+        const doc = document.documentElement;
+        const next = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        doc.setAttribute('data-theme', next);
+        localStorage.setItem('qs_theme', next);
+      });
+    }
+
+    // Exit flow
     const exitBtn = document.getElementById('btn-quiz-exit');
-    
-    // Clear old listeners
-    const newNext = nextBtn.cloneNode(true);
-    const newPrev = prevBtn.cloneNode(true);
-    const newExit = exitBtn.cloneNode(true);
-    nextBtn.parentNode.replaceChild(newNext, nextBtn);
-    prevBtn.parentNode.replaceChild(newPrev, prevBtn);
-    exitBtn.parentNode.replaceChild(newExit, exitBtn);
-
-    newNext.addEventListener('click', () => {
-      // Save answer
-      saveCurrentAnswer();
-      
-      if (activeQuizState.currentIndex < activeQuizState.data.questions.length - 1) {
-        activeQuizState.currentIndex++;
-        renderActiveQuestion();
-      } else {
-        submitQuiz();
-      }
-    });
-
-    newPrev.addEventListener('click', () => {
-      saveCurrentAnswer();
-      if (activeQuizState.currentIndex > 0) {
-        activeQuizState.currentIndex--;
-        renderActiveQuestion();
-      }
-    });
-
-    // Exit logic
     const confirmOverlay = document.getElementById('exit-confirm-overlay');
-    const btnCancelExit = document.getElementById('btn-cancel-exit');
-    const btnConfirmExit = document.getElementById('btn-confirm-exit');
-
-    newExit.addEventListener('click', () => {
+    exitBtn.addEventListener('click', () => {
+      pauseTimer();
       confirmOverlay.classList.add('active');
     });
 
-    // Need to use one-time event listeners for the modal buttons or clone them too
-    const newCancel = btnCancelExit.cloneNode(true);
-    const newConfirm = btnConfirmExit.cloneNode(true);
-    btnCancelExit.parentNode.replaceChild(newCancel, btnCancelExit);
-    btnConfirmExit.parentNode.replaceChild(newConfirm, btnConfirmExit);
-
-    newCancel.addEventListener('click', () => {
-      confirmOverlay.classList.remove('active');
+    const btnCancel = document.getElementById('btn-cancel-exit');
+    const btnConfirm = document.getElementById('btn-confirm-exit');
+    [btnCancel, btnConfirm].forEach(el => {
+      const clone = el.cloneNode(true);
+      el.parentNode.replaceChild(clone, el);
     });
-
-    newConfirm.addEventListener('click', () => {
+    document.getElementById('btn-cancel-exit').addEventListener('click', () => {
       confirmOverlay.classList.remove('active');
-      clearInterval(timerInterval);
+      resumeTimer();
+    });
+    document.getElementById('btn-confirm-exit').addEventListener('click', () => {
+      confirmOverlay.classList.remove('active');
+      pauseTimer();
       document.getElementById('active-quiz-container').style.display = 'none';
-      document.getElementById('mode-choices').style.display = 'flex';
     });
+
+    // Submit review popup bindings
+    const reviewClose = document.getElementById('btn-review-close');
+    const reviewSubmit = document.getElementById('btn-review-submit');
+    if (reviewClose) {
+      const rc = reviewClose.cloneNode(true);
+      reviewClose.parentNode.replaceChild(rc, reviewClose);
+      rc.addEventListener('click', () => {
+        document.getElementById('submit-review-overlay').classList.remove('active');
+        resumeTimer();
+      });
+    }
+    if (reviewSubmit) {
+      const rs = reviewSubmit.cloneNode(true);
+      reviewSubmit.parentNode.replaceChild(rs, reviewSubmit);
+      rs.addEventListener('click', () => {
+        document.getElementById('submit-review-overlay').classList.remove('active');
+        finalSubmit();
+      });
+    }
 
     renderActiveQuestion();
-    startTimer();
   }
 
+  // ── Timer — pause / resume / start ──
+  function pauseTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function resumeTimer() {
+    if (timerInterval) return; // Already running
+    const idx = activeQuizState.currentIndex;
+    if (activeQuizState.locked[idx]) return;
+    startTimerForCurrent();
+  }
+
+  function startTimerForCurrent() {
+    pauseTimer();
+    const state = activeQuizState;
+    const idx = state.currentIndex;
+
+    if (state.locked[idx]) {
+      updateTimerDisplay(0);
+      return;
+    }
+
+    updateTimerDisplay(state.timeRemaining[idx]);
+
+    timerInterval = setInterval(() => {
+      state.timeRemaining[idx]--;
+      state.timeSpent[idx]++;
+      state.totalTimeTaken++;
+
+      if (state.timeRemaining[idx] <= 0) {
+        state.timeRemaining[idx] = 0;
+        state.locked[idx] = true;
+        pauseTimer();
+        saveCurrentAnswer();
+        renderQuestionNav();
+        updateTimerDisplay(0);
+        autoNavigateAfterLock();
+        return;
+      }
+
+      updateTimerDisplay(state.timeRemaining[idx]);
+    }, 1000);
+  }
+
+  function updateTimerDisplay(seconds) {
+    const timerEl = document.getElementById('active-quiz-timer');
+    const textEl = document.getElementById('timer-text');
+    if (!textEl) return;
+    const m = Math.floor(Math.max(0, seconds) / 60).toString().padStart(2, '0');
+    const s = (Math.max(0, seconds) % 60).toString().padStart(2, '0');
+    textEl.textContent = `${m}:${s}`;
+    if (seconds <= 10) {
+      timerEl.classList.add('warning');
+    } else {
+      timerEl.classList.remove('warning');
+    }
+  }
+
+  // ── Auto-navigate when a question locks ──
+  function autoNavigateAfterLock() {
+    const target = findNearestUnlocked();
+    if (target === -1) {
+      // All questions locked or answered — trigger submit review
+      showSubmitReview();
+    } else {
+      saveCurrentAnswer();
+      activeQuizState.currentIndex = target;
+      renderActiveQuestion();
+    }
+  }
+
+  // Find nearest unlocked question (search forward first, then backward)
+  function findNearestUnlocked() {
+    const state = activeQuizState;
+    const n = state.data.questions.length;
+    // Search forward from current (Right side)
+    for (let i = state.currentIndex + 1; i < n; i++) {
+      if (!state.locked[i] && state.timeRemaining[i] > 0) return i;
+    }
+    // Search backward from current (Left side)
+    for (let i = state.currentIndex - 1; i >= 0; i--) {
+      if (!state.locked[i] && state.timeRemaining[i] > 0) return i;
+    }
+    return -1; // None found
+  }
+
+  // Find nearest unlocked PREVIOUS question
+  function findNearestUnlockedPrev() {
+    const state = activeQuizState;
+    for (let i = state.currentIndex - 1; i >= 0; i--) {
+      if (!state.locked[i] && state.timeRemaining[i] > 0) return i;
+    }
+    return -1;
+  }
+
+  // ── Navigation handlers ──
+  function handleNext() {
+    saveCurrentAnswer();
+    const state = activeQuizState;
+    if (state.currentIndex < state.data.questions.length - 1) {
+      pauseTimer();
+      state.currentIndex++;
+      // Skip locked questions going forward
+      while (state.currentIndex < state.data.questions.length - 1 && state.locked[state.currentIndex]) {
+        state.currentIndex++;
+      }
+      renderActiveQuestion();
+    } else {
+      // Last question — show submit review
+      pauseTimer();
+      showSubmitReview();
+    }
+  }
+
+  function handlePrev() {
+    saveCurrentAnswer();
+    const target = findNearestUnlockedPrev();
+    if (target === -1) return; // No unlocked previous
+    pauseTimer();
+    activeQuizState.currentIndex = target;
+    renderActiveQuestion();
+  }
+
+  function navigateToQuestion(idx) {
+    const state = activeQuizState;
+    if (state.locked[idx]) return; // Can't navigate to locked
+    saveCurrentAnswer();
+    pauseTimer();
+    state.currentIndex = idx;
+    renderActiveQuestion();
+  }
+
+  // ── Save answer ──
   function saveCurrentAnswer() {
-    const q = activeQuizState.data.questions[activeQuizState.currentIndex];
+    if (!activeQuizState) return;
+    const idx = activeQuizState.currentIndex;
+    if (activeQuizState.locked[idx]) return; // Can't modify locked
+    const q = activeQuizState.data.questions[idx];
     if (q.type === 'mcq') {
       const selected = document.querySelector('.quiz-option-btn.selected');
       if (selected) {
-        activeQuizState.userAnswers[activeQuizState.currentIndex] = selected.dataset.value;
+        activeQuizState.userAnswers[idx] = selected.dataset.value;
       }
     } else if (q.type === 'integer') {
       const input = document.getElementById('active-int-input');
       if (input && input.value !== '') {
-        activeQuizState.userAnswers[activeQuizState.currentIndex] = input.value;
+        activeQuizState.userAnswers[idx] = input.value;
       }
     }
   }
 
+  // ── Render question navigation strip ──
+  function renderQuestionNav() {
+    const navContainer = document.getElementById('quiz-question-nav');
+    if (!navContainer) return;
+    navContainer.innerHTML = '';
+    const state = activeQuizState;
+
+    state.data.questions.forEach((_, idx) => {
+      const box = document.createElement('div');
+      box.className = 'q-nav-box';
+
+      if (state.locked[idx]) {
+        box.classList.add('locked');
+      } else if (state.userAnswers[idx] !== null) {
+        box.classList.add('attempted');
+      }
+      if (idx === state.currentIndex) box.classList.add('current');
+
+      box.textContent = idx + 1;
+
+      box.addEventListener('click', () => {
+        if (state.locked[idx]) return;
+        navigateToQuestion(idx);
+      });
+      navContainer.appendChild(box);
+    });
+  }
+
+  // ── Render the active question ──
   function renderActiveQuestion() {
     const state = activeQuizState;
-    const q = state.data.questions[state.currentIndex];
-    
-    document.getElementById('active-quiz-progress').textContent = `Question ${state.currentIndex + 1} of ${state.data.questions.length}`;
+    const idx = state.currentIndex;
+    const q = state.data.questions[idx];
+    const isLocked = state.locked[idx];
+
+    document.getElementById('active-quiz-progress').textContent = `Question ${idx + 1} of ${state.data.questions.length}`;
     document.getElementById('active-question-text').textContent = q.q;
-    
+
+    renderQuestionNav();
+
     const optionsContainer = document.getElementById('active-options-container');
     optionsContainer.innerHTML = '';
-
-    const savedAns = state.userAnswers[state.currentIndex];
+    const savedAns = state.userAnswers[idx];
 
     if (q.type === 'mcq') {
-      q.options.forEach((opt, idx) => {
-        const letter = String.fromCharCode(65 + idx); // A, B, C, D
+      q.options.forEach((opt, i) => {
+        const letter = String.fromCharCode(65 + i);
         const btn = document.createElement('button');
         btn.className = 'quiz-option-btn' + (savedAns === opt ? ' selected' : '');
         btn.dataset.value = opt;
         btn.innerHTML = `<span class="option-label">${letter}</span> ${opt}`;
-        
-        btn.onclick = () => {
-          document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-        };
+
+        if (isLocked) {
+          btn.disabled = true;
+          btn.classList.add('locked-option');
+        } else {
+          btn.onclick = () => {
+            document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            saveCurrentAnswer();
+            renderQuestionNav();
+          };
+        }
         optionsContainer.appendChild(btn);
       });
     } else if (q.type === 'integer') {
@@ -443,81 +675,194 @@
       input.placeholder = 'Enter a number...';
       input.style.fontSize = 'var(--fs-2xl)';
       input.style.padding = 'var(--space-6)';
-      if (savedAns !== null) {
-        input.value = savedAns;
+      if (savedAns !== null) input.value = savedAns;
+
+      if (isLocked) {
+        input.disabled = true;
+        input.classList.add('locked-option');
+      } else {
+        input.addEventListener('input', () => {
+          saveCurrentAnswer();
+          renderQuestionNav();
+        });
       }
       optionsContainer.appendChild(input);
     }
 
-    // Update buttons
-    const nextBtn = document.getElementById('btn-quiz-next');
-    const prevBtn = document.getElementById('btn-quiz-prev');
-    
-    prevBtn.style.visibility = state.currentIndex === 0 ? 'hidden' : 'visible';
-    
-    if (state.currentIndex === state.data.questions.length - 1) {
-      nextBtn.textContent = 'Submit Quiz';
-      nextBtn.style.background = 'var(--success)';
+    // Show locked banner if applicable
+    const existingBanner = document.querySelector('.locked-banner');
+    if (existingBanner) existingBanner.remove();
+    if (isLocked) {
+      const banner = document.createElement('div');
+      banner.className = 'locked-banner';
+      banner.innerHTML = '🔒 Time expired — this question is locked';
+      optionsContainer.parentNode.insertBefore(banner, optionsContainer);
+    }
+
+    // Update prev/next buttons
+    updateNavButtons();
+
+    // Start or show timer
+    if (isLocked) {
+      pauseTimer();
+      updateTimerDisplay(0);
     } else {
-      nextBtn.textContent = 'Next Question';
-      nextBtn.style.background = 'var(--primary)';
+      startTimerForCurrent();
     }
   }
 
-  function startTimer() {
-    clearInterval(timerInterval);
-    const timerEl = document.getElementById('active-quiz-timer');
-    const textEl = document.getElementById('timer-text');
-    
-    timerInterval = setInterval(() => {
-      activeQuizState.timeRemaining--;
-      const r = activeQuizState.timeRemaining;
-      
-      if (r <= 0) {
-        clearInterval(timerInterval);
-        submitQuiz();
-        return;
-      }
-      
-      const m = Math.floor(r / 60).toString().padStart(2, '0');
-      const s = (r % 60).toString().padStart(2, '0');
-      textEl.textContent = `${m}:${s}`;
-      
-      if (r <= 30) {
-        timerEl.classList.add('warning');
-      } else {
-        timerEl.classList.remove('warning');
-      }
-    }, 1000);
+  function updateNavButtons() {
+    const state = activeQuizState;
+    const prevBtn = document.getElementById('btn-quiz-prev');
+    const nextBtn = document.getElementById('btn-quiz-next');
+
+    // Previous: disabled if first question OR no unlocked previous exists
+    const hasPrev = findNearestUnlockedPrev() !== -1;
+    prevBtn.disabled = !hasPrev;
+
+    // Next / Submit
+    if (state.currentIndex === state.data.questions.length - 1) {
+      nextBtn.textContent = 'Submit';
+      nextBtn.style.background = '#0ea5e9';
+      nextBtn.style.borderColor = '#0ea5e9';
+      nextBtn.style.color = '#ffffff';
+    } else {
+      nextBtn.textContent = 'Next';
+      nextBtn.style.background = '';
+      nextBtn.style.borderColor = '';
+      nextBtn.style.color = '';
+    }
   }
 
-  function submitQuiz() {
-    clearInterval(timerInterval);
+  // ── Submit Review Popup ──
+  function showSubmitReview() {
+    pauseTimer();
+    saveCurrentAnswer();
+    const state = activeQuizState;
+    const overlay = document.getElementById('submit-review-overlay');
+    const grid = document.getElementById('review-question-grid');
+
+    if (!overlay || !grid) { finalSubmit(); return; }
+
+    // Find questions with time remaining
+    const remaining = [];
+    state.data.questions.forEach((_, idx) => {
+      if (!state.locked[idx] && state.timeRemaining[idx] > 0) {
+        remaining.push(idx);
+      }
+    });
+
+    grid.innerHTML = '';
+    if (remaining.length === 0) {
+      document.getElementById('review-message').textContent = 'All questions have been answered or their timers have expired.';
+    } else {
+      document.getElementById('review-message').textContent = `${remaining.length} question(s) still have time remaining:`;
+      remaining.forEach(idx => {
+        const box = document.createElement('div');
+        box.className = 'q-nav-box review-box';
+        if (state.userAnswers[idx] !== null) box.classList.add('attempted');
+        box.textContent = idx + 1;
+        const timeLabel = document.createElement('span');
+        timeLabel.className = 'review-time-label';
+        timeLabel.textContent = `${state.timeRemaining[idx]}s`;
+        box.appendChild(timeLabel);
+        box.addEventListener('click', () => {
+          overlay.classList.remove('active');
+          navigateToQuestion(idx);
+        });
+        grid.appendChild(box);
+      });
+    }
+
+    overlay.classList.add('active');
+  }
+
+  // ── Final Submit — detailed analysis ──
+  function finalSubmit() {
+    pauseTimer();
     saveCurrentAnswer();
     document.getElementById('active-quiz-container').style.display = 'none';
-    
-    // Calculate Score
-    let correct = 0;
-    const questions = activeQuizState.data.questions;
-    for (let i = 0; i < questions.length; i++) {
-      // Simple string match for mock purposes
-      if (activeQuizState.userAnswers[i] == questions[i].ans) {
-        correct++;
-      }
-    }
 
-    const timeTaken = activeQuizState.data.timeLimit - activeQuizState.timeRemaining;
-    const m = Math.floor(timeTaken / 60).toString().padStart(2, '0');
-    const s = (timeTaken % 60).toString().padStart(2, '0');
+    const state = activeQuizState;
+    const questions = state.data.questions;
+    let correct = 0, wrong = 0, skipped = 0, timeout = 0;
 
-    document.getElementById('quiz-results-container').style.display = 'flex';
+    // Build per-question analysis
+    const analysisData = questions.map((q, idx) => {
+      const userAns = state.userAnswers[idx];
+      const isCorrect = userAns != null && String(userAns) === String(q.ans);
+
+      let status;
+      if (userAns === null && state.locked[idx]) { status = 'timeout'; timeout++; }
+      else if (userAns === null) { status = 'skipped'; skipped++; }
+      else if (isCorrect) { status = 'correct'; correct++; }
+      else { status = 'wrong'; wrong++; }
+
+      return { q: q.q, userAns, correctAns: q.ans, timeSpent: state.timeSpent[idx], status, type: q.type };
+    });
+
+    const totalTime = state.totalTimeTaken;
+    const avgTime = Math.round(totalTime / questions.length);
+    const m = Math.floor(totalTime / 60).toString().padStart(2, '0');
+    const s = (totalTime % 60).toString().padStart(2, '0');
+    const accuracy = Math.round((correct / questions.length) * 100);
+
+    // Populate results
+    const container = document.getElementById('quiz-results-container');
+    container.style.display = 'flex';
+
     document.getElementById('results-score').textContent = `${correct}/${questions.length}`;
     document.getElementById('results-time').textContent = `${m}:${s}`;
-    document.getElementById('results-accuracy').textContent = Math.round((correct / questions.length) * 100) + '%';
-    
-    document.getElementById('btn-return-arena').onclick = () => {
-      document.getElementById('quiz-results-container').style.display = 'none';
-    };
+    document.getElementById('results-accuracy').textContent = accuracy + '%';
+    document.getElementById('results-avg-time').textContent = avgTime + 's';
+
+    // Populate chart
+    const totalQ = questions.length;
+    document.getElementById('chart-correct').style.width = (correct / totalQ * 100) + '%';
+    document.getElementById('chart-wrong').style.width = (wrong / totalQ * 100) + '%';
+    document.getElementById('chart-skipped').style.width = (skipped / totalQ * 100) + '%';
+    document.getElementById('chart-timeout').style.width = (timeout / totalQ * 100) + '%';
+
+    document.getElementById('legend-c').textContent = correct;
+    document.getElementById('legend-w').textContent = wrong;
+    document.getElementById('legend-s').textContent = skipped;
+    document.getElementById('legend-t').textContent = timeout;
+
+    // Per-question breakdown
+    const breakdown = document.getElementById('results-breakdown');
+    if (breakdown) {
+      breakdown.innerHTML = analysisData.map((d, idx) => {
+        const statusIcons = { correct: '✓', wrong: '✗', timeout: '⏱', skipped: '—' };
+        const statusLabels = { correct: 'Correct', wrong: 'Wrong', timeout: 'Time Up', skipped: 'Skipped' };
+        const userDisplay = d.userAns !== null ? d.userAns : '—';
+        return `
+          <div class="result-question-card status-${d.status}">
+            <div class="rq-header">
+              <span class="rq-num">Q${idx + 1}</span>
+              <span class="rq-status status-badge-${d.status}">${statusIcons[d.status]} ${statusLabels[d.status]}</span>
+              <span class="rq-time">${d.timeSpent}s</span>
+            </div>
+            <p class="rq-text">${d.q}</p>
+            <div class="rq-answers">
+              <div class="rq-ans"><span class="rq-label">Your answer:</span> <span class="rq-val rq-user-${d.status}">${userDisplay}</span></div>
+              <div class="rq-ans"><span class="rq-label">Correct:</span> <span class="rq-val rq-correct">${d.correctAns}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+
+    // Return button
+    const returnBtn = document.getElementById('btn-return-arena');
+    if (returnBtn) {
+      const clone = returnBtn.cloneNode(true);
+      returnBtn.parentNode.replaceChild(clone, returnBtn);
+      clone.addEventListener('click', () => {
+        container.style.display = 'none';
+        activeQuizState = null;
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -526,13 +871,13 @@
     init();
   }
 
-  // Expose questions for buzzer and quiz start
+  // Expose for external use
   window.QSQuiz = { 
     QUESTIONS, 
     getRandomQuestion: () => QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)],
     startPracticeMatch: (quizId) => {
       document.getElementById('quiz-mode-overlay').classList.remove('active');
-      startCountdown(quizId);
+      startQuizEntryFlow(quizId);
     }
   };
 })();

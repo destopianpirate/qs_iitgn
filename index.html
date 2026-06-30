@@ -23,11 +23,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/sections.css">
+  <link rel="stylesheet" href="css/variables.css?v=3">
+  <link rel="stylesheet" href="css/base.css?v=3">
+  <link rel="stylesheet" href="css/animations.css?v=3">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/sections.css?v=3">
 </head>
 
 <body>
@@ -89,6 +89,21 @@
   <main>
     <section class="hero" id="hero" aria-label="Hero">
       <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+      <!-- Background Animated Blobs -->
+      <div class="hero-blobs" aria-hidden="true">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+      </div>
+
+      <!-- Floating Thematic SVGs -->
+      <div class="hero-decorations" aria-hidden="true">
+        <svg class="decor-icon decor-bulb anim-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21h6"/><path d="M10 21v-2c0-1.5-1-3-2-4-1.5-1.5-2-3.5-2-5.5a6 6 0 0 1 12 0c0 2-.5 4-2 5.5-1 1-2 2.5-2 4v2"/><path d="M12 2v2"/><path d="M12 10a2 2 0 0 0-2 2"/></svg>
+        <svg class="decor-icon decor-brain anim-float-delayed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></svg>
+        <svg class="decor-icon decor-question anim-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1"/></svg>
+        <svg class="decor-icon decor-star anim-float-fast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
 
       <div class="hero-content">
         <div class="hero-logos">
@@ -173,26 +188,29 @@
           <p class="section-subtitle">We are the Quizzing Society of IIT Gandhinagar &mdash; a community of relentlessly curious minds who believe that every question is a doorway to a new world.</p>
         </div>
 
-        <div class="about-content">
-          <div class="about-visual" data-scroll="fade-right">
+        <div class="about-bento" data-scroll="fade-up">
+          <div class="bento-card bento-main">
+            <h3>More Than Just Questions</h3>
+            <p>
+              Born from a shared love of trivia and intellectual sparring, the Quizzing Society has grown into one of the most vibrant communities at IITGN. We cultivate a culture of curiosity that spans every discipline, from astrophysics to Bollywood, from ancient history to cutting-edge technology.
+            </p>
+          </div>
+          <div class="bento-card bento-visual">
             <div class="about-logo-wrapper">
               <div class="about-logo-ring" aria-hidden="true"></div>
               <div class="about-logo-ring-2" aria-hidden="true"></div>
               <img src=".png" alt="Quizzing Society Emblem">
             </div>
           </div>
-
-          <div class="about-text" data-scroll="fade-left">
-            <h3>More Than Just Questions</h3>
-            <p>
-              Born from a shared love of trivia and intellectual sparring, the Quizzing Society has grown into one of the most vibrant communities at IITGN. We don't just ask questions &mdash; we cultivate a culture of curiosity that spans every discipline, from astrophysics to Bollywood, from ancient history to cutting-edge technology.
-            </p>
-            <p>
-              Our weekly quiz nights, themed events, and competitive circuit participation have forged a space where knowledge is celebrated, debate is encouraged, and every "I didn't know that!" moment is a small victory.
-            </p>
-            <p>
-              Whether you're a seasoned quizzer who has competed on the national stage or someone who just enjoys a good trivia round with friends &mdash; there's a seat for you at our table.
-            </p>
+          <div class="bento-card bento-side">
+            <svg viewBox="0 0 24 24" class="bento-icon"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <h4>National Circuit</h4>
+            <p>We actively participate and win in major inter-college tournaments across the country.</p>
+          </div>
+          <div class="bento-card bento-side">
+            <svg viewBox="0 0 24 24" class="bento-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <h4>Inclusive Community</h4>
+            <p>Whether you're a seasoned quizzer or a beginner, there's a seat for you at our table.</p>
           </div>
         </div>
 
@@ -408,7 +426,6 @@
             <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="footer-iitgn-logo" height="48">
           </div>
           <p class="footer-tagline">The Quizzing Society of IIT Gandhinagar. Where curiosity meets competition, and every question is a doorway to a new world.</p>
-          <p class="footer-made">Made with <span style="color:#EF4444;">&#10084;</span> at IIT Gandhinagar</p>
         </div>
 
         <div class="footer-nav">

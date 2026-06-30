@@ -1,0 +1,308 @@
+/* ────────────────────────────────────────────
+   TIMELINE (Borderless)
+   ──────────────────────────────────────────── */
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent 0%, var(--primary-border) 10%, var(--primary-border) 90%, transparent 100%);
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  position: relative;
+  width: 50%;
+  padding: 0 var(--space-10);
+  margin-bottom: var(--space-10);
+}
+
+.timeline-item:nth-child(odd) {
+  margin-left: 0;
+  text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+  margin-left: 50%;
+  text-align: left;
+}
+
+/* Hexagonal node */
+.timeline-node {
+  position: absolute;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.timeline-item:nth-child(odd) .timeline-node {
+  right: -22px;
+}
+
+.timeline-item:nth-child(even) .timeline-node {
+  left: -22px;
+}
+
+.timeline-node svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-on-primary);
+  stroke: none;
+}
+
+.timeline-card {
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.timeline-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.timeline-tag {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-3);
+}
+
+.tag-internal {
+  background: var(--primary-surface);
+  color: var(--primary);
+}
+
+.tag-workshop {
+  background: rgba(34,197,94,0.1);
+  color: #15803D;
+}
+
+[data-theme="dark"] .tag-workshop {
+  background: rgba(34,197,94,0.15);
+  color: #4ADE80;
+}
+
+.tag-national {
+  background: rgba(239,68,68,0.1);
+  color: #DC2626;
+}
+
+[data-theme="dark"] .tag-national {
+  background: rgba(239,68,68,0.15);
+  color: #F87171;
+}
+
+.tag-collaboration {
+  background: rgba(168,85,247,0.1);
+  color: #7C3AED;
+}
+
+[data-theme="dark"] .tag-collaboration {
+  background: rgba(168,85,247,0.15);
+  color: #C084FC;
+}
+
+.timeline-card h4 {
+  font-family: var(--font-heading);
+  margin-bottom: var(--space-2);
+}
+
+.timeline-card p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 20px;
+  }
+
+  .timeline-item,
+  .timeline-item:nth-child(odd),
+  .timeline-item:nth-child(even) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 60px;
+    padding-right: 0;
+    text-align: left;
+  }
+
+  .timeline-item:nth-child(odd) .timeline-node,
+  .timeline-item:nth-child(even) .timeline-node {
+    left: -2px;
+    right: auto;
+  }
+}
+
+
+/* ────────────────────────────────────────────
+   FLIP CARD (Daily Question) — Borderless
+   ──────────────────────────────────────────── */
+.flip-card {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 380px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s var(--ease-out);
+  transform-style: preserve-3d;
+}
+
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10);
+  text-align: center;
+}
+
+.flip-card-front {
+  background: var(--surface);
+  box-shadow: var(--shadow-xl);
+}
+
+.flip-card-back {
+  background: linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-bright) 100%);
+  color: #FFFFFF;
+  transform: rotateY(180deg);
+}
+
+.flip-card-back p,
+.flip-card-back span,
+.flip-card-back h3,
+.flip-card-back h4,
+.flip-card-back div {
+  color: #ffffff !important;
+}
+
+.flip-card-category {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-widest);
+  color: var(--primary);
+  margin-bottom: var(--space-6);
+  background: var(--primary-surface);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+}
+
+.flip-card-back .flip-card-category {
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.15);
+}
+
+.flip-card-question {
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  margin-bottom: var(--space-8);
+  color: var(--text);
+}
+
+.flip-card-back .flip-card-question {
+  color: #FFFFFF;
+}
+
+.flip-card-hint {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+
+.flip-card-back .flip-card-hint {
+  color: rgba(255,255,255,0.6);
+}
+
+.flip-card-answer-label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-widest);
+  opacity: 0.7;
+  margin-bottom: var(--space-4);
+}
+
+.flip-card-answer {
+  font-family: var(--font-heading);
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-extrabold);
+  margin-bottom: var(--space-4);
+}
+
+.flip-card-funfact {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  opacity: 0.85;
+  max-width: 40ch;
+}
+
+.flip-card-difficulty {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+
+.flip-card-difficulty svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 600px) {
+  .flip-card {
+    height: 320px;
+  }
+  .flip-card-front,
+  .flip-card-back {
+    padding: var(--space-5) var(--space-4);
+  }
+  .flip-card-question {
+    font-size: var(--fs-xl);
+    margin-bottom: var(--space-4);
+  }
+  .flip-card-answer {
+    font-size: var(--fs-2xl);
+  }
+  .flip-card-funfact {
+    font-size: var(--fs-xs);
+    line-height: var(--lh-normal);
+  }
+}

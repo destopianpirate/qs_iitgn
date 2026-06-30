@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/sections.css">
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/variables.css?v=7">
+  <link rel="stylesheet" href="css/base.css?v=7">
+  <link rel="stylesheet" href="css/animations.css?v=7">
+  <link rel="stylesheet" href="css/components.css?v=7">
+  <link rel="stylesheet" href="css/sections.css?v=7">
+  <link rel="stylesheet" href="css/admin.css?v=7">
 </head>
 <body class="subpage">
 
@@ -67,9 +67,7 @@
           <div class="flip-card" id="flip-card" data-scroll="scale-up" aria-label="Trivia question flip card. Click to reveal answer.">
             <div class="flip-card-inner">
               <div class="flip-card-front">
-                <p class="flip-card-category" id="quiz-category">Loading...</p>
                 <p class="flip-card-question" id="quiz-question">Loading question...</p>
-                <div class="flip-card-difficulty" id="quiz-difficulty" aria-label="Difficulty rating"></div>
                 <p class="flip-card-hint" id="quiz-hint">Click to reveal the answer</p>
               </div>
               <div class="flip-card-back">
@@ -136,6 +134,36 @@
         </div>
       </div>
     </div>
+    <!-- QUIZ ENTRY FLOW OVERLAY -->
+    <div class="quiz-entry-overlay" id="quiz-entry-overlay">
+      <div class="quiz-entry-modal glass-card">
+        
+        <!-- Step 1: Name Input -->
+        <div id="entry-step-name">
+          <h2 style="color: var(--primary); margin-bottom: var(--space-4);">Welcome to the Arena</h2>
+          <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">Please enter your name to proceed.</p>
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <input type="text" id="quiz-participant-name" class="form-field" placeholder="Enter your full name" autocomplete="off">
+          </div>
+          <button class="btn btn-primary btn-lg" id="btn-entry-next" style="width: 100%; justify-content: center;">Next</button>
+        </div>
+
+        <!-- Step 2: Rules -->
+        <div id="entry-step-rules" style="display: none;">
+          <h2 style="color: var(--primary); margin-bottom: var(--space-4);">Match Rules</h2>
+          <div class="rules-list" style="text-align: left; background: var(--bg-alt); padding: var(--space-4); border-radius: var(--radius-lg); margin-bottom: var(--space-6);">
+            <ul style="color: var(--text-secondary); font-size: var(--fs-sm); list-style-type: disc; margin-left: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2);">
+              <li>Once a question's timer runs out, it is locked and you cannot change your answer.</li>
+              <li>You can navigate back and forth between questions as long as they have time remaining.</li>
+              <li>Do not refresh the page, or your progress will be lost.</li>
+              <li>When time expires for all questions, the quiz will automatically submit.</li>
+            </ul>
+          </div>
+          <button class="btn btn-primary btn-lg" id="btn-entry-start" style="width: 100%; justify-content: center; background: #22c55e; border-color: #22c55e;">Start Countdown</button>
+        </div>
+
+      </div>
+    </div>
 
     <!-- COUNTDOWN OVERLAY -->
     <div class="countdown-overlay" id="countdown-overlay">
@@ -149,60 +177,114 @@
         
         <!-- Quiz Header -->
         <div class="quiz-header">
-          <div class="quiz-header-info">
+          <div class="quiz-header-left">
             <h3 id="active-quiz-title">Quiz Title</h3>
             <span class="quiz-progress" id="active-quiz-progress">Question 1 of 5</span>
-          </div>
-          <div style="display: flex; gap: var(--space-4); align-items: center;">
             <div class="quiz-timer" id="active-quiz-timer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span id="timer-text">05:00</span>
             </div>
+          </div>
+          <div class="quiz-header-right">
+            <button class="theme-toggle" id="quiz-theme-toggle" aria-label="Toggle dark mode" style="position: static; padding: var(--space-2); background: var(--surface); border-radius: var(--radius-full); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--section-divider);">
+              <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
             <button class="btn btn-outline" id="btn-quiz-exit" style="border-color: var(--error); color: var(--error);">Exit</button>
           </div>
+        </div>
+
+        <!-- Question Nav -->
+        <div class="quiz-question-nav" id="quiz-question-nav">
+          <!-- Dynamically injected .q-nav-box elements -->
         </div>
 
         <!-- Question Body -->
         <div class="active-question-body">
           <p class="question-text" id="active-question-text">Loading question...</p>
-          
-          <div class="options-container" id="active-options-container">
-            <!-- Options or Integer input injected here -->
+          <div class="options-scroll-container">
+            <div class="options-container" id="active-options-container">
+              <!-- Options or Integer input injected here -->
+            </div>
           </div>
         </div>
 
         <!-- Quiz Footer -->
         <div class="quiz-footer">
-          <button class="btn" id="btn-quiz-prev" style="visibility: hidden;">Previous</button>
+          <button class="btn" id="btn-quiz-prev">Previous</button>
           <button class="btn btn-primary" id="btn-quiz-next">Next Question</button>
         </div>
 
       </div>
     </div>
 
+    <!-- SUBMIT REVIEW OVERLAY -->
+    <div class="submit-review-overlay" id="submit-review-overlay">
+      <div class="submit-review-modal glass-card">
+        <h3 style="margin-bottom: var(--space-2); color: var(--primary);">Review Before Submit</h3>
+        <p id="review-message" style="color: var(--text-secondary); margin-bottom: var(--space-6);"></p>
+        <div class="review-question-grid" id="review-question-grid">
+          <!-- Dynamically injected .q-nav-box.review-box elements -->
+        </div>
+        <div class="submit-review-actions">
+          <button class="btn" id="btn-review-close">Go Back</button>
+          <button class="btn btn-primary" id="btn-review-submit" style="background: #0ea5e9; border-color: #0ea5e9;">Submit Quiz</button>
+        </div>
+      </div>
+    </div>
+
     <!-- QUIZ RESULTS SCREEN -->
     <div class="quiz-results-container" id="quiz-results-container" style="display: none;">
       <div class="results-modal glass-card">
-        <h2 style="font-size: var(--fs-3xl); margin-bottom: var(--space-2); color: var(--primary);">Quiz Complete!</h2>
-        <p style="color: var(--text-secondary); margin-bottom: var(--space-8);">Here is how you performed.</p>
+        <div class="results-header-section">
+          <h2 style="font-size: var(--fs-3xl); margin-bottom: var(--space-2); color: var(--primary);">Quiz Complete!</h2>
+          <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">Here is how you performed.</p>
+        </div>
         
-        <div class="score-ring">
-          <div class="score-number" id="results-score">0/5</div>
-          <p class="score-label">Correct Answers</p>
+        <div class="results-scroll-area">
+          <div class="score-ring">
+            <div class="score-number" id="results-score">0/5</div>
+            <p class="score-label">Correct Answers</p>
+          </div>
+
+          <div class="results-stats">
+            <div class="result-stat">
+              <span class="stat-value" id="results-time">00:00</span>
+              <span class="stat-label">Total Time</span>
+            </div>
+            <div class="result-stat">
+              <span class="stat-value" id="results-accuracy">0%</span>
+              <span class="stat-label">Accuracy</span>
+            </div>
+            <div class="result-stat">
+              <span class="stat-value" id="results-avg-time">0s</span>
+              <span class="stat-label">Avg/Q</span>
+            </div>
+          </div>
+
+          <div class="results-chart-container">
+            <h3 style="margin-top: var(--space-6); margin-bottom: var(--space-4); font-size: var(--fs-lg); text-align: left;">Performance Distribution</h3>
+            <div class="chart-bar-wrap">
+              <div class="chart-segment chart-correct" id="chart-correct" style="width: 0%;"></div>
+              <div class="chart-segment chart-wrong" id="chart-wrong" style="width: 0%;"></div>
+              <div class="chart-segment chart-skipped" id="chart-skipped" style="width: 0%;"></div>
+              <div class="chart-segment chart-timeout" id="chart-timeout" style="width: 0%;"></div>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot correct"></span><span id="legend-c">0</span> Correct</span>
+              <span class="legend-item"><span class="legend-dot wrong"></span><span id="legend-w">0</span> Wrong</span>
+              <span class="legend-item"><span class="legend-dot skipped"></span><span id="legend-s">0</span> Skipped</span>
+              <span class="legend-item"><span class="legend-dot timeout"></span><span id="legend-t">0</span> Timeout</span>
+            </div>
+          </div>
+
+          <h3 style="margin-top: var(--space-6); margin-bottom: var(--space-4); font-size: var(--fs-lg); text-align: left;">Detailed Breakdown</h3>
+          <div class="results-breakdown" id="results-breakdown">
+            <!-- Per-question cards injected by JS -->
+          </div>
         </div>
 
-        <div class="results-stats">
-          <div class="result-stat">
-            <span class="stat-value" id="results-time">00:00</span>
-            <span class="stat-label">Time Taken</span>
-          </div>
-          <div class="result-stat">
-            <span class="stat-value" id="results-accuracy">0%</span>
-            <span class="stat-label">Accuracy</span>
-          </div>
-        </div>
-
-        <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width: 100%; justify-content: center; margin-top: var(--space-8);">Return to Arena</button>
+        <button class="btn btn-primary btn-lg" id="btn-return-arena" style="width: 100%; justify-content: center; margin-top: var(--space-6);">Return to Arena</button>
       </div>
     </div>
 
@@ -436,7 +518,6 @@
             <img src="iitgn_logo.png" alt="IIT Gandhinagar Logo" class="footer-iitgn-logo" height="48">
           </div>
           <p class="footer-tagline">The Quizzing Society of IIT Gandhinagar. Where curiosity meets competition, and every question is a doorway to a new world.</p>
-          <p class="footer-made">Made with <span style="color:#EF4444;">&#10084;</span> at IIT Gandhinagar</p>
         </div>
 
         <div class="footer-nav">

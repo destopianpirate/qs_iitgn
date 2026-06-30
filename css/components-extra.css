@@ -1,0 +1,400 @@
+@import "components-additional.css";
+
+/* ────────────────────────────────────────────
+   TRIVIA TICKER
+   ──────────────────────────────────────────── */
+.ticker {
+  background: var(--ticker-bg);
+  color: var(--ticker-text);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: var(--space-3) 0;
+  position: relative;
+  z-index: var(--z-base);
+}
+
+.ticker::before,
+.ticker::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ticker::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--ticker-bg) 0%, transparent 100%);
+}
+
+.ticker::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--ticker-bg) 0%, transparent 100%);
+}
+
+.ticker-track {
+  display: flex;
+  gap: var(--space-12);
+  animation: marquee 60s linear infinite;
+  width: max-content;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-wide);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ticker-dot {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+
+/* ────────────────────────────────────────────
+   STAT COUNTER (Borderless, capsule badges)
+   ──────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.stat-card {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-4);
+  background: var(--primary-surface);
+  border-radius: var(--radius-pill);
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--primary);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stat-number {
+  font-family: var(--font-body);
+  font-size: var(--fs-4xl);
+  font-weight: var(--fw-bold);
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.stat-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+}
+
+
+/* ────────────────────────────────────────────
+   TEAM CARDS (Borderless, capsule elements)
+   ──────────────────────────────────────────── */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-8);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.team-card {
+  position: relative;
+  perspective: 800px;
+  height: 360px;
+}
+
+.team-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s var(--ease-out);
+  transform-style: preserve-3d;
+}
+
+.team-card:hover .team-card-inner {
+  transform: rotateY(8deg) rotateX(3deg);
+}
+
+.team-card.is-flipped .team-card-inner {
+  transform: rotateY(180deg);
+}
+
+.team-card-front,
+.team-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+.team-card-front {
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.team-card:hover .team-card-front {
+  box-shadow: var(--shadow-xl);
+}
+
+.team-card-back {
+  background: linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-cyan) 100%);
+  color: #FFFFFF;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.team-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background: var(--primary-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-5);
+  overflow: hidden;
+}
+
+.team-avatar svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--primary);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.team-card-front h4 {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  margin-bottom: var(--space-2);
+}
+
+.team-role {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-widest);
+  color: var(--primary);
+  margin-bottom: var(--space-4);
+  background: var(--primary-surface);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  display: inline-block;
+}
+
+.team-card-back .team-role {
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.15);
+}
+
+.team-quote {
+  font-style: italic;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+}
+
+.team-card-back .team-quote {
+  color: rgba(255,255,255,0.85);
+}
+
+.team-card-flip-hint {
+  position: absolute;
+  bottom: var(--space-4);
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+
+/* ────────────────────────────────────────────
+   RESOURCE BOOKSHELF (Borderless)
+   ──────────────────────────────────────────── */
+.bookshelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.book-item {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  overflow: hidden;
+}
+
+.book-item:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: var(--shadow-xl);
+  color: inherit;
+}
+
+.book-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--primary);
+  border-radius: var(--radius-2xl) 0 0 var(--radius-2xl);
+}
+
+.book-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-surface);
+  border-radius: var(--radius-pill);
+}
+
+.book-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--primary);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.book-item h4 {
+  font-size: var(--fs-base);
+  margin-bottom: var(--space-2);
+}
+
+.book-item p {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 0 auto;
+}
+
+
+/* ────────────────────────────────────────────
+   SOCIAL ICON LINKS (Pill shapes)
+   ──────────────────────────────────────────── */
+.social-links {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  background: var(--primary-surface);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.social-link:hover {
+  color: var(--text-on-primary);
+  background: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.social-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+
+/* ────────────────────────────────────────────
+   CONFETTI (for interactions)
+   ──────────────────────────────────────────── */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: var(--z-toast);
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  opacity: 0;
+}

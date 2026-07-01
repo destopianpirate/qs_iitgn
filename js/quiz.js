@@ -537,7 +537,8 @@
         
         const stepLobby = document.getElementById('portal-step-lobby');
         if (stepLobby) stepLobby.style.display = 'block';
-        document.getElementById('portal-card').style.maxWidth = '1200px';
+        const pCard = document.querySelector('.portal-card');
+        if (pCard) pCard.style.maxWidth = '1200px';
         document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
         
         joinLobby(matchingQuiz.id);
@@ -664,7 +665,8 @@
     // Lobby buttons
     document.getElementById('btn-lobby-leave').onclick = () => {
       leaveLobby(quizId);
-      document.getElementById('portal-card').style.maxWidth = '500px';
+      const pCard = document.querySelector('.portal-card');
+      if (pCard) pCard.style.maxWidth = '500px';
       const stepMode = document.getElementById('portal-step-mode');
       const allSteps = document.querySelectorAll('.portal-step');
       allSteps.forEach(s => s.style.display = 'none');

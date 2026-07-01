@@ -447,6 +447,9 @@
       } else if (currentFlow === 'practice') {
         if (stepPractice) stepPractice.style.display = 'block';
         loadPracticeArena(document.getElementById('arena-grid'));
+      } else if (currentFlow === 'survey') {
+        const stepSurveyCode = document.getElementById('portal-step-survey-code');
+        if (stepSurveyCode) stepSurveyCode.style.display = 'block';
       } else if (currentFlow === 'deepLink') {
         if (deepLinkCode) {
           const codeInput = document.getElementById('tournament-code-input');
@@ -478,7 +481,17 @@
       requireUsername('tournament');
     });
 
-
+    const btnPortalSurvey = document.getElementById('btn-portal-survey');
+    if (btnPortalSurvey) {
+      btnPortalSurvey.addEventListener('click', () => {
+        const savedName = localStorage.getItem('participantName');
+        if (savedName) {
+          participantName = savedName;
+          document.getElementById('quiz-participant-name-new').value = savedName;
+        }
+        requireUsername('survey');
+      });
+    }
 
     // Back Buttons
     document.getElementById('btn-practice-back').addEventListener('click', () => {
@@ -1959,4 +1972,150 @@
       }
     }
   });
+
+  // ═══════════════════════════════════════════════════════════
+  //                         SURVEY LOGIC                         
+  // ═══════════════════════════════════════════════════════════
+  let currentSurveyCode = null;
+  let liveSurveyUnsubscribe = null;
+  let currentSurveySlideId = null;
+
+  const btnSurveyJoin = document.getElementById('btn-survey-join');
+  const btnSurveyBack = document.getElementById('btn-survey-back');
+
+  if (btnSurveyBack) {
+    btnSurveyBack.addEventListener('click', () => {
+      hideAllSteps();
+      document.getElementById('portal-step-username').style.display = 'block';
+    });
+  }
+
+  if (btnSurveyJoin) {
+    btnSurveyJoin.addEventListener('click', async () => {
+      const codeInp = document.getElementById('inp-survey-code').value.trim();
+      const errEl = document.getElementById('survey-join-err');
+      
+      if(!codeInp) {
+        errEl.textContent = "Please enter the survey code.";
+        errEl.style.display = 'block';
+        return;
+      }
+      
+      const btnOrigText = btnSurveyJoin.textContent;
+      btnSurveyJoin.textContent = "Joining...";
+      btnSurveyJoin.disabled = true;
+
+      try {
+        const doc = await window.db.collection('live_surveys').doc(codeInp).get();
+        if(!doc.exists || doc.data().status !== 'active') {
+          errEl.textContent = "Invalid or inactive survey code.";
+          errEl.style.display = 'block';
+          btnSurveyJoin.textContent = btnOrigText;
+          btnSurveyJoin.disabled = false;
+          return;
+        }
+        
+        currentSurveyCode = codeInp;
+        errEl.style.display = 'none';
+        
+        document.getElementById('portal-step-survey-code').style.display = 'none';
+        document.getElementById('portal-step-survey-lobby').style.display = 'block';
+        
+        startListeningToSurvey();
+        
+      } catch(e) {
+        console.error(e);
+        errEl.textContent = "Connection error. Try again.";
+        errEl.style.display = 'block';
+        btnSurveyJoin.textContent = btnOrigText;
+        btnSurveyJoin.disabled = false;
+      }
+    });
+  }
+
+  function startListeningToSurvey() {
+    liveSurveyUnsubscribe = window.db.collection('live_surveys').doc(currentSurveyCode).onSnapshot(doc => {
+      if(!doc.exists || doc.data().status !== 'active') {
+        // Survey ended
+        document.getElementById('portal-step-survey-active').style.display = 'none';
+        document.getElementById('portal-step-survey-lobby').style.display = 'block';
+        document.getElementById('portal-step-survey-lobby').innerHTML = `<h4 style="font-size: 1.5rem; margin-bottom: 16px; font-weight: 800; color: #ef4444;">Survey Ended</h4><p style="color: var(--text-secondary); font-size: 1.1rem;">Thank you for participating!</p>
+        <button class="btn" style="margin-top: 24px; padding: 12px 24px; border-radius: 9999px; background: #f1f5f9;" onclick="window.location.reload()">Back Home</button>`;
+        if(liveSurveyUnsubscribe) liveSurveyUnsubscribe();
+        return;
+      }
+      
+      const data = doc.data();
+      const slide = data.slides[data.activeSlideIndex];
+      
+      if(slide.id !== currentSurveySlideId) {
+        currentSurveySlideId = slide.id;
+        renderActiveSurveySlide(slide);
+      }
+    });
+  }
+
+  function renderActiveSurveySlide(slide) {
+    document.getElementById('portal-step-survey-lobby').style.display = 'none';
+    document.getElementById('portal-step-survey-active').style.display = 'block';
+    document.getElementById('survey-submitted-msg').style.display = 'none';
+    
+    document.getElementById('survey-slide-question').textContent = slide.question;
+    const interactiveArea = document.getElementById('survey-interactive-area');
+    interactiveArea.style.display = 'flex';
+    interactiveArea.innerHTML = '';
+    
+    if(slide.type === 'multiple_choice') {
+      (slide.options || []).forEach(opt => {
+        const btn = document.createElement('button');
+        btn.style.cssText = 'width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 600; background: #f8fafc; border: 2px solid var(--section-divider); border-radius: 12px; color: var(--text); cursor: pointer; transition: all 0.2s; text-align: center;';
+        btn.textContent = opt;
+        btn.onclick = () => submitSurveyResponse(slide.id, opt);
+        btn.onmouseover = () => { btn.style.borderColor = '#0ea5e9'; btn.style.background = 'rgba(14,165,233,0.05)'; };
+        btn.onmouseout = () => { btn.style.borderColor = 'var(--section-divider)'; btn.style.background = '#f8fafc'; };
+        interactiveArea.appendChild(btn);
+      });
+    } 
+    else if (slide.type === 'open_ended' || slide.type === 'word_cloud') {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = 'Type your answer...';
+      inp.style.cssText = 'width: 100%; padding: 16px; font-size: 1.1rem; border-radius: 12px; border: 2px solid var(--section-divider); outline: none; margin-bottom: 12px; box-sizing: border-box;';
+      
+      const btn = document.createElement('button');
+      btn.textContent = 'Submit';
+      btn.className = 'btn-sky';
+      btn.style.cssText = 'width: 100%; padding: 14px; font-size: 1.1rem; border-radius: 12px;';
+      
+      btn.onclick = () => {
+        if(inp.value.trim()) {
+          submitSurveyResponse(slide.id, inp.value.trim());
+        }
+      };
+      
+      interactiveArea.appendChild(inp);
+      interactiveArea.appendChild(btn);
+    }
+  }
+
+  async function submitSurveyResponse(slideId, answerText) {
+    document.getElementById('survey-interactive-area').style.display = 'none';
+    document.getElementById('survey-submitted-msg').style.display = 'block';
+    
+    try {
+      await window.db.collection('survey_responses').add({
+        code: currentSurveyCode,
+        slideId: slideId,
+        participantName: participantName || 'Anonymous',
+        answer: answerText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e) {
+      console.error("Failed to submit response:", e);
+      alert("Failed to submit response. Please try again.");
+      document.getElementById('survey-interactive-area').style.display = 'flex';
+      document.getElementById('survey-submitted-msg').style.display = 'none';
+    }
+  }
+
 })();

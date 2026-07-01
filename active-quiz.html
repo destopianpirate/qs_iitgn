@@ -81,6 +81,10 @@
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" style="vertical-align: middle; margin-right: 8px;"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>Practice Match</h3>
             <p style="color: var(--text-tertiary); font-size: var(--fs-sm);">Enter the arena for public quizzes.</p>
           </button>
+          <button class="mode-choice-card" id="btn-portal-survey" style="background: #f1f5f9; border: none; border-radius: 20px; padding: 28px 20px;">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" style="vertical-align: middle; margin-right: 8px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Live Survey</h3>
+            <p style="color: var(--text-tertiary); font-size: var(--fs-sm);">Join a live presentation (Menti).</p>
+          </button>
         </div>
         <div style="margin-top: var(--space-4); text-align: center;">
           <button class="btn" id="btn-mode-back" style="display: none; background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #475569; font-weight: 600;">Back</button>
@@ -97,6 +101,48 @@
         <div style="display: flex; gap: var(--space-4);">
           <button class="btn" id="btn-username-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #111827; font-weight: 600; min-width: 100px;">Back</button>
           <button id="btn-username-next" style="flex: 1; justify-content: center; border-radius: 9999px; background: #0ea5e9; color: #ffffff; border: none; padding: 16px 24px; font-size: var(--fs-lg); cursor: pointer; font-weight: 600;">Continue</button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!--                         SURVEY FLOW                         -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      
+      <!-- Survey Step 1: Code Entry -->
+      <div id="portal-step-survey-code" class="portal-step" style="display: none;">
+        <h3 style="font-size: 1.75rem; margin-bottom: 8px;">Join Survey</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Enter the 6-digit code provided by the presenter.</p>
+        
+        <div class="fg">
+          <input type="number" id="inp-survey-code" placeholder="123456" style="padding: 16px; font-size: 1.5rem; letter-spacing: 4px; border-radius: 12px; border: 1px solid var(--section-divider); outline: none; background: #f8fafc; font-weight: 700; text-align: center; width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <p class="err" id="survey-join-err" style="margin-bottom:16px; color:#ef4444; font-size:0.9rem; display:none;"></p>
+        
+        <div style="display: flex; gap: 16px; margin-top: 24px;">
+          <button class="btn" id="btn-survey-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 14px 24px; color: #111827; font-weight: 600;">Back</button>
+          <button id="btn-survey-join" class="btn-sky" style="flex: 1; padding: 14px; font-size: 1.1rem; border-radius: 9999px;">Join Survey</button>
+        </div>
+      </div>
+
+      <!-- Survey Step 2: Lobby (Waiting for Slide) -->
+      <div id="portal-step-survey-lobby" class="portal-step" style="display: none; text-align: center; padding: 40px 20px;">
+        <h4 style="font-size: 1.5rem; margin-bottom: 16px; font-weight: 800; color: var(--primary);">You're In!</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 1.1rem;">Waiting for the presenter to show the next slide...</p>
+        <div class="loader" style="margin: 0 auto;"></div>
+      </div>
+
+      <!-- Survey Step 3: Active Slide -->
+      <div id="portal-step-survey-active" class="portal-step" style="display: none; text-align: center;">
+        <h3 id="survey-slide-question" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px; line-height: 1.3;">Question?</h3>
+        
+        <!-- Interactive Area -->
+        <div id="survey-interactive-area" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Content injected by JS based on slide type -->
+        </div>
+
+        <div id="survey-submitted-msg" style="display: none; margin-top: 24px; padding: 16px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 12px; color: #047857; font-weight: 600;">
+          Response submitted! Wait for the next slide.
         </div>
       </div>
 
@@ -365,8 +411,23 @@
 
   <!-- QUIZ RESULTS SCREEN — Duplicate removed to prevent DOM ID conflict -->
 
-  <script src="js/quiz.js?v=9999"></script>
-  <!-- Main js is used for theme toggle mostly, we'll keep it simple by adding theme logic locally if needed, or include main.js -->
-  <script src="js/main.js"></script>
+  <style>
+  .loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #f3f4f6;
+    border-bottom-color: #0ea5e9;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+  @keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<script src="js/quiz.js?v=2"></script>
 </body>
 </html>

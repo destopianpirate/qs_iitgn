@@ -127,20 +127,43 @@
     surveys.forEach(s => {
       const card = document.createElement('div');
       card.className = 'quiz-card';
+      card.style.cursor = 'pointer';
+      card.onclick = () => window.openSurveyDetail(s.id);
+      
       const numSlides = s.slides ? s.slides.length : 0;
       card.innerHTML = `
         <div class="header">
           <div class="title">${s.name || 'Untitled Survey'}</div>
           <span class="pill" style="background:#0ea5e9; color:white; font-size:0.75rem;">${numSlides} Slides</span>
         </div>
-        <div class="actions" style="margin-top: 16px; display: flex; gap: 8px;">
-          <button class="btn" style="flex:1;" onclick="window.editSurvey('${s.id}')">Edit</button>
-          <button class="btn" style="flex:1; background:#10b981; color:white; border:none;" onclick="window.presentSurvey('${s.id}')">Present</button>
+        <div style="margin-top: 16px; color: var(--text-secondary); font-size: 0.9rem;">
+          Click to manage survey
         </div>
       `;
       grid.appendChild(card);
     });
   };
+
+  window.openSurveyDetail = function(id) {
+    currentSurveyId = id;
+    const survey = surveys.find(s => s.id === id);
+    if (!survey) return;
+    
+    window.showScreen('screen-survey-dashboard-detail');
+    document.getElementById('detail-survey-title').textContent = survey.name;
+    document.getElementById('detail-survey-name-display').textContent = survey.name;
+    const numSlides = survey.slides ? survey.slides.length : 0;
+    document.getElementById('detail-survey-slides-count').textContent = `${numSlides} Slide${numSlides === 1 ? '' : 's'}`;
+    
+    document.getElementById('btn-detail-edit').onclick = () => window.editSurvey(id);
+    document.getElementById('btn-detail-present').onclick = () => window.presentSurvey(id);
+  };
+
+  // Bind back button for detail screen
+  document.getElementById('btn-survey-detail-back')?.addEventListener('click', () => {
+    window.showScreen('screen-surveys-dashboard');
+    window.renderSurveysDashboard();
+  });
 
   async function saveSurveys() {
     try {

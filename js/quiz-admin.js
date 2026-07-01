@@ -114,30 +114,53 @@
     if (els.panel) els.panel.classList.remove('active');
   }
 
-  function handleLogin(e) {
-    e.preventDefault();
-    const user = els.usernameInput.value.trim();
-    const pass = els.passwordInput.value.trim();
+  function setupIdentityListeners() {
+    if (els.loginBtn) {
+      els.loginBtn.addEventListener('click', async () => {
+        const u = els.usernameInput ? els.usernameInput.value.trim() : '';
+        const p = els.passwordInput ? els.passwordInput.value.trim() : '';
+        
+        if (!u || !p) {
+          if (els.loginError) { els.loginError.textContent = "Please fill out both fields"; els.loginError.classList.add('visible'); }
+          return;
+        }
 
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      sessionStorage.setItem('qs_admin', 'true');
-      isLoggedIn = true;
-      hideLoginScreen();
-      showDashboard();
-    } else {
-      if (els.loginError) els.loginError.classList.add('visible');
-      if (els.passwordInput) {
-        els.passwordInput.value = '';
-        els.passwordInput.focus();
-      }
+        els.loginBtn.textContent = 'Verifying...';
+        els.loginBtn.disabled = true;
+
+        try {
+          if (window.db) {
+            const snap = await window.db.collection('admins').doc(u).get();
+            if (snap.exists && snap.data().password === p) {
+              isLoggedIn = true;
+              sessionStorage.setItem('qs_admin', 'true');
+              sessionStorage.setItem('qs_admin_id', u);
+              hideLoginScreen();
+              showDashboard();
+              loadQuestions();
+            } else {
+              if (els.loginError) { els.loginError.textContent = "Invalid username or password."; els.loginError.classList.add('visible'); }
+            }
+          }
+        } catch(e) {
+          console.error(e);
+          if (els.loginError) { els.loginError.textContent = "Database error. Please try again."; els.loginError.classList.add('visible'); }
+        }
+        
+        els.loginBtn.textContent = 'Enter Dashboard';
+        els.loginBtn.disabled = false;
+      });
     }
-  }
 
-  function handleLogout() {
-    sessionStorage.removeItem('qs_admin');
-    isLoggedIn = false;
-    hideDashboard();
-    showLoginScreen();
+    if (els.logoutBtn) {
+      els.logoutBtn.addEventListener('click', () => {
+        isLoggedIn = false;
+        sessionStorage.removeItem('qs_admin');
+        sessionStorage.removeItem('qs_admin_id');
+        hideDashboard();
+        showLoginScreen();
+      });
+    }
   }
 
   // ── Question type switching ──
@@ -344,6 +367,7 @@
 
     const quizMode = {
       name,
+      uid: Math.floor(1000000000 + Math.random() * 9000000000).toString(),
       totalTime: time * 60,
       questionIds: questions.map(q => q.id),
       questionCount: questions.length,
@@ -385,20 +409,16 @@
   function init() {
     cacheDom();
 
-    // Login form submit
-    if (els.loginForm) els.loginForm.addEventListener('submit', handleLogin);
+    // Call new identity listeners (handles login and logout)
+    setupIdentityListeners();
 
     // Legacy modal triggers
-    if (els.loginBtn) els.loginBtn.addEventListener('click', showLoginScreen);
     if (els.modalClose) els.modalClose.addEventListener('click', hideLoginScreen);
     if (els.modalOverlay) {
       els.modalOverlay.addEventListener('click', (e) => {
         if (e.target === els.modalOverlay) hideLoginScreen();
       });
     }
-
-    // Logout
-    if (els.logoutBtn) els.logoutBtn.addEventListener('click', handleLogout);
 
     // Add question form
     if (els.addForm) els.addForm.addEventListener('submit', handleAddQuestion);

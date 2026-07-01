@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Become a Host | Quizzing Society</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <style>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Google Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6);
+      margin: 0;
+    }
+
+    .brand-header {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-header img { height: 40px; }
+    .brand-header span { font-weight: 800; font-size: 1.25rem; color: #0F172A; }
+    
+    .signup-container {
+      max-width: 420px;
+      width: 100%;
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: none;
+      text-align: center;
+      border: none;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+      margin-left: 12px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 9999px;
+      border: none;
+      background: #f3f4f6;
+      font-size: 0.95rem;
+      color: #111827;
+      outline: none;
+      box-sizing: border-box;
+      transition: background 0.2s;
+    }
+    .input-field:focus {
+      background: #e2e8f0;
+    }
+
+    .btn-sky {
+      width: 100%; border-radius: 9999px; background: #0ea5e9; color: #fff; border: none;
+      padding: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      margin-top: 12px; transition: background 0.2s;
+    }
+    .btn-sky:hover { background: #0284c7; }
+    
+    .err-msg { color: #EF4444; font-size: 0.9rem; margin-top: 12px; display: none; font-weight: 600; }
+    
+    .links-row {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .links-row a {
+      color: #0ea5e9;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .links-row a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="brand-header">
+    <img src="qs_logo.png" alt="QS Logo">
+    <span>QS IITGN</span>
+  </div>
+  
+  <a href="active-quiz.html" style="position: absolute; top: 32px; right: 32px; color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-weight: 600; z-index: 10;">&larr; Back to Arena</a>
+
+  <div class="signup-container">
+    <h2 style="color: black; margin-bottom: 8px; font-size: 1.75rem; font-weight: 800;">Become a Host</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">Create an admin account to host your own tournaments.</p>
+    
+    <div class="input-group">
+      <label class="input-label" for="signup-email">Email Address</label>
+      <input type="email" id="signup-email" class="input-field" placeholder="Enter your email">
+    </div>
+    
+    <div class="input-group">
+      <label class="input-label" for="signup-password">Password</label>
+      <input type="password" id="signup-password" class="input-field" placeholder="Create a password (min 6 chars)">
+    </div>
+    
+    <button class="btn-sky" id="btn-signup">Create Account</button>
+    <div class="err-msg" id="signup-error"></div>
+    
+    <div class="links-row">
+      <div style="font-size: 0.95rem; font-weight: 600; color: black;">
+        Already an Admin? <a href="admin.html" style="color: #0ea5e9; text-decoration: none; cursor: pointer;">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('btn-signup').addEventListener('click', async () => {
+      const e = document.getElementById('signup-email').value.trim();
+      const p = document.getElementById('signup-password').value.trim();
+      const err = document.getElementById('signup-error');
+      const btn = document.getElementById('btn-signup');
+      
+      err.style.display = 'none';
+
+      if (!e || !p) {
+        err.textContent = "Please fill out both fields.";
+        err.style.display = 'block';
+        return;
+      }
+      
+      if (p.length < 6) {
+        err.textContent = "Password must be at least 6 characters.";
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = 'Creating...';
+      btn.disabled = true;
+
+      try {
+        if (!window.firebase) throw new Error("Firebase not connected.");
+        
+        // Use Firebase Auth
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(e, p);
+        
+        // Save to admins collection just to be safe (if needed by other logic)
+        await window.db.collection('admins').doc(userCredential.user.uid).set({
+          email: e,
+          role: 'admin',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert("Account created successfully!");
+        window.location.href = 'admin.html';
+      } catch (ex) {
+        console.error(ex);
+        err.textContent = "Failed to create account: " + ex.message;
+        err.style.display = 'block';
+      } finally {
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+[
+  {
+    "type": "mcq",
+    "question": "What is the result of $$ \\int x^2 dx $$?",
+    "options": ["$$ \\frac{x^3}{3} + C $$", "$$ x^3 + C $$", "$$ 2x + C $$", "$$ \\frac{x^2}{2} + C $$"],
+    "ans": "$$ \\frac{x^3}{3} + C $$"
+  },
+  {
+    "type": "msq",
+    "question": "Which of the following are **programming languages**? Select all that apply.",
+    "options": ["Python", "HTML", "C++", "Markdown"],
+    "correctAnswers": [0, 2]
+  },
+  {
+    "type": "integer",
+    "question": "If $$ f(x) = x^2 $$, what is $$ f'(3) $$?",
+    "ans": "6"
+  }
+]

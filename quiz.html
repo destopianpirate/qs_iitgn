@@ -20,6 +20,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <!-- Firebase Config -->
   <script src="js/firebase.js"></script>
+  
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <!-- Marked.js -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="subpage">
 
@@ -64,8 +71,9 @@
           
           <h2 class="section-title">Question of the Day</h2>
           <p class="section-subtitle">A new question every day. Click the card to reveal the answer. Navigate through our archive of 50+ curated questions.</p>
-          <div style="margin-top: var(--space-6);">
+          <div style="margin-top: var(--space-6); display: flex; gap: var(--space-4); justify-content: center;">
             <button class="btn btn-primary" id="open-quiz-modes-btn">View Quiz Modes & Tournaments</button>
+            <button class="btn btn-outline" id="btn-open-student-dashboard">My Dashboard</button>
           </div>
         </div>
 
@@ -254,6 +262,43 @@
         <div class="exit-confirm-actions">
           <button class="btn btn-outline" id="btn-cancel-exit">Resume</button>
           <button class="btn btn-primary" style="background: var(--error);" id="btn-confirm-exit">Exit Quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT DASHBOARD MODAL -->
+    <div class="quiz-mode-overlay" id="student-dashboard-overlay">
+      <div class="quiz-mode-modal" style="max-width: 800px; padding: var(--space-6); position: relative; max-height: 90vh; overflow-y: auto;">
+        <button id="btn-close-student-dashboard" style="position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 24px;">&times;</button>
+        <h2 style="font-weight: 800; font-size: var(--fs-2xl); color: var(--primary); margin-bottom: var(--space-2);">My Dashboard</h2>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">Your personal performance history across all practice matches and tournaments.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+          <div style="background: var(--bg-alt); padding: var(--space-4); border-radius: var(--radius-lg); text-align: center;">
+            <div style="font-size: var(--fs-sm); color: var(--text-secondary); font-weight: 600;">Total Tests Given</div>
+            <div id="stu-total-tests" style="font-size: 2rem; font-weight: 800; color: #0ea5e9;">0</div>
+          </div>
+          <div style="background: var(--bg-alt); padding: var(--space-4); border-radius: var(--radius-lg); text-align: center;">
+            <div style="font-size: var(--fs-sm); color: var(--text-secondary); font-weight: 600;">Average Score</div>
+            <div id="stu-avg-score" style="font-size: 2rem; font-weight: 800; color: #10B981;">0%</div>
+          </div>
+        </div>
+
+        <h4 style="text-align: left; font-size: var(--fs-lg); margin-bottom: var(--space-4);">Test History</h4>
+        <div style="overflow-x: auto; text-align: left; background: var(--bg-alt); border-radius: var(--radius-lg); padding: var(--space-4);">
+          <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--section-divider);">
+                <th style="padding: 12px; font-weight: 700;">Date</th>
+                <th style="padding: 12px; font-weight: 700;">Quiz Name</th>
+                <th style="padding: 12px; font-weight: 700;">Mode</th>
+                <th style="padding: 12px; font-weight: 700;">Score</th>
+              </tr>
+            </thead>
+            <tbody id="stu-history-tbody">
+              <tr><td colspan="4" style="text-align:center; padding: 24px; color: var(--text-secondary);">Loading history...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

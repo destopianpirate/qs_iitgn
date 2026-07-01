@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard | Quizzing Society</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Google Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-6);
+    }
+    
+    .brand-header {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-header img { height: 40px; }
+    .brand-header span { font-weight: 800; font-size: 1.25rem; color: #0F172A; }
+    
+    .login-container {
+      max-width: 400px;
+      width: 100%;
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-top: 10vh;
+      border: none;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 9999px;
+      border: none;
+      background: #f3f4f6;
+      font-size: 1rem;
+      color: #111827;
+      outline: none;
+      text-align: center;
+      margin-bottom: 24px;
+      box-sizing: border-box;
+    }
+
+    .stat-box {
+      background: var(--surface);
+      border: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      flex: 1;
+    }
+    
+    .history-card {
+      background: var(--surface);
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .history-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    
+    .panel-card {
+      background: var(--surface);
+      border: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .history-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand-header">
+    <img src="qs_logo.png" alt="QS Logo">
+    <span>QS IITGN</span>
+  </div>
+
+  <!-- Login State -->
+  <div class="login-container" id="login-container">
+    <h2 style="color: #0ea5e9; margin-bottom: 8px; font-size: 2rem; font-weight: 800;">My Dashboard</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 24px;">Enter your username to view your performance</p>
+    <input type="text" id="username-input" class="input-field" placeholder="Username (e.g. jdoe123)">
+    <button class="btn" id="btn-login" style="width: 100%; border-radius: 9999px; padding: 14px; justify-content: center; font-weight: 700; background: #0ea5e9; color: white; border: none; font-size: 1.1rem; transition: background 0.2s;">View Dashboard</button>
+    <a href="active-quiz.html" style="display: block; margin-top: 16px; color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-weight: 600;">&larr; Back to Arena</a>
+  </div>
+
+  <!-- Dashboard State -->
+  <div class="dashboard-container" id="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h2 style="font-size: 2rem; color: var(--primary);">Welcome, <span id="dash-username"></span>!</h2>
+      <button class="btn" id="btn-logout" style="background: #f1f5f9; border-radius: 9999px; padding: 8px 16px; font-weight: 600;">Logout</button>
+    </div>
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <div class="stat-box">
+        <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Quizzes Taken</div>
+        <div id="stat-quizzes-taken" style="font-size: 3rem; font-weight: 800; color: #0ea5e9; margin-top: 8px;">0</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Avg Score</div>
+        <div id="stat-avg-score" style="font-size: 3rem; font-weight: 800; color: #10B981; margin-top: 8px;">0%</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Total Time</div>
+        <div id="stat-total-time" style="font-size: 3rem; font-weight: 800; color: #8B5CF6; margin-top: 8px;">0m</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px;">
+      <div class="panel-card">
+        <h3 style="margin-bottom: 16px; color: var(--text); font-weight: 800;">Attempt History</h3>
+        <div id="history-list" style="max-height: 400px; overflow-y: auto;">
+          <!-- History items injected here -->
+        </div>
+      </div>
+      <div class="panel-card">
+        <h3 style="margin-bottom: 16px; color: var(--text); font-weight: 800;">Score Progression</h3>
+        <div style="height: 300px;">
+          <canvas id="progression-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chartInstance = null;
+
+    document.getElementById('btn-login').addEventListener('click', () => {
+      const username = document.getElementById('username-input').value.trim();
+      if (!username) return alert('Please enter your username.');
+      loadDashboard(username);
+    });
+
+    document.getElementById('username-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('btn-login').click();
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      document.getElementById('dashboard-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+      document.getElementById('username-input').value = '';
+    });
+
+    async function loadDashboard(username) {
+      const btn = document.getElementById('btn-login');
+      btn.textContent = 'Loading...';
+      btn.disabled = true;
+
+      try {
+        if (!window.db) throw new Error("Firebase not connected.");
+        
+        const snap = await window.db.collection('quiz_attempts').where('studentName', '==', username).get();
+        let attempts = [];
+        snap.forEach(doc => attempts.push({ id: doc.id, ...doc.data() }));
+
+        attempts.sort((a,b) => new Date(a.submittedAt) - new Date(b.submittedAt));
+
+        renderStats(username, attempts);
+        
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('dashboard-container').style.display = 'flex';
+      } catch (e) {
+        console.error(e);
+        alert("Failed to load dashboard: " + e.message);
+      } finally {
+        btn.textContent = 'View Dashboard';
+        btn.disabled = false;
+      }
+    }
+
+    function renderStats(username, attempts) {
+      document.getElementById('dash-username').textContent = username;
+      
+      document.getElementById('stat-quizzes-taken').textContent = attempts.length;
+      
+      let totalScore = 0;
+      let totalMax = 0;
+      let totalTime = 0;
+      
+      const historyHtml = [];
+      const chartLabels = [];
+      const chartData = [];
+
+      attempts.forEach((a, i) => {
+        totalScore += a.score || 0;
+        totalMax += a.totalQuestions || 1;
+        totalTime += a.timeTaken || 0;
+        
+        const pct = Math.round(((a.score||0)/(a.totalQuestions||1))*100);
+        chartLabels.push(`Quiz ${i+1}`);
+        chartData.push(pct);
+        
+        const d = new Date(a.submittedAt).toLocaleDateString();
+        const modeBadge = a.mode === 'tournament' ? 
+          '<span style="background: rgba(139,92,246,0.1); color: #8B5CF6; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">Tournament</span>' :
+          '<span style="background: rgba(16,185,129,0.1); color: #10B981; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">Practice</span>';
+
+        historyHtml.unshift(`
+          <div class="history-card">
+            <div>
+              <div style="font-weight: 700; color: var(--text); font-size: 1.05rem;">${a.quizName || 'Untitled Quiz'}</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">${d} &bull; ${modeBadge}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 1.2rem; font-weight: 800; color: ${pct >= 70 ? '#10B981' : (pct >= 40 ? '#F59E0B' : '#EF4444')};">${pct}%</div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">${a.score}/${a.totalQuestions}</div>
+            </div>
+          </div>
+        `);
+      });
+
+      document.getElementById('history-list').innerHTML = historyHtml.length ? historyHtml.join('') : '<div style="color:var(--text-secondary);text-align:center;padding:20px;">No quizzes taken yet.</div>';
+
+      const avg = totalMax > 0 ? Math.round((totalScore/totalMax)*100) : 0;
+      document.getElementById('stat-avg-score').textContent = avg + '%';
+      document.getElementById('stat-total-time').textContent = Math.round(totalTime / 60) + 'm';
+
+      // Render chart
+      const ctx = document.getElementById('progression-chart');
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            label: 'Score %',
+            data: chartData,
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, max: 100 } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

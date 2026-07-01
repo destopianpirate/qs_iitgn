@@ -4,7 +4,7 @@ This document provides a comprehensive overview of the Quizzing Society website 
 
 ## 1. Core Architecture
 The website uses a **static HTML/CSS/JS architecture** without a build tool like Webpack or Vite. 
-It leverages modern browser features (CSS variables, ES6 Modules) and uses **Firebase Realtime Database** via CDN scripts for dynamic functionality (Join Form submissions, Quiz Admin panel).
+It leverages modern browser features (CSS variables, ES6 Modules) and uses **Firebase Firestore** via CDN scripts for backend functionality (Join Form submissions, Quiz Creation, Leaderboards, and Telemetry tracking). **Chart.js** is used for real-time data visualization on the Admin Dashboard.
 
 ## 2. Directory Structure
 
@@ -12,22 +12,17 @@ It leverages modern browser features (CSS variables, ES6 Modules) and uses **Fir
 ├── css/
 │   ├── variables.css   # Design tokens (colors, fonts, spacing, light/dark mode variables)
 │   ├── base.css        # Resets, global typography, utilities (.glass-card, .form-field)
-│   ├── animations.css  # Keyframes and scroll-triggered animation classes
 │   ├── components.css  # Reusable UI components (.btn, .navbar, .pill)
 │   ├── sections.css    # Page-specific layouts and the global .footer
 │   └── admin.css       # Quiz admin panel dashboard, grid layouts, and modals
 ├── js/
-│   ├── main.js         # Entry point (initializes theme, mobile nav, typewriter, back-to-top)
-│   ├── scroll.js       # Scroll reveal logic (Intersection Observer)
-│   ├── particles.js    # Canvas-based background particle system
-│   ├── buzzer.js       # Logic for the interactive buzzer on the homepage
-│   ├── cards.js        # 3D tilt effects for cards
-│   ├── quiz.js         # Daily quiz frontend logic (deterministic date-based question selection)
-│   ├── quiz-admin.js   # Quiz Admin Dashboard logic (Firebase CRUD, local fallback)
+│   ├── main.js         # Entry point (initializes theme, mobile nav)
+│   ├── quiz.js         # Active Quiz frontend logic, scoring, timer, and telemetry
 │   └── join-form.js    # Join page form validation, confetti animation, and Firebase push
 ├── index.html          # Homepage
 ├── events.html         # Events timeline
-├── quiz.html           # Daily Quiz and Admin Panel
+├── active-quiz.html    # The active Quiz Arena (takes access code to enter a quiz)
+├── admin.html          # Full Admin Panel (Quiz Editor, Applications, Analytics)
 ├── team.html           # Team directory
 ├── resources.html      # Study materials and archives
 └── join.html           # Recruitment form
@@ -39,19 +34,18 @@ The CSS is designed to be highly modular and relies heavily on CSS custom proper
 
 - **Theming:** Handled via the `data-theme="light|dark"` attribute on the `<html>` tag. Colors swap instantly because `variables.css` redefines the tokens based on this attribute.
 - **Glassmorphism:** The premium frosted glass effect is applied via the `.glass-card` class (found in `base.css`).
-- **Responsive Design:** Media queries are written directly into the CSS files where components are defined (e.g., footer grid stacking is in `sections.css`, admin dashboard split layout is in `admin.css`).
+- **Responsive Design:** Media queries are written directly into the CSS files where components are defined.
 - **Typography:** Uses Google Sans and Product Sans globally.
 
-## 4. State & Database (Firebase)
+## 4. State & Database (Firebase Firestore)
 
-The project utilizes Firebase Realtime Database for two main features:
-1. **Join Form Applications:** Handled in `js/join-form.js`. Data is pushed to the `/applications` node.
-2. **Quiz Admin Panel:** Handled in `js/quiz-admin.js`. Questions are stored in the `/quizQuestions` node.
-
-**Important Note on Firebase Config:**
-Currently, the codebase uses dummy placeholder keys (`AIzaSyDemoKeyReplace`). The `quiz-admin.js` script automatically detects this and drops into a **local fallback mode** so that UI changes (adding/sorting questions) work visually in the browser without crashing due to network rejections. To deploy to production, replace the `firebaseConfig` object in the respective JS files with real credentials.
+The project utilizes Firebase Firestore as its primary backend:
+1. **Join Form Applications:** Pushed directly to a Firestore collection. Viewed in the `admin.html` Applications screen.
+2. **Quiz Admin Panel (`admin.html`):** The primary hub for creating quizzes. Quizzes are saved to the `global/allQuizzes` document as stringified JSON.
+3. **Active Quizzes (`active-quiz.html`):** Fetches the quizzes from Firestore, enforces access codes for Private (Tournament) quizzes, handles scoring, and tracks time.
+4. **Telemetry & Analytics:** `quiz.js` logs every single quiz attempt to the `quiz_attempts` collection. The Admin Dashboard reads this collection to generate dynamic Chart.js dashboards showing Platform Overview metrics and Quiz-Specific analysis.
 
 ## 5. Maintenance Notes
 
 - **Global Components (Navbar/Footer):** Because this is a static site without a templating engine (like Next.js or PHP), the Navbar and Footer HTML blocks are duplicated across all `.html` files. If you need to make changes to them, you must apply the changes to *all* HTML files simultaneously.
-- **Admin Panel Layout:** The quiz admin panel (`quiz.html`) uses a split layout (`.dashboard-layout` -> `.dashboard-left` and `.dashboard-right`). It is hidden by default and triggered by the login modal button.
+- **Admin Panel Navigation:** The Admin Panel uses a custom Single Page App (SPA) structure. Clicking the sidebar elements triggers JavaScript functions (like `showScreen()`) that toggle `.active` classes on sections (e.g., `#screen-dash`, `#screen-applications`, `#screen-editor`, `#screen-quiz-analytics`).

@@ -636,22 +636,18 @@
         const msgs = [];
         snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
         msgs.sort((a, b) => {
-          const t1 = a.timestamp ? a.timestamp.toMillis() : Date.now();
-          const t2 = b.timestamp ? b.timestamp.toMillis() : Date.now();
+          const t1 = (a.timestamp && typeof a.timestamp.toMillis === 'function') ? a.timestamp.toMillis() : Date.now();
+          const t2 = (b.timestamp && typeof b.timestamp.toMillis === 'function') ? b.timestamp.toMillis() : Date.now();
           return t1 - t2;
         });
         msgsDiv.innerHTML = '';
         msgs.forEach(msg => {
           const div = document.createElement('div');
           const isMe = msg.sender === participantName;
-          const bg = isMe ? '#0ea5e9' : (msg.sender === 'Admin' ? '#fbbf24' : '#f1f5f9');
-          const color = (isMe || msg.sender === 'Admin') ? 'white' : 'var(--text)';
-          div.style.cssText = `margin-bottom:8px; padding:10px 14px; border-radius:12px; background:${bg}; color:${color}; width:fit-content; max-width:85%; align-self:${isMe?'flex-end':'flex-start'}; border: 1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(0,0,0,0.05);`;
-          if (msg.sender === 'Admin') {
-            div.style.background = '#475569';
-            div.style.border = 'none';
-          }
-          div.innerHTML = `<strong style="font-size:0.75rem; opacity:0.8; display:block; margin-bottom:4px;">${msg.sender}</strong>${msg.message}`;
+          const bg = isMe ? '#0ea5e9' : '#ef4444';
+          const color = 'white';
+          div.style.cssText = `margin-bottom:8px; padding:10px 14px; border-radius:12px; background:${bg}; color:${color}; width:fit-content; max-width:85%; align-self:${isMe?'flex-end':'flex-start'}; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: none; line-height: 1.4;`;
+          div.innerHTML = `<strong style="font-size:0.75rem; opacity:0.9; display:block; margin-bottom:4px;">${msg.sender}</strong>${msg.message}`;
           msgsDiv.appendChild(div);
         });
         msgsDiv.scrollTop = msgsDiv.scrollHeight;

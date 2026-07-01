@@ -1515,14 +1515,14 @@ globalCharts);
           const msgs = [];
           snap.forEach(doc => msgs.push(doc.data()));
           msgs.sort((a, b) => {
-            const t1 = a.timestamp ? a.timestamp.toMillis() : Date.now();
-            const t2 = b.timestamp ? b.timestamp.toMillis() : Date.now();
+            const t1 = (a.timestamp && typeof a.timestamp.toMillis === 'function') ? a.timestamp.toMillis() : Date.now();
+            const t2 = (b.timestamp && typeof b.timestamp.toMillis === 'function') ? b.timestamp.toMillis() : Date.now();
             return t1 - t2;
           });
           msgs.forEach(msg => {
             const isAdmin = msg.sender === 'Admin';
             const align = isAdmin ? 'flex-end' : 'flex-start';
-            const bg = isAdmin ? '#0ea5e9' : '#f1f5f9';
+            const bg = isAdmin ? '#0ea5e9' : '#ffffff';
             const color = isAdmin ? 'white' : 'var(--text)';
             
             chatMessages.innerHTML += `

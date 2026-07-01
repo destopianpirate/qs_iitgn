@@ -537,7 +537,7 @@
         
         const stepLobby = document.getElementById('portal-step-lobby');
         if (stepLobby) stepLobby.style.display = 'block';
-        document.getElementById('portal-card').style.maxWidth = '1000px';
+        document.getElementById('portal-card').style.maxWidth = '1200px';
         document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
         
         joinLobby(matchingQuiz.id);
@@ -611,12 +611,10 @@
         if (quiz && quiz.isDeployed) {
           document.getElementById('lobby-status-text').textContent = "Match is starting!";
           document.getElementById('lobby-status-text').style.color = "#10B981";
-          document.querySelector('.lobby-spinner').style.display = 'none';
           document.getElementById('btn-lobby-start').style.display = 'block';
         } else {
           document.getElementById('lobby-status-text').textContent = "Waiting for host to start...";
           document.getElementById('lobby-status-text').style.color = "var(--text)";
-          document.querySelector('.lobby-spinner').style.display = 'block';
           document.getElementById('btn-lobby-start').style.display = 'none';
         }
       }

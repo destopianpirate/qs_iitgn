@@ -530,15 +530,18 @@
         }
       }
 
-      document.getElementById('tournament-error').style.display = 'none';
       currentPendingQuizId = matchingQuiz.id;
-      hideAllSteps();
-      
-      const stepLobby = document.getElementById('portal-step-lobby');
-      if (stepLobby) stepLobby.style.display = 'block';
-      document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
-      
-      joinLobby(matchingQuiz.id);
+      if (matchingQuiz) {
+        document.getElementById('tournament-error').style.display = 'none';
+        hideAllSteps();
+        
+        const stepLobby = document.getElementById('portal-step-lobby');
+        if (stepLobby) stepLobby.style.display = 'block';
+        document.getElementById('portal-card').style.maxWidth = '1000px';
+        document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
+        
+        joinLobby(matchingQuiz.id);
+      }
     });
 
     // Step 4: Rules Back
@@ -663,6 +666,7 @@
     // Lobby buttons
     document.getElementById('btn-lobby-leave').onclick = () => {
       leaveLobby(quizId);
+      document.getElementById('portal-card').style.maxWidth = '500px';
       const stepMode = document.getElementById('portal-step-mode');
       const allSteps = document.querySelectorAll('.portal-step');
       allSteps.forEach(s => s.style.display = 'none');

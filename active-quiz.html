@@ -41,7 +41,7 @@
   <!-- PORTAL ENTRY FLOW -->
   <div class="portal-flow-overlay" id="portal-flow-overlay" style="transition: all 0.5s ease-in-out;">
     <div style="position: absolute; top: var(--space-6); left: var(--space-6); display: flex; align-items: center; gap: var(--space-3); z-index: 10;">
-      <img src=".png" alt="Quizzing Society" style="height: 40px; width: auto; object-fit: contain;">
+      <img src="qs_logo.png" alt="Quizzing Society" style="height: 40px; width: auto; object-fit: contain;">
       <span style="font-weight: 800; font-size: var(--fs-xl); color: var(--text-primary); font-family: 'Google Sans', sans-serif;">QS IITGN</span>
     </div>
     <div id="top-right-nav" style="position: absolute; top: var(--space-6); right: var(--space-6); z-index: 10; display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
@@ -138,9 +138,9 @@
         <h4 style="margin-bottom: var(--space-2); text-align: center; font-size: 2.25rem; font-weight: 800; color: var(--primary);">Tournament Lobby</h4>
         <p id="lobby-quiz-name" style="text-align: center; color: var(--text-secondary); margin-bottom: var(--space-6); font-weight: 600; font-size: 1.25rem;">Loading...</p>
         
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: start;">
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: stretch;">
           <!-- Left side: Chat -->
-          <div style="background: var(--surface); border: 1px solid var(--section-divider); border-radius: 16px; display: flex; flex-direction: column; height: 500px; overflow: hidden;">
+          <div style="background: var(--surface); border: 1px solid var(--section-divider); border-radius: 16px; display: flex; flex-direction: column; min-height: 500px; overflow: hidden;">
             <div style="padding: 16px; background: rgba(14,165,233,0.1); font-weight: 700; color: #0ea5e9; border-bottom: 1px solid var(--section-divider);">Lobby Chat</div>
             <div id="lobby-chat-messages" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
               <!-- Messages injected here -->
@@ -152,9 +152,8 @@
           </div>
           
           <!-- Right side: Status -->
-          <div style="display: flex; flex-direction: column; gap: 24px; text-align: center;">
-            <div style="padding: 32px; background: var(--surface); border: 1px solid var(--section-divider); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 250px;">
-              <div class="lobby-spinner" style="width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top: 4px solid #0ea5e9; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 24px; text-align: center; height: 100%;">
+            <div style="flex: 1; padding: 32px; background: var(--surface); border: 1px solid var(--section-divider); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
               <h5 style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 8px;" id="lobby-status-text">Waiting for host to start...</h5>
               <p style="color: var(--text-secondary); font-size: 0.9rem;" id="lobby-participants-count">Participants joined: 1</p>
             </div>

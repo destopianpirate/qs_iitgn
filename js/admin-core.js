@@ -137,14 +137,17 @@
       return s;
     }
   
-    // â”€â”€ Screen switching â”€â”€
-    function showScreen(id) {
+    // ──────── Screen switching ────────
+    window.showScreen = function(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
       if (id !== 'screen-login' && typeof initSidebar === 'function') {
         initSidebar();
       }
-    }
+    };
+    // Keep local reference for existing code in this file
+    const showScreen = window.showScreen;
   
     // â”€â”€ LOGIN â”€â”€
     const loginForm = document.getElementById('login-form');

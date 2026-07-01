@@ -727,7 +727,17 @@ timer: parseInt(obj.timer) || 30 };
       showScreen('screen-applications');
       fetchApplicationsFromDB();
     });
-  
+
+    const sbNavSurveys = document.getElementById('sb-nav-surveys');
+    if (sbNavSurveys) {
+      sbNavSurveys.addEventListener('click', () => {
+        document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+        sbNavSurveys.classList.add('active');
+        showScreen('screen-surveys-dashboard');
+        if (window.renderSurveysDashboard) window.renderSurveysDashboard();
+      });
+    }
+
     // Function to show sidebar
     function initSidebar() {
       sidebar.style.display = 'flex';

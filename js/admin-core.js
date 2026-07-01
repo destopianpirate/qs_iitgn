@@ -1505,7 +1505,6 @@ globalCharts);
       // 2. Listen to Live Chats
       liveChatsUnsubscribe = window.db.collection('live_chats')
         .where('quizId', '==', quizId)
-        .orderBy('timestamp', 'asc')
         .onSnapshot(snap => {
           if (!chatMessages) return;
           chatMessages.innerHTML = '';
@@ -1513,8 +1512,14 @@ globalCharts);
             chatMessages.innerHTML = '<div style="text-align:center; color:gray; font-size:0.85rem; padding: 16px;">No messages yet.</div>';
             return;
           }
-          snap.forEach(doc => {
-            const msg = doc.data();
+          const msgs = [];
+          snap.forEach(doc => msgs.push(doc.data()));
+          msgs.sort((a, b) => {
+            const t1 = a.timestamp ? a.timestamp.toMillis() : Date.now();
+            const t2 = b.timestamp ? b.timestamp.toMillis() : Date.now();
+            return t1 - t2;
+          });
+          msgs.forEach(msg => {
             const isAdmin = msg.sender === 'Admin';
             const align = isAdmin ? 'flex-end' : 'flex-start';
             const bg = isAdmin ? '#0ea5e9' : '#f1f5f9';
@@ -1523,7 +1528,7 @@ globalCharts);
             chatMessages.innerHTML += `
               <div style="display:flex; flex-direction:column; align-items:${align}; margin-bottom:8px;">
                 <span style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:2px; font-weight:600;">${msg.sender}</span>
-                <div style="background:${bg}; color:${color}; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.9rem; word-break:break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <div style="background:${bg}; color:${color}; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.9rem; word-break:break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
                   ${msg.message}
                 </div>
               </div>

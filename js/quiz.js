@@ -541,6 +541,12 @@
         if (pCard) pCard.style.maxWidth = '1200px';
         document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
         
+        const qCount = matchingQuiz.questions ? matchingQuiz.questions.length : 0;
+        const totalTime = matchingQuiz.questions ? matchingQuiz.questions.reduce((sum, q) => sum + (parseInt(q.timeLimit) || 30), 0) : 0;
+        const minutes = Math.floor(totalTime / 60);
+        const metaEl = document.getElementById('lobby-quiz-meta');
+        if(metaEl) metaEl.textContent = `${qCount} questions • ${minutes} min`;
+        
         joinLobby(matchingQuiz.id);
       }
     });
@@ -626,22 +632,30 @@
     msgsDiv.innerHTML = '';
     lobbyChatUnsubscribe = window.db.collection('live_chats')
       .where('quizId', '==', quizId)
-      .orderBy('timestamp', 'asc')
       .onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const msg = change.doc.data();
+        const msgs = [];
+        snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
+        msgs.sort((a, b) => {
+          const t1 = a.timestamp ? a.timestamp.toMillis() : Date.now();
+          const t2 = b.timestamp ? b.timestamp.toMillis() : Date.now();
+          return t1 - t2;
+        });
+        msgsDiv.innerHTML = '';
+        msgs.forEach(msg => {
           const div = document.createElement('div');
           const isMe = msg.sender === participantName;
           const bg = isMe ? '#0ea5e9' : (msg.sender === 'Admin' ? '#fbbf24' : '#f1f5f9');
           const color = (isMe || msg.sender === 'Admin') ? 'white' : 'var(--text)';
-          div.style.cssText = `margin-bottom:8px; padding:10px; border-radius:8px; background:${bg}; color:${color}; width:fit-content; max-width:80%; align-self:${isMe?'flex-end':'flex-start'}`;
+          div.style.cssText = `margin-bottom:8px; padding:10px 14px; border-radius:12px; background:${bg}; color:${color}; width:fit-content; max-width:85%; align-self:${isMe?'flex-end':'flex-start'}; border: 1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(0,0,0,0.05);`;
+          if (msg.sender === 'Admin') {
+            div.style.background = '#475569';
+            div.style.border = 'none';
+          }
           div.innerHTML = `<strong style="font-size:0.75rem; opacity:0.8; display:block; margin-bottom:4px;">${msg.sender}</strong>${msg.message}`;
           msgsDiv.appendChild(div);
-          msgsDiv.scrollTop = msgsDiv.scrollHeight;
-        }
+        });
+        msgsDiv.scrollTop = msgsDiv.scrollHeight;
       });
-    });
 
     // Handle sending chat
     document.getElementById('btn-lobby-send').onclick = () => {

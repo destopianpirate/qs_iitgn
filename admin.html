@@ -211,7 +211,7 @@
 <!-- ═══════════════════════ APPLICATIONS SCREEN ═══════════════════════ -->
 <div class="screen applications-screen" id="screen-applications" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
-    <div class="left"><img src=".png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
     <div class="center">Admin Panel</div>
     <div class="right" style="display: flex; justify-content: flex-end;">
       <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
@@ -274,6 +274,7 @@
              <span id="qa-uid-dynamic" style="background: rgba(14,165,233,0.1); color: #0ea5e9; font-weight: 800; padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-family: monospace; letter-spacing: 1px;">UID-0000000000</span>
           </div>
           <div style="color: var(--text-secondary); font-size: 1.1rem; font-weight: 600;" id="qa-meta-dynamic">0 questions | 0 min</div>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 0 0; width: 100%;">
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-end;">
           <div style="display: flex; gap: 8px; position: relative;">
@@ -298,7 +299,7 @@
     
     <!-- LIVE TOURNAMENT STATS -->
     <div id="qa-live-stats-panel" style="display: none; margin-bottom: 24px;">
-      <h3 style="font-size: 1.25rem; font-weight: 800; color: #0ea5e9; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #000000; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
         Live Tournament Control
       </h3>
       
@@ -313,11 +314,9 @@
           <div id="live-avg-completion" style="font-size: 3.5rem; font-weight: 800; color: #10b981; line-height: 1; margin-top: 8px;">0%</div>
         </div>
         <div style="text-align: center; border-left: 1px solid var(--section-divider); padding-left: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Tournament Access Code:</div>
-          <div id="live-access-code-display" style="font-family: monospace; font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #f472b6; background: rgba(244,114,182,0.1); padding: 8px 16px; border-radius: 8px; margin-bottom: 16px;">------</div>
-          <div id="deploy-schedule-container" style="display: flex; gap: 8px; margin-bottom: 16px; width: 100%;">
-            <input type="date" id="deploy-date" style="flex: 1; padding: 8px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none;">
-            <input type="time" id="deploy-time" style="flex: 1; padding: 8px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none;">
+          <div id="deploy-schedule-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;">
+            <input type="date" id="deploy-date" style="width: 100%; padding: 10px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit;">
+            <input type="time" id="deploy-time" style="width: 100%; padding: 10px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit;">
           </div>
           <button id="btn-qa-deploy" style="background: #10B981; border: none; border-radius: 9999px; padding: 12px 24px; color: white; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3); width: 100%; transition: all 0.2s;">Deploy Quiz</button>
         </div>
@@ -504,7 +503,7 @@
 
 <div class="screen editor-screen" id="screen-editor">
   <div class="editor-topbar">
-    <div class="left"><img src=".png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
     <div class="center" id="editor-title">Edit Quiz</div>
     <div class="right"></div>
   </div>
@@ -516,22 +515,27 @@
         <h4>Quiz Settings</h4>
         <div class="settings-row" style="grid-template-columns: 1fr;">
           <div class="fg"><label>Quiz Name</label><input type="text" id="ed-name" placeholder="e.g. Weekly Quiz #5" style="font-size: 1.25rem; font-weight: bold; padding: 12px 16px;"></div>
-          <div class="fg" style="display: none;"><label>Total Time (auto-calculated)</label><input type="text" id="ed-time" readonly style="background: #e2e8f0 !important; cursor: not-allowed; color: #64748b !important; font-weight: bold;"></div>
         </div>
         <div class="fg" style="margin-bottom:12px;">
           <label>Additional Instructions (Optional)</label>
           <textarea id="ed-instructions" placeholder="Enter any extra rules, grading info, or notes for the students..." style="width: 100%; border-radius: 12px; padding: 12px 20px; border: none; background: #f0f2f5; font-family: inherit; resize: vertical; min-height: 80px;"></textarea>
         </div>
-        <div class="fg" style="margin-bottom:12px;">
-          <label>Allowed Attempts per Student</label>
-          <select id="ed-allowed-attempts" style="width: 100%; border-radius: 12px; padding: 12px 20px; border: none; background: #f0f2f5; font-family: inherit; font-weight: 600;">
-            <option value="1">1 Attempt</option>
-            <option value="2">2 Attempts</option>
-            <option value="3">3 Attempts</option>
-            <option value="5">5 Attempts</option>
-            <option value="10">10 Attempts</option>
-            <option value="unlimited">Unlimited Attempts</option>
-          </select>
+        <div class="settings-row" style="margin-bottom:12px;">
+          <div class="fg">
+            <label>Allowed Attempts per Student</label>
+            <select id="ed-allowed-attempts" style="width: 100%; border-radius: 12px; padding: 12px 20px; border: none; background: #f0f2f5; font-family: inherit; font-weight: 600;">
+              <option value="1">1 Attempt</option>
+              <option value="2">2 Attempts</option>
+              <option value="3">3 Attempts</option>
+              <option value="5">5 Attempts</option>
+              <option value="10">10 Attempts</option>
+              <option value="unlimited">Unlimited Attempts</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Total Time (auto-calculated)</label>
+            <input type="text" id="ed-time" readonly style="background: #e2e8f0 !important; cursor: not-allowed; color: #64748b !important; font-weight: bold; padding: 12px 20px;">
+          </div>
         </div>
         <div class="fg" style="margin-bottom:12px;">
           <label>Visibility</label>
@@ -618,95 +622,107 @@
 <link rel="stylesheet" href="css/admin-shared.css">
 
 
+<style>
+  .modal-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  }
+  .m-tab, .m-sample-tab {
+    padding: 8px 18px; border-radius: 9999px; border: 2px solid var(--section-divider);
+    background: var(--bg); cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: inherit;
+    color: var(--text-secondary); transition: all 0.2s;
+  }
+  .m-tab.active, .m-sample-tab.active {
+    border-color: #0ea5e9; color: #0ea5e9; background: rgba(14,165,233,0.05);
+  }
+</style>
 <div id="import-modal" class="custom-modal-overlay" style="display:none;">
-  <div class="custom-modal" style="width: 600px; max-width: 90%; position: relative;">
-    <h3 style="font-size:1.25rem; font-weight:800;">Import Questions</h3>
+  <div class="custom-modal" style="width: 700px; max-width: 90%; height: 500px; display: flex; flex-direction: column; position: relative; text-align: left;">
+    <h3 style="font-size:1.25rem; font-weight:800; text-align: center;">Import Questions</h3>
     <button class="modal-close" style="position:absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="document.getElementById('import-modal').style.display='none'">×</button>
-    <div class="modal-tabs" style="margin-top: 16px;">
-      <button class="m-tab active" data-target="m-upload" onclick="switchModalTab('m-upload')">Upload File</button>
-      <button class="m-tab" data-target="m-paste" onclick="switchModalTab('m-paste')">Paste Text</button>
+    
+    <!-- Top-level tabs -->
+    <div class="modal-tabs" style="margin-top: 16px; border-bottom: 2px solid var(--section-divider);">
+      <button class="m-top-tab active" data-target="top-import" onclick="switchTopTab('top-import')" style="padding: 10px 20px; font-weight: 700; background: none; border: none; border-bottom: 2px solid #0ea5e9; color: #0ea5e9; cursor: pointer;">Import</button>
+      <button class="m-top-tab" data-target="top-sample" onclick="switchTopTab('top-sample')" style="padding: 10px 20px; font-weight: 700; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer;">Sample Formats</button>
     </div>
     
-    <div id="m-upload" class="m-pane active">
-      <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom: 8px;">Select a .json or .csv file to import questions.</p>
-      <div style="font-size: 0.8rem; margin-bottom: 12px; display: flex; justify-content: center; gap: 12px;">
-        <a href="samples/sample_import.csv" download style="color: #0ea5e9; font-weight: 600; text-decoration: none;">Download CSV Sample</a>
-        <span style="color: var(--section-divider);">|</span>
-        <a href="samples/sample_import.json" download style="color: #0ea5e9; font-weight: 600; text-decoration: none;">Download JSON Sample</a>
+    <!-- Import Tab Content -->
+    <div id="top-import" class="m-top-pane active" style="margin-top: 16px; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+      <div class="modal-tabs" style="margin-bottom: 16px;">
+        <button class="m-tab active" data-target="m-upload" onclick="switchModalTab('m-upload')">Import File</button>
+        <button class="m-tab" data-target="m-paste" onclick="switchModalTab('m-paste')">Paste JSON/CSV</button>
       </div>
-      <div style="position:relative; width:100%; border-radius: 20px; background: #f3f4f6; border: none; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height: 140px; margin-top: 12px; overflow: hidden;">
-        <p style="color: #64748b; font-weight: 600; pointer-events:none; margin: 0; position:absolute; top: 40px; width: 100%;">Drag & Drop Here<br><span style="font-size: 0.8rem; font-weight: 400;">or click to browse</span></p>
-        <input type="file" id="modal-file-input" accept=".json,.csv" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;" onchange="document.getElementById('file-name-display').textContent = this.files[0] ? this.files[0].name : 'No file chosen'">
-        <div id="file-name-display" style="position:absolute; bottom: 20px; font-size: 0.8rem; color: var(--primary); font-weight: 600; z-index: 1;">No file chosen</div>
+      
+      <div id="m-upload" class="m-pane active" style="flex: 1; display: flex; flex-direction: column;">
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom: 8px; text-align: center;">Select a .json or .csv file to import questions.</p>
+        <div style="position:relative; width:100%; border-radius: 20px; background: #f3f4f6; border: none; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; flex: 1; margin-top: 12px; overflow: hidden;">
+          <p style="color: #64748b; font-weight: 600; pointer-events:none; margin: 0; position:absolute; top: 40px; width: 100%;">Drag & Drop Here<br><span style="font-size: 0.8rem; font-weight: 400;">or click to browse</span></p>
+          <input type="file" id="modal-file-input" accept=".json,.csv" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;" onchange="document.getElementById('file-name-display').textContent = this.files[0] ? this.files[0].name : 'No file chosen'">
+          <div id="file-name-display" style="position:absolute; bottom: 20px; font-size: 0.8rem; color: var(--primary); font-weight: 600; z-index: 1;">No file chosen</div>
+        </div>
+      </div>
+      
+      <div id="m-paste" class="m-pane" style="display:none; flex: 1; flex-direction: column;">
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom: 8px; text-align: center;">Paste raw JSON or CSV text below:</p>
+        <select id="modal-paste-type" style="margin-bottom: 12px; width: 100%; padding: 12px 20px; border-radius: 9999px; border: none; background: #f3f4f6; color: var(--text); font-family: inherit; outline: none; font-weight: 600; cursor: pointer; appearance: none; -webkit-appearance: none;">
+          <option value="json">JSON format</option>
+          <option value="csv">CSV format</option>
+        </select>
+        <textarea id="modal-paste-text" placeholder="Paste here..." style="width:100%; flex: 1; min-height: 150px; border-radius:20px; padding:20px; font-family:monospace; border:none; resize:none; background:#f3f4f6; color:var(--text); outline: none;"></textarea>
+      </div>
+      
+      <div style="margin-top: auto; padding-top: 20px;">
+        <button class="btn-add-q" id="btn-modal-import" style="margin-top:0;">Run Import</button>
       </div>
     </div>
-    
-    <div id="m-paste" class="m-pane" style="display:none;">
-      <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom: 8px;">Paste raw JSON or CSV text below:</p>
-      <select id="modal-paste-type" style="margin-bottom: 12px; width: 100%; padding: 12px 20px; border-radius: 9999px; border: none; background: #f3f4f6; color: var(--text); font-family: inherit; outline: none; font-weight: 600; cursor: pointer; appearance: none; -webkit-appearance: none;">
-        <option value="json">JSON format</option>
-        <option value="csv">CSV format</option>
-      </select>
-      <textarea id="modal-paste-text" placeholder="Paste here..." style="width:100%; height: 150px; border-radius:20px; padding:20px; font-family:monospace; border:none; resize:none; background:#f3f4f6; color:var(--text); outline: none;"></textarea>
-    </div>
-    
-    <button class="btn-add-q" id="btn-modal-import" style="margin-top:20px;">Run Import</button>
-  </div>
-</div>
 
-<div id="format-modal" class="custom-modal-overlay" style="display:none;">
-  <div class="custom-modal" style="width: 600px; max-width: 90%; position: relative;">
-    <h3 style="font-size:1.25rem; font-weight:800;">Sample Import Formats</h3>
-    <button class="modal-close" style="position:absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="document.getElementById('format-modal').style.display='none'">×</button>
-    <div class="modal-tabs">
-      <button class="m-tab format-tab active" data-target="f-json" onclick="switchFormatTab('f-json')">JSON Format</button>
-      <button class="m-tab format-tab" data-target="f-csv" onclick="switchFormatTab('f-csv')">CSV Format</button>
-    </div>
-    
-    <div id="f-json" class="m-pane format-pane active">
-      <div style="position: relative;">
-        <textarea id="sample-json-text" readonly style="width:100%; height: 250px; border-radius:8px; padding:12px; font-family:monospace; border:1px solid var(--section-divider); resize:none; background:var(--bg); color:var(--text); outline: none;">
+    <!-- Sample Formats Tab Content -->
+    <div id="top-sample" class="m-top-pane" style="display:none; margin-top: 16px; flex: 1; flex-direction: column; overflow-y: auto;">
+      <div class="modal-tabs" style="margin-bottom: 16px;">
+        <button class="m-sample-tab active" data-target="sample-csv" onclick="switchSampleTab('sample-csv')">CSV Format</button>
+        <button class="m-sample-tab" data-target="sample-json" onclick="switchSampleTab('sample-json')">JSON Format</button>
+      </div>
+      
+      <div id="sample-csv" class="m-sample-pane active" style="position: relative; flex: 1;">
+        <div style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 0.85rem; color: #334155; white-space: pre-wrap; overflow-x: auto; position: relative; text-align: left; height: 100%; box-sizing: border-box;">
+type,text,options,correctIndex,timer,category
+mcq,"What is 2+2?","3|4|5|6",1,30,Math
+single,"Sun is a star?","Yes|No",0,15,Science
+integer,"Vertices in triangle?","",3,30,Math
+        </div>
+        <button onclick="copyCSVFormat()" style="position:absolute; top: 8px; right: 8px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: #0ea5e9;">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy
+        </button>
+      </div>
+      
+      <div id="sample-json" class="m-sample-pane" style="display:none; position: relative; flex: 1;">
+        <div style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 0.85rem; color: #334155; white-space: pre-wrap; overflow-x: auto; position: relative; text-align: left; height: 100%; overflow-y: auto; box-sizing: border-box;">
 [
   {
-    "type": "single",
-    "question": "Which planet is known as the Red Planet?",
-    "category": "Science",
+    "type": "mcq",
+    "text": "What is 2+2?",
+    "options": ["3", "4", "5", "6"],
+    "correctIndex": 1,
     "timer": 30,
-    "options": ["Earth", "Mars", "Jupiter", "Venus"],
-    "correctAnswers": [1]
-  },
-  {
-    "type": "multiple",
-    "question": "Select the primary colors:",
-    "category": "Arts",
-    "timer": 45,
-    "options": ["Red", "Green", "Blue", "Yellow"],
-    "correctAnswers": [0, 2, 3]
+    "category": "Math"
   },
   {
     "type": "integer",
-    "question": "What is 5 + 7?",
-    "category": "Mathematics",
-    "timer": 15,
-    "answer": 12
+    "text": "Vertices in triangle?",
+    "correctIndex": 3,
+    "timer": 30,
+    "category": "Math"
   }
-]</textarea>
-        <button class="btn-back" style="position: absolute; top: 10px; right: 20px; padding: 4px 8px; font-size: 0.8rem;" onclick="copyText('sample-json-text')">Copy</button>
-      </div>
-    </div>
-    
-    <div id="f-csv" class="m-pane format-pane">
-      <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom: 8px;">Note: Use pipe (|) to separate array items like options.</p>
-      <div style="position: relative;">
-        <textarea id="sample-csv-text" readonly style="width:100%; height: 250px; border-radius:8px; padding:12px; font-family:monospace; border:1px solid var(--section-divider); resize:none; background:var(--bg); color:var(--text); outline: none; white-space: pre; overflow-x: auto;">type,question,category,timer,options,correctAnswers,answer
-single,Which planet is known as the Red Planet?,Science,30,Earth|Mars|Jupiter|Venus,1,
-multiple,Select the primary colors:,Arts,45,Red|Green|Blue|Yellow,0|2|3,
-integer,What is 5 + 7?,Mathematics,15,,,12</textarea>
-        <button class="btn-back" style="position: absolute; top: 10px; right: 20px; padding: 4px 8px; font-size: 0.8rem;" onclick="copyText('sample-csv-text')">Copy</button>
+]
+        </div>
+        <button onclick="copyJSONFormat()" style="position:absolute; top: 8px; right: 24px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: #0ea5e9;">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy
+        </button>
       </div>
     </div>
   </div>
 </div>
+
 
 <div class="custom-modal-overlay" id="custom-modal-overlay">
   <div class="custom-modal">

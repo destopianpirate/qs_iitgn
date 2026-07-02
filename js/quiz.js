@@ -333,6 +333,16 @@
       });
     }
 
+    const btnModeBack = document.getElementById('btn-mode-back');
+    if (btnModeBack) {
+      btnModeBack.addEventListener('click', () => {
+        hideAllSteps();
+        if (stepWelcome) stepWelcome.style.display = 'block';
+        const topNav = document.getElementById('top-right-nav');
+        if (topNav) topNav.style.display = 'flex';
+      });
+    }
+
     // Admin Auth Logic
     const adminAuthOverlay = document.getElementById('admin-auth-overlay');
     const btnLoginAdmin = document.getElementById('btn-login-admin');
@@ -484,12 +494,29 @@
     const btnPortalSurvey = document.getElementById('btn-portal-survey');
     if (btnPortalSurvey) {
       btnPortalSurvey.addEventListener('click', () => {
-        const savedName = localStorage.getItem('participantName');
-        if (savedName) {
-          participantName = savedName;
-          document.getElementById('quiz-participant-name-new').value = savedName;
+        hideAllSteps();
+        const stepSurveyCode = document.getElementById('portal-step-survey-code');
+        if (stepSurveyCode) stepSurveyCode.style.display = 'block';
+        currentFlow = 'survey';
+        
+        // Initialize mask logic if not already done
+        const inp = document.getElementById('inp-survey-code');
+        if (inp && !inp.dataset.maskInitialized) {
+          inp.dataset.maskInitialized = 'true';
+          const maskTyped = document.getElementById('mask-typed');
+          const maskDots = document.getElementById('mask-dots');
+          const wrapper = document.getElementById('survey-code-wrapper');
+          if (maskTyped && maskDots) {
+            inp.addEventListener('focus', () => { if(wrapper){ wrapper.style.borderColor = '#0ea5e9'; wrapper.style.boxShadow = '0 0 0 4px rgba(14,165,233,0.15)'; }});
+            inp.addEventListener('blur', () => { if(wrapper){ wrapper.style.borderColor = 'var(--section-divider)'; wrapper.style.boxShadow = 'none'; }});
+            inp.addEventListener('input', (e) => {
+              let val = e.target.value.replace(/[^0-9]/g, '').substring(0, 6);
+              e.target.value = val;
+              maskTyped.textContent = val;
+              maskDots.textContent = '.'.repeat(6 - val.length);
+            });
+          }
         }
-        requireUsername('survey');
       });
     }
 
@@ -773,11 +800,16 @@
       grid.innerHTML = filtered.map((q, idx) => {
         const instructions = q.instructions ? `<div style="font-size: 0.85rem; color: #64748b; margin-top: 8px; padding: 8px; background: #e2e8f0; border-radius: 8px;"><strong>Instructions:</strong><br>${q.instructions}</div>` : '';
         return `
-          <div class="arena-card hover-elevate stagger-enter" id="arena-card-${q.id}" onclick="window.QSQuiz.selectPracticeMatch('${q.id}')" style="background: #f1f5f9; border: 2px solid transparent; border-radius: 12px; padding: 12px 16px; cursor: pointer; animation-delay: ${idx * 0.05}s;">
+          <div class="arena-card hover-elevate stagger-enter" id="arena-card-${q.id}" onclick="window.QSQuiz.selectPracticeMatch('${q.id}')" style="border-radius: 12px; padding: 12px 16px; cursor: pointer; animation-delay: ${idx * 0.05}s;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
               <div style="flex: 1; min-width: 120px;">
                 <h4 style="margin:0; color:var(--primary); font-size: 1rem; font-weight: 700;">${q.name || 'Untitled Quiz'}</h4>
-                <div style="font-size: 0.75rem; color: #94a3b8; font-family: monospace; margin-top: 4px;">UID: ${q.id}</div>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #94a3b8; font-family: monospace; margin-top: 4px;">
+                  <span>UID: ${q.id}</span>
+                  <button title="Copy UID" onclick="event.stopPropagation(); navigator.clipboard.writeText('${q.id}').then(()=>alert('UID copied!'))" style="background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; display: flex; align-items: center;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                </div>
               </div>
               <div style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
                 <span style="display:flex; align-items:center; font-size:var(--fs-xs); color:var(--text-secondary); background: var(--surface); padding: 4px 12px; border-radius: 9999px; font-weight: 600;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>${Math.ceil((q.totalTime || 300)/60)} min</span>
@@ -1792,7 +1824,7 @@
       </head>
       <body>
         <div class="header-brand">
-          <img src=".png" alt="QS">
+          <img src="qs_logo.png" alt="QS">
           <span>QS IITGN</span>
         </div>
         
@@ -1985,8 +2017,8 @@
 
   if (btnSurveyBack) {
     btnSurveyBack.addEventListener('click', () => {
-      hideAllSteps();
-      document.getElementById('portal-step-username').style.display = 'block';
+      document.getElementById('portal-step-survey-code').style.display = 'none';
+      document.getElementById('portal-step-mode').style.display = 'block';
     });
   }
 

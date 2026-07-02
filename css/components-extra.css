@@ -4,13 +4,18 @@
    TRIVIA TICKER
    ──────────────────────────────────────────── */
 .ticker {
-  background: var(--ticker-bg);
-  color: var(--ticker-text);
+  background: var(--gradient-primary);
+  color: #ffffff;
   overflow: hidden;
   white-space: nowrap;
-  padding: var(--space-3) 0;
+  padding: var(--space-4) 0;
   position: relative;
   z-index: var(--z-base);
+  transform: rotate(-1.5deg) scale(1.05);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  margin: var(--space-10) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .ticker::before,
@@ -19,19 +24,19 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 80px;
+  width: 120px;
   z-index: 2;
   pointer-events: none;
 }
 
 .ticker::before {
   left: 0;
-  background: linear-gradient(90deg, var(--ticker-bg) 0%, transparent 100%);
+  background: linear-gradient(90deg, var(--brand-deep) 0%, transparent 100%);
 }
 
 .ticker::after {
   right: 0;
-  background: linear-gradient(270deg, var(--ticker-bg) 0%, transparent 100%);
+  background: linear-gradient(270deg, var(--brand-cyan) 0%, transparent 100%);
 }
 
 .ticker-track {
@@ -48,13 +53,15 @@
 .ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  letter-spacing: var(--ls-wide);
+  gap: var(--space-4);
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-normal);
+  text-transform: uppercase;
   white-space: nowrap;
   flex-shrink: 0;
+  color: #ffffff;
 }
 
 .ticker-dot {

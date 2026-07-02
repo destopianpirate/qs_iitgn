@@ -50,9 +50,50 @@
   function switchModalTab(target) {
     document.querySelectorAll('.m-tab:not(.format-tab)').forEach(b => b.classList.remove('active'));
     document.querySelector(`.m-tab:not(.format-tab)[data-target="${target}"]`).classList.add('active');
-    document.querySelectorAll('.m-pane:not(.format-pane)').forEach(p => p.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
+    document.querySelectorAll('.m-pane:not(.format-pane)').forEach(p => {
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    const t = document.getElementById(target);
+    if(t) {
+      t.classList.add('active');
+      t.style.display = 'flex';
+    }
   }
+
+  window.switchTopTab = function(target) {
+    document.querySelectorAll('.m-top-tab').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderBottomColor = 'transparent';
+      b.style.color = 'var(--text-secondary)';
+    });
+    const activeBtn = document.querySelector(`.m-top-tab[data-target="${target}"]`);
+    if(activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.style.borderBottomColor = '#0ea5e9';
+      activeBtn.style.color = '#0ea5e9';
+    }
+    document.querySelectorAll('.m-top-pane').forEach(p => p.style.display = 'none');
+    const targetPane = document.getElementById(target);
+    if(targetPane) targetPane.style.display = 'block';
+  };
+
+  window.switchSampleTab = function(target) {
+    document.querySelectorAll('.m-sample-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.m-sample-tab[data-target="${target}"]`).classList.add('active');
+    document.querySelectorAll('.m-sample-pane').forEach(p => p.style.display = 'none');
+    document.getElementById(target).style.display = 'block';
+  };
+
+  window.copyCSVFormat = function() {
+    const text = 'type,text,options,correctIndex,timer,category\nmcq,"What is 2+2?","3|4|5|6",1,30,Math\nsingle,"Sun is a star?","Yes|No",0,15,Science\ninteger,"Vertices in triangle?","",3,30,Math';
+    navigator.clipboard.writeText(text).then(() => alert('CSV format copied!'));
+  };
+
+  window.copyJSONFormat = function() {
+    const text = '[\n  {\n    "type": "mcq",\n    "text": "What is 2+2?",\n    "options": ["3", "4", "5", "6"],\n    "correctIndex": 1,\n    "timer": 30,\n    "category": "Math"\n  },\n  {\n    "type": "integer",\n    "text": "Vertices in triangle?",\n    "correctIndex": 3,\n    "timer": 30,\n    "category": "Math"\n  }\n]';
+    navigator.clipboard.writeText(text).then(() => alert('JSON format copied!'));
+  };
   function openFormatModal(tab) {
     document.getElementById('format-modal').style.display = 'flex';
     switchFormatTab(tab);
@@ -126,7 +167,9 @@
           .catch(e => console.error("Error saving to Firebase:", e));
       }
     }
-    function genId() { return 'qz_' + Date.now() + '_' + Math.random().toString(36).substr(2,5); }
+    function genId() {
+      return Math.floor(10000000 + Math.random() * 90000000).toString();
+    }
     function genCode() {
       const c = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
       let s;
@@ -274,16 +317,22 @@
       else if (q.visibility === 'private') badge = '<span class="qc-badge private">Private</span>';
       else badge = '<span class="qc-badge" style="background:#e2e8f0; color:#475569;">Archived</span>';
       
-      const code = (q.accessCode && q.visibility === 'private') ? `<div class="qc-code">Code: ${q.accessCode}</div>` : 
-'';
       const count = (q.questions || []).length;
-      const time = q.totalTime ? Math.ceil(q.totalTime/60) + ' min' : 'â€”';
-      return `<div class="quiz-card hover-elevate stagger-enter" data-id="${q.id}" style="animation-delay: ${idx * 
-0.05}s">
+      const time = q.totalTime ? Math.ceil(q.totalTime/60) + ' min' : '—';
+      
+      const uidHTML = (q.visibility === 'public') ? `
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #94a3b8; font-family: monospace; margin: 4px 0 8px 0;">
+          <span>UID: ${q.id}</span>
+          <button title="Copy UID" onclick="event.stopPropagation(); navigator.clipboard.writeText('${q.id}').then(()=>alert('UID copied!'))" style="background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; display: flex; align-items: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>` : '';
+
+      return `<div class="quiz-card hover-elevate stagger-enter" data-id="${q.id}" style="animation-delay: ${idx * 0.05}s">
         ${badge}
-        <h3>${q.name || 'Untitled Quiz'}</h3>
+        <h3 style="margin-bottom: ${q.visibility === 'public' ? '0' : '8px'};">${q.name || 'Untitled Quiz'}</h3>
+        ${uidHTML}
         <div class="qc-meta"><span>${count} question${count!==1?'s':''}</span><span>${time}</span></div>
-        ${code}
       </div>`;
     }
   
@@ -339,12 +388,11 @@ border: none;">Back to Quiz Dashboard</button>`;
         let qCount = quiz.questions ? quiz.questions.length : 0;
         let tTime = quiz.totalTime ? Math.ceil(quiz.totalTime/60) + ' min' : 'â€”';
         headerDiv.innerHTML = `
-          <button class="btn-back" id="btn-editor-back-dynamic" style="background:#f1f5f9; color:#334155; padding: 
-10px 24px; border-radius: 9999px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; margin-bottom: 
-12px;">Back to Quiz Analytics</button>
-          <div style="text-align: left;">
+          <button class="btn-back" id="btn-editor-back-dynamic" style="background:#f1f5f9; color:#334155; padding: 10px 24px; border-radius: 9999px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; margin-bottom: 12px;">Back to Quiz Analytics</button>
+          <div style="text-align: left; width: 100%;">
             <div style="font-weight: 800; font-size: 1.75rem; margin-bottom: 4px;">${quiz.name || 'Untitled Quiz'}</div>
-            <div style="color: var(--text-secondary); font-size: 1rem;">${qCount} questions â€¢ ${tTime}</div>
+            <div style="color: var(--text-secondary); font-size: 1rem;">${qCount} questions • ${tTime}</div>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 0 0; width: 100%;">
           </div>
         `;
       }
@@ -393,14 +441,16 @@ border: none;">Back to Quiz Dashboard</button>`;
       document.getElementById('ed-time').value = `${m} min ${s} sec`;
   
       list.innerHTML = quiz.questions.map((q, i) => `
-        <div class="q-item" data-idx="${i}">
+        <div class="q-item" data-idx="${i}" style="position: relative;">
+          ${i > 0 ? `<button class="q-move q-up" data-idx="${i}" title="Move Up" style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 1px solid var(--section-divider);"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>` : ''}
+          ${i < quiz.questions.length - 1 ? `<button class="q-move q-down" data-idx="${i}" title="Move Down" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); z-index: 10; box-shadow: 0 -2px 8px rgba(0,0,0,0.15); border: 1px solid var(--section-divider);"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></button>` : ''}
           <span class="q-num">${i+1}</span>
-          <span class="q-text">${q.question}</span>
+          <span class="q-text" style="font-size: 0.8rem; line-height: 1.4;">${q.question}</span>
           <span class="q-type-pill">${q.type}</span>
-          <div class="q-actions">
-            ${i > 0 ? `<button class="q-move q-up" data-idx="${i}">â†‘</button>` : ''}
-            ${i < quiz.questions.length - 1 ? `<button class="q-move q-down" data-idx="${i}">â†“</button>` : ''}
-            <button class="q-del" data-idx="${i}">Delete</button>
+          <div class="q-actions" style="margin-left: auto;">
+            <button class="q-del" data-idx="${i}" title="Delete Question" style="padding: 8px; display: flex; align-items: center; justify-content: center; background: rgba(239,68,68,0.1); border-radius: 50%;">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
           </div>
         </div>
       `).join('');
@@ -506,10 +556,10 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
         if (isNaN(qData.answer)) { alert('Enter the integer answer'); return; }
       } else {
         const opts = []; const correct = [];
-        document.querySelectorAll('.aq-opt').forEach((inp, i) => {
+        document.querySelectorAll('#aq-opts-wrap .aq-opt').forEach((inp, i) => {
           if (inp.value.trim()) {
             opts.push(inp.value.trim());
-            if (document.querySelectorAll('.aq-chk')[i].checked) correct.push(opts.length - 1);
+            if (document.querySelectorAll('#aq-opts-wrap .aq-chk')[i].checked) correct.push(opts.length - 1);
           }
         });
         if (opts.length < 2) { alert('Enter at least 2 options'); return; }
@@ -552,8 +602,8 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       if (currentType === 'integer') {
         document.getElementById('aq-int-val').value = q.answer || '';
       } else {
-        const opts = document.querySelectorAll('.aq-opt');
-        const chks = document.querySelectorAll('.aq-chk');
+        const opts = document.querySelectorAll('#aq-opts-wrap .aq-opt');
+        const chks = document.querySelectorAll('#aq-opts-wrap .aq-chk');
         opts.forEach((o, i) => o.value = (q.options && q.options[i]) || '');
         chks.forEach((c, i) => {
           c.type = currentType === 'single' ? 'radio' : 'checkbox';
@@ -572,8 +622,8 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       document.getElementById('btn-cancel-edit').style.display = 'none';
   
       quillEditor.setText('');
-      document.querySelectorAll('.aq-opt').forEach(i => i.value = '');
-      document.querySelectorAll('.aq-chk').forEach(c => c.checked = false);
+      document.querySelectorAll('#aq-opts-wrap .aq-opt').forEach(i => i.value = '');
+      document.querySelectorAll('#aq-opts-wrap .aq-chk').forEach(c => c.checked = false);
       document.getElementById('aq-int-val').value = '';
       currentType = 'mcq';
       document.querySelectorAll('.type-pill').forEach(b => b.classList.toggle('active', b.dataset.type === 'mcq'));
@@ -644,12 +694,17 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
           headers.forEach((h, j) => { if (rows[i][j] !== undefined) obj[h] = rows[i][j]; });
           if (obj.type) {
             const qType = obj.type.toLowerCase().trim();
-            const q = { type: qType, question: obj.question || obj.q || '', category: obj.category || 'General', 
-timer: parseInt(obj.timer) || 30 };
+            const q = { type: qType, question: obj.question || obj.text || obj.q || '', category: obj.category || 'General', timer: parseInt(obj.timer) || 30 };
             if (qType === 'integer') q.answer = parseInt(obj.answer || obj.ans) || 0;
             else {
               q.options = obj.options ? obj.options.split('|') : [];
-              q.correctAnswers = obj.correctanswers ? obj.correctanswers.split('|').map(n => parseInt(n)) : [];
+              if (obj.correctanswers) {
+                q.correctAnswers = obj.correctanswers.split('|').map(n => parseInt(n));
+              } else if (obj.correctindex !== undefined) {
+                q.correctAnswers = [parseInt(obj.correctindex)];
+              } else {
+                q.correctAnswers = [];
+              }
             }
             imported.push(q);
           }
@@ -662,6 +717,14 @@ timer: parseInt(obj.timer) || 30 };
       const quiz = quizzes.find(q => q.id === currentQuizId);
       if (!quiz) return;
       if (imported && imported.length > 0) {
+        imported.forEach(q => {
+          if (q.correctIndex !== undefined && q.correctAnswers === undefined) {
+            q.correctAnswers = [q.correctIndex];
+          }
+          if (q.text !== undefined && q.question === undefined) {
+            q.question = q.text;
+          }
+        });
         quiz.questions = quiz.questions.concat(imported);
         save(); renderQuestionList(quiz);
         alert(`Imported ${imported.length} question(s) successfully!`);

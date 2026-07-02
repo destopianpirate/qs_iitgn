@@ -1,4 +1,0 @@
-type,question,options,answer
-mcq,"What is the result of $$ \\int x^2 dx $$?","$$ \\frac{x^3}{3} + C $$|$$ x^3 + C $$|$$ 2x + C $$|$$ \\frac{x^2}{2} + C $$","$$ \\frac{x^3}{3} + C $$"
-msq,"Which of the following are **programming languages**?","Python|HTML|C++|Markdown","0,2"
-integer,"If $$ f(x) = x^2 $$, what is $$ f'(3) $$?",,"6"

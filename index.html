@@ -32,6 +32,7 @@
   <!-- Firebase Compat Libraries -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <!-- Firebase Config -->
   <script src="js/firebase.js"></script>
 </head>
@@ -603,6 +604,21 @@
   <script src="js/scroll.js"></script>
   <script src="js/buzzer.js"></script>
   <script src="js/main.js"></script>
-
+  <!-- Firebase Auth Observer & UI Logic -->
+  <script src="js/quiz.js"></script>
+  
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // SW won't work on file:// protocol, so catch gracefully
+        navigator.serviceWorker.register('./sw.js').then(registration => {
+          console.log('ServiceWorker registered:', registration.scope);
+        }).catch(err => {
+          console.log('ServiceWorker registration failed (likely running on file://):', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>

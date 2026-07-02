@@ -1,3 +1,22 @@
+const PROFANITY_LIST = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'cunt', 'pussy', 'bastard', 'slut', 'whore', 'fag', 'nigger', 'nigga', 'cock', 'piss', 'crap'];
+function maskProfanity(text) {
+  if (!text) return '';
+  let masked = text;
+  PROFANITY_LIST.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    masked = masked.replace(regex, '*'.repeat(word.length));
+  });
+  return masked;
+}
+
+const REACTION_SVGS = {
+  'like': `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>`,
+  'heart': `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+  'smile': `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>`,
+  'star': `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+  'bulb': `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2v1"></path><path d="M12 7a5 5 0 0 1 5 5c0 2-2 3-2 5h-6c0-2-2-3-2-5a5 5 0 0 1 5-5z"></path></svg>`
+};
+
 (function() {
   let db = null;
   // Wait for firebase to load
@@ -66,10 +85,17 @@
       const survey = surveys.find(s => s.id === currentSurveyId);
       if (survey && survey.slides[activeSlideIndex]) {
         survey.slides[activeSlideIndex].type = e.target.value;
-        if (e.target.value === 'multiple_choice' && !survey.slides[activeSlideIndex].options) {
-          survey.slides[activeSlideIndex].options = ['Option 1', 'Option 2'];
+        if (e.target.value !== 'multiple_choice' && e.target.value !== 'scales' && e.target.value !== 'ranking') {
+          survey.slides[activeSlideIndex].options = [];
         }
         renderEditor();
+      }
+    });
+    
+    document.getElementById('survey-allow-multiple')?.addEventListener('change', (e) => {
+      const survey = surveys.find(s => s.id === currentSurveyId);
+      if (survey && survey.slides[activeSlideIndex]) {
+        survey.slides[activeSlideIndex].allowMultiple = e.target.checked;
       }
     });
 
@@ -77,22 +103,116 @@
       const survey = surveys.find(s => s.id === currentSurveyId);
       if (survey && survey.slides[activeSlideIndex]) {
         survey.slides[activeSlideIndex].question = e.target.value;
-        document.getElementById('preview-question').textContent = e.target.value || 'Untitled Question';
+        document.getElementById('preview-question').innerHTML = e.target.value || 'Untitled Question';
       }
     });
 
+    const pq = document.getElementById('preview-question');
+    const rtToolbar = document.getElementById('rich-text-toolbar');
+    
+    if (pq && rtToolbar) {
+      pq.addEventListener('focus', () => {
+        rtToolbar.style.display = 'flex';
+        // Position it just below the question
+        const rect = pq.getBoundingClientRect();
+        const containerRect = pq.parentElement.getBoundingClientRect();
+        rtToolbar.style.top = (rect.bottom - containerRect.top + 8) + 'px';
+      });
+      
+      document.addEventListener('mousedown', (e) => {
+        if (!pq.contains(e.target) && !rtToolbar.contains(e.target)) {
+          rtToolbar.style.display = 'none';
+        }
+      });
+      
+      pq.addEventListener('input', (e) => {
+        const survey = surveys.find(s => s.id === currentSurveyId);
+        if (survey && survey.slides[activeSlideIndex]) {
+          survey.slides[activeSlideIndex].question = e.target.innerHTML;
+          document.getElementById('survey-question-text').value = e.target.innerHTML;
+        }
+      });
+    }
+
     document.getElementById('btn-survey-add-option')?.addEventListener('click', () => {
       const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'multiple_choice') {
+      if (survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
         survey.slides[activeSlideIndex].options.push('New Option');
         renderEditor();
       }
+    });
+    
+    document.getElementById('survey-require-name')?.addEventListener('change', (e) => {
+      const survey = surveys.find(s => s.id === currentSurveyId);
+      if (survey) {
+        survey.requireName = e.target.checked;
+      }
+    });
+
+    document.getElementById('survey-slide-theme')?.addEventListener('change', (e) => {
+      const survey = surveys.find(s => s.id === currentSurveyId);
+      if (survey && survey.slides[activeSlideIndex]) {
+        survey.slides[activeSlideIndex].theme = e.target.value;
+        renderEditor(); // update preview
+      }
+    });
+
+    document.querySelectorAll('.survey-reaction-cb').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const survey = surveys.find(s => s.id === currentSurveyId);
+        if (survey && survey.slides[activeSlideIndex]) {
+          let reactions = survey.slides[activeSlideIndex].reactions || [];
+          const val = e.target.value;
+          if (e.target.checked && !reactions.includes(val)) {
+            reactions.push(val);
+          } else if (!e.target.checked && reactions.includes(val)) {
+            reactions = reactions.filter(r => r !== val);
+          }
+          survey.slides[activeSlideIndex].reactions = reactions;
+        }
+      });
+    });
+
+    document.getElementById('btn-preview-survey')?.addEventListener('click', () => {
+      const survey = surveys.find(s => s.id === currentSurveyId);
+      if (survey && survey.slides[activeSlideIndex]) {
+        const modal = document.getElementById('survey-preview-modal');
+        const container = document.getElementById('survey-preview-container');
+        modal.style.display = 'flex';
+        // Need to render the slide similarly to quiz.js
+        renderSimulatedStudentSlide(container, survey.slides[activeSlideIndex], survey.requireName);
+      }
+    });
+
+    document.getElementById('btn-close-preview')?.addEventListener('click', () => {
+      document.getElementById('survey-preview-modal').style.display = 'none';
     });
     
     document.getElementById('btn-live-survey-back')?.addEventListener('click', () => {
       stopLiveSurvey();
       window.showScreen('screen-surveys-dashboard');
       window.renderSurveysDashboard();
+    });
+    
+    document.getElementById('btn-live-fullscreen')?.addEventListener('click', () => {
+      const container = document.getElementById('screen-survey-live-admin');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+    
+    document.addEventListener('fullscreenchange', () => {
+      const isFs = !!document.fullscreenElement;
+      const iconEnter = document.getElementById('icon-fullscreen-enter');
+      const iconExit = document.getElementById('icon-fullscreen-exit');
+      if(iconEnter && iconExit) {
+        iconEnter.style.display = isFs ? 'none' : 'block';
+        iconExit.style.display = isFs ? 'block' : 'none';
+      }
     });
     
     document.getElementById('btn-survey-next')?.addEventListener('click', () => changeLiveSlide(1));
@@ -180,6 +300,8 @@
     if (survey) {
       window.showScreen('screen-survey-editor');
       document.getElementById('survey-title-input').value = survey.name;
+      const rnCheckbox = document.getElementById('survey-require-name');
+      if (rnCheckbox) rnCheckbox.checked = !!survey.requireName;
       activeSlideIndex = 0;
       renderEditor();
     }
@@ -215,7 +337,13 @@
       div.style.cssText = `padding: 12px; background: var(--surface); border-radius: 8px; cursor: pointer; position: relative; ${activeClass}`;
       div.onclick = () => window.selectSlide(idx);
       
-      const typeIcon = slide.type === 'multiple_choice' ? '📊' : (slide.type === 'word_cloud' ? '☁️' : '📝');
+      let typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+      if(slide.type === 'multiple_choice') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`;
+      else if(slide.type === 'word_cloud') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`;
+      else if(slide.type === 'scales') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>`;
+      else if(slide.type === 'ranking') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`;
+      else if(slide.type === 'guess_number') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><path d="M4 9h16"></path><path d="M4 15h16"></path><path d="M10 3L8 21"></path><path d="M16 3l-2 18"></path></svg>`;
+      else if(slide.type === 'q_and_a') typeIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
       div.innerHTML = `
         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">Slide ${idx + 1} ${typeIcon}</div>
         <div style="font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${slide.question || 'Untitled'}</div>
@@ -228,13 +356,23 @@
     if (!activeSlide) return;
 
     // Populate right sidebar
-    document.getElementById('survey-slide-type').value = activeSlide.type || 'multiple_choice';
     document.getElementById('survey-question-text').value = activeSlide.question || '';
+    
+    const themeSel = document.getElementById('survey-slide-theme');
+    if (themeSel) themeSel.value = activeSlide.theme || 'theme-default';
+    
+    const activeReactions = activeSlide.reactions || [];
+    document.querySelectorAll('.survey-reaction-cb').forEach(cb => {
+      cb.checked = activeReactions.includes(cb.value);
+    });
 
+    // Slide Type Settings
+    document.getElementById('survey-slide-type').value = activeSlide.type;
     const optsContainer = document.getElementById('survey-options-container');
     const optsList = document.getElementById('survey-options-list');
+    const wcSettings = document.getElementById('survey-wordcloud-settings');
     
-    if (activeSlide.type === 'multiple_choice') {
+    if (['multiple_choice', 'scales', 'ranking'].includes(activeSlide.type)) {
       optsContainer.style.display = 'block';
       optsList.innerHTML = '';
       (activeSlide.options || []).forEach((opt, idx) => {
@@ -246,37 +384,60 @@
         `;
         optsList.appendChild(row);
       });
+      document.getElementById('btn-survey-add-option').style.display = 'block';
+    } else if (activeSlide.type === 'guess_number') {
+      optsContainer.style.display = 'block';
+      optsList.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Target Number</label>
+          <input type="number" id="guess-target" value="${activeSlide.targetNumber || 0}" style="padding:8px; border:1px solid var(--section-divider); border-radius:6px; outline:none;" onchange="window.updateGuessSettings()">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-top:8px;">Tolerance (+/-)</label>
+          <input type="number" id="guess-tolerance" value="${activeSlide.tolerance || 0}" style="padding:8px; border:1px solid var(--section-divider); border-radius:6px; outline:none;" onchange="window.updateGuessSettings()">
+        </div>
+      `;
+      document.getElementById('btn-survey-add-option').style.display = 'none';
     } else {
       optsContainer.style.display = 'none';
     }
+    
+    if (activeSlide.type === 'word_cloud') {
+      wcSettings.style.display = 'block';
+      document.getElementById('survey-allow-multiple').checked = !!activeSlide.allowMultiple;
+    } else {
+      wcSettings.style.display = 'none';
+    }
 
     // Populate Center Preview
-    document.getElementById('preview-question').textContent = activeSlide.question || 'Untitled Question';
+    document.getElementById('preview-question').innerHTML = activeSlide.question || 'Untitled Question';
+    const previewContainer = document.getElementById('survey-slide-preview');
     const previewContent = document.getElementById('preview-content');
     
-    if (activeSlide.type === 'multiple_choice') {
-      previewContent.innerHTML = `<div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:400px;">
-        ${(activeSlide.options || []).map(o => `<div style="padding:12px 24px; background:#f1f5f9; border-radius:999px; font-weight:600; color:#475569;">${o}</div>`).join('')}
-      </div>`;
-    } else if (activeSlide.type === 'word_cloud') {
-      previewContent.innerHTML = `
-        <div style="color:#0ea5e9; font-weight:800; font-size:3rem; opacity:0.8;">Cloud Word</div>
-        <div style="color:#10b981; font-weight:700; font-size:2rem; opacity:0.6; position:absolute; transform:translate(-80px, -50px);">Thoughts</div>
-        <div style="color:#f59e0b; font-weight:600; font-size:1.5rem; opacity:0.5; position:absolute; transform:translate(100px, 60px);">Ideas</div>
-      `;
-    } else if (activeSlide.type === 'open_ended') {
-      previewContent.innerHTML = `
-        <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
-          <div style="padding:16px 24px; background:#fff; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.1); font-size:1.2rem;">Sample Answer...</div>
-          <div style="padding:16px 24px; background:#fff; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.1); font-size:1.2rem;">Another response</div>
-        </div>
-      `;
-    }
+    // Apply theme dynamically to inline preview container
+    previewContainer.className = activeSlide.theme || 'theme-default';
+    
+    // Quick inline render for center preview
+    renderSimulatedStudentSlide(previewContent, activeSlide, false, true);
   }
+
+  window.updateGuessSettings = function() {
+    const survey = surveys.find(s => s.id === currentSurveyId);
+    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'guess_number') {
+      survey.slides[activeSlideIndex].targetNumber = parseFloat(document.getElementById('guess-target').value) || 0;
+      survey.slides[activeSlideIndex].tolerance = parseFloat(document.getElementById('guess-tolerance').value) || 0;
+      renderEditor();
+    }
+  };
+  window.updateWordCloudSettings = function() {
+    const survey = surveys.find(s => s.id === currentSurveyId);
+    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'word_cloud') {
+      survey.slides[activeSlideIndex].allowMultiple = document.getElementById('survey-allow-multiple').checked;
+      renderEditor();
+    }
+  };
 
   window.updateOption = function(idx, val) {
     const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'multiple_choice') {
+    if(survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
       survey.slides[activeSlideIndex].options[idx] = val;
       renderEditor();
     }
@@ -284,10 +445,82 @@
 
   window.deleteOption = function(idx) {
     const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'multiple_choice') {
+    if(survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
       survey.slides[activeSlideIndex].options.splice(idx, 1);
       renderEditor();
     }
+  };
+
+  window.renderSimulatedStudentSlide = function(container, slide, requireName, isInline = false) {
+    let contentHtml = '';
+    const themeClass = slide.theme || 'theme-default';
+    
+    // Base layout mimicking quiz.js
+    if (slide.type === 'multiple_choice') {
+      contentHtml = `<div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:400px;">
+        ${(slide.options || []).map(o => `<div style="padding:16px 24px; background:rgba(255,255,255,0.8); border:2px solid rgba(0,0,0,0.1); border-radius:9999px; font-weight:700; color:#1e293b; cursor:pointer; text-align:center;">${o}</div>`).join('')}
+      </div>`;
+    } else if (slide.type === 'word_cloud') {
+      contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:400px;">
+        <input type="text" placeholder="Enter a word..." style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:9999px; outline:none; font-size:1.1rem; margin-bottom:12px;">
+        <button style="width:100%; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+      </div>`;
+    } else if (slide.type === 'open_ended' || slide.type === 'q_and_a') {
+      contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:500px;">
+        <textarea rows="4" placeholder="${slide.type === 'q_and_a' ? 'Ask a question...' : 'Type your answer here...'}" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:24px; outline:none; font-size:1.1rem; margin-bottom:12px; resize:none;"></textarea>
+        <button style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+      </div>`;
+    } else if (slide.type === 'scales') {
+      contentHtml = `<div style="width:100%; max-width:500px; display:flex; flex-direction:column; gap:16px;">
+        ${(slide.options || []).map(o => `
+          <div style="background:rgba(255,255,255,0.8); padding:16px; border-radius:12px;">
+            <div style="font-weight:700; margin-bottom:12px; color:#1e293b;">${o}</div>
+            <input type="range" min="1" max="5" value="3" style="width:100%;">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#64748b; margin-top:4px;"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
+          </div>
+        `).join('')}
+        <button style="width:100%; padding:12px; background:#8b5cf6; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+      </div>`;
+    } else if (slide.type === 'ranking') {
+      contentHtml = `<div style="width:100%; max-width:400px; display:flex; flex-direction:column; gap:12px;">
+        <div style="font-size:0.9rem; margin-bottom:8px;">Drag to rank options (1st is highest)</div>
+        ${(slide.options || []).map((o, i) => `
+          <div style="padding:16px 24px; background:rgba(255,255,255,0.8); border:2px solid rgba(0,0,0,0.1); border-radius:9999px; font-weight:700; display:flex; align-items:center; gap:12px; color:#1e293b;">
+            <div style="background:#e2e8f0; color:#475569; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink: 0;">${i+1}</div>
+            ${o}
+          </div>
+        `).join('')}
+        <button style="width:100%; padding:12px; background:#ec4899; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer; margin-top:8px;">Submit</button>
+      </div>`;
+    } else if (slide.type === 'guess_number') {
+      contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:400px; display:flex; flex-direction:column; gap:12px;">
+        <input type="number" placeholder="Enter your guess..." style="width:100%; padding:16px; border:2px solid #cbd5e1; border-radius:9999px; outline:none; font-size:1.5rem; text-align:center;">
+        <button style="width:100%; padding:12px; background:#f59e0b; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+      </div>`;
+    }
+
+    // Reaction Bar
+    let reactionHtml = '';
+    if ((slide.reactions || []).length > 0) {
+      reactionHtml = `<div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:12px; background:rgba(255,255,255,0.9); padding:12px 24px; border-radius:999px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+        ${slide.reactions.map(r => `<button style="background:none; border:none; cursor:pointer; color: var(--text); transition:transform 0.1s; display: flex; align-items: center; justify-content: center;" onmousedown="this.style.transform='scale(0.8)'" onmouseup="this.style.transform='scale(1)'">${REACTION_SVGS[r] || r}</button>`).join('')}
+      </div>`;
+    }
+
+    let innerContent = '';
+    if (isInline) {
+      innerContent = contentHtml;
+    } else {
+      innerContent = `
+        <div class="${themeClass}" style="width:100%; min-height:100%; padding:40px 20px; display:flex; flex-direction:column; align-items:center; position:relative;">
+          <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 40px; text-align:center; max-width:800px;">${slide.question || 'Untitled Question'}</h2>
+          ${contentHtml}
+          ${reactionHtml}
+        </div>
+      `;
+    }
+
+    container.innerHTML = innerContent;
   };
 
   // --- LIVE PRESENTER LOGIC ---
@@ -309,11 +542,15 @@
     
     activeSlideIndex = 0;
     
+    // Render slide immediately before network request
+    renderLiveSlide();
+    
     try {
       // Create session in live_surveys
       await db.collection('live_surveys').doc(currentLiveCode).set({
         surveyId: currentLiveSurvey.id,
         surveyName: currentLiveSurvey.name,
+        requireName: currentLiveSurvey.requireName || false,
         activeSlideIndex: activeSlideIndex,
         totalSlides: currentLiveSurvey.slides.length,
         slides: currentLiveSurvey.slides, // include full structure so clients don't need to fetch global
@@ -322,26 +559,28 @@
       });
       
       startListeningToLiveResponses();
-      renderLiveSlide();
     } catch(e) {
       console.error("Error starting live survey:", e);
     }
   };
 
+  let liveReactionsUnsubscribe = null;
+
   function startListeningToLiveResponses() {
     if (liveResponsesUnsubscribe) liveResponsesUnsubscribe();
-    liveResponsesUnsubscribe = db.collection('survey_responses')
-      .where('code', '==', currentLiveCode)
-      .onSnapshot(snap => {
-        const activeSlideId = currentLiveSurvey.slides[activeSlideIndex].id;
-        
-        // Filter responses for CURRENT slide
+    if (liveReactionsUnsubscribe) liveReactionsUnsubscribe();
+    
+    const slideId = currentLiveSurvey.slides[activeSlideIndex].id;
+    
+    if (window.rtdb) {
+      const responsesRef = window.rtdb.ref(`survey_responses/${slideId}`);
+      responsesRef.on('value', snap => {
         const responses = [];
-        snap.forEach(doc => {
-          const d = doc.data();
-          if(d.slideId === activeSlideId) {
-            responses.push(d);
-          }
+        snap.forEach(child => {
+          const d = child.val();
+          d.id = child.key;
+          d.upvotesCount = d.upvotes ? Object.keys(d.upvotes).length : 0;
+          responses.push(d);
         });
         
         document.getElementById('live-survey-participant-count').innerHTML = `
@@ -351,11 +590,42 @@
         
         renderLiveVisuals(responses);
       });
+      liveResponsesUnsubscribe = () => responsesRef.off('value');
+      
+      // Listen for reactions
+      let initialReactions = true;
+      const reactionsRef = window.rtdb.ref(`survey_reactions/${slideId}`);
+      reactionsRef.on('child_added', snap => {
+        if (initialReactions) return;
+        showFloatingReaction(snap.val().reaction);
+      });
+      reactionsRef.once('value').then(() => { initialReactions = false; });
+      liveReactionsUnsubscribe = () => reactionsRef.off('child_added');
+    }
+  }
+
+  function showFloatingReaction(emojiKey) {
+    const el = document.createElement('div');
+    el.className = 'reaction-particle';
+    el.innerHTML = REACTION_SVGS[emojiKey] || emojiKey;
+    el.style.left = (Math.random() * 80 + 10) + '%';
+    el.style.color = '#0ea5e9'; // Default color for SVGs
+    if (emojiKey === 'heart') el.style.color = '#ef4444';
+    if (emojiKey === 'smile') el.style.color = '#f59e0b';
+    if (emojiKey === 'star' || emojiKey === 'bulb') el.style.color = '#eab308';
+    
+    const container = document.getElementById('screen-survey-live-admin');
+    if (container) container.appendChild(el);
+    setTimeout(() => {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 3000);
   }
 
   function stopLiveSurvey() {
     if (liveResponsesUnsubscribe) liveResponsesUnsubscribe();
+    if (liveReactionsUnsubscribe) liveReactionsUnsubscribe();
     liveResponsesUnsubscribe = null;
+    liveReactionsUnsubscribe = null;
     
     if (liveChart) {
       liveChart.destroy();
@@ -390,29 +660,39 @@
 
   function renderLiveSlide() {
     const slide = currentLiveSurvey.slides[activeSlideIndex];
-    document.getElementById('live-survey-question').textContent = slide.question;
+    document.getElementById('live-survey-question').innerHTML = slide.question || 'Untitled Question';
     document.getElementById('survey-slide-counter').textContent = `${activeSlideIndex + 1} / ${currentLiveSurvey.slides.length}`;
     
-    document.getElementById('survey-live-chart').style.display = 'none';
+    document.getElementById('survey-live-chart-wrapper').style.display = 'none';
     document.getElementById('survey-live-open-ended').style.display = 'none';
+    
+    // Apply theme class
+    const themeClass = slide.theme || 'theme-default';
+    const container = document.getElementById('screen-survey-live-admin');
+    // Remove old themes safely
+    Array.from(container.classList).forEach(cls => {
+      if(cls.startsWith('theme-')) container.classList.remove(cls);
+    });
+    container.classList.add(themeClass);
     
     if(liveChart) {
       liveChart.destroy();
       liveChart = null;
     }
     
-    if(slide.type === 'multiple_choice') {
+    if(['multiple_choice', 'scales', 'ranking'].includes(slide.type)) {
+      const wrapper = document.getElementById('survey-live-chart-wrapper');
+      wrapper.style.display = 'block';
       const ctx = document.getElementById('survey-live-chart');
-      ctx.style.display = 'block';
       // Setup Chart.js
       liveChart = new Chart(ctx, {
-        type: 'bar',
+        type: slide.type === 'scales' ? 'bar' : (slide.type === 'ranking' ? 'bar' : 'bar'),
         data: {
           labels: slide.options || [],
           datasets: [{
-            label: 'Votes',
+            label: slide.type === 'scales' ? 'Avg Score' : (slide.type === 'ranking' ? 'Avg Rank (Lower is Better)' : 'Votes'),
             data: new Array((slide.options || []).length).fill(0),
-            backgroundColor: '#0ea5e9',
+            backgroundColor: slide.type === 'scales' ? '#8b5cf6' : (slide.type === 'ranking' ? '#ec4899' : '#0ea5e9'),
             borderRadius: 8
           }]
         },
@@ -421,12 +701,12 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
+            y: { beginAtZero: true, ticks: { precision: slide.type === 'multiple_choice' ? 0 : 1 } },
             x: { grid: { display: false }, ticks: { font: { size: 16, weight: 'bold' } } }
           }
         }
       });
-    } else if (slide.type === 'open_ended' || slide.type === 'word_cloud') {
+    } else if (slide.type === 'open_ended' || slide.type === 'word_cloud' || slide.type === 'q_and_a' || slide.type === 'guess_number') {
       const div = document.getElementById('survey-live-open-ended');
       div.style.display = 'flex';
       div.innerHTML = '<div style="color:var(--text-secondary); margin-top:40px;">Waiting for responses...</div>';
@@ -446,57 +726,180 @@
       });
       liveChart.data.datasets[0].data = counts;
       liveChart.update();
-    } 
-    else if (slide.type === 'open_ended') {
+    }
+    else if (slide.type === 'scales' && liveChart) {
+      const totals = new Array((slide.options || []).length).fill(0);
+      const counts = new Array((slide.options || []).length).fill(0);
+      responses.forEach(r => {
+        try {
+          const vals = JSON.parse(r.answer);
+          vals.forEach((v, i) => {
+            if (i < totals.length) {
+              totals[i] += v;
+              counts[i]++;
+            }
+          });
+        } catch(e){}
+      });
+      const avgs = totals.map((t, i) => counts[i] > 0 ? (t / counts[i]) : 0);
+      liveChart.data.datasets[0].data = avgs;
+      liveChart.update();
+    }
+    else if (slide.type === 'ranking' && liveChart) {
+      const totals = new Array((slide.options || []).length).fill(0);
+      const counts = new Array((slide.options || []).length).fill(0);
+      responses.forEach(r => {
+        try {
+          const vals = JSON.parse(r.answer); // ordered list of items
+          vals.forEach((item, rankIndex) => {
+            const optIdx = slide.options.indexOf(item);
+            if(optIdx !== -1) {
+              totals[optIdx] += (rankIndex + 1); // Rank 1 is best
+              counts[optIdx]++;
+            }
+          });
+        } catch(e){}
+      });
+      const avgs = totals.map((t, i) => counts[i] > 0 ? (t / counts[i]) : 0);
+      liveChart.data.datasets[0].data = avgs;
+      liveChart.update();
+    }
+    else if (slide.type === 'guess_number') {
       const div = document.getElementById('survey-live-open-ended');
       div.innerHTML = '';
       if(responses.length === 0) {
         div.innerHTML = '<div style="color:var(--text-secondary); margin-top:40px;">Waiting for responses...</div>';
         return;
       }
+      
+      let sum = 0;
+      let closestDist = Infinity;
+      let closestWinner = null;
+      let closestGuess = null;
+      
       responses.forEach(r => {
-        const card = document.createElement('div');
-        card.style.cssText = 'padding: 16px 24px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--section-divider); font-size: 1.25rem; font-weight: 600; color: var(--text); max-width: 400px; animation: popIn 0.3s ease-out;';
-        card.textContent = r.answer;
-        div.appendChild(card);
+        const val = parseFloat(r.answer);
+        if(!isNaN(val)) {
+          sum += val;
+          const dist = Math.abs(val - (slide.targetNumber || 0));
+          if (dist < closestDist) {
+            closestDist = dist;
+            closestWinner = r.participantName || 'Anonymous';
+            closestGuess = val;
+          }
+        }
       });
+      
+      const avg = (sum / responses.length).toFixed(2);
+      
+      div.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid var(--section-divider); text-align: center; max-width: 600px; width: 100%;">
+          <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Target Number</div>
+          <div style="font-size: 4rem; font-weight: 900; color: #10b981;">${slide.targetNumber || 0}</div>
+          <div style="font-size: 1.1rem; color: var(--text-secondary); margin-top: 16px;">Average Guess: <strong>${avg}</strong></div>
+          ${closestWinner ? `<div style="font-size: 1.25rem; font-weight: 700; color: #0ea5e9; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--section-divider);">Closest Guess: ${closestGuess} by ${closestWinner}</div>` : ''}
+        </div>
+      `;
     }
-    else if (slide.type === 'word_cloud') {
-      // Basic text-based word cloud (font size scales by frequency)
+    else if (slide.type === 'open_ended' || slide.type === 'q_and_a') {
       const div = document.getElementById('survey-live-open-ended');
       div.innerHTML = '';
       if(responses.length === 0) {
         div.innerHTML = '<div style="color:var(--text-secondary); margin-top:40px;">Waiting for responses...</div>';
+        return;
+      }
+      
+      let sortedResponses = [...responses];
+      if (slide.type === 'q_and_a') {
+        sortedResponses.sort((a,b) => (b.upvotes ? b.upvotes.length : 0) - (a.upvotes ? a.upvotes.length : 0));
+      }
+      
+      sortedResponses.forEach(r => {
+        const card = document.createElement('div');
+        card.style.cssText = 'padding: 16px 24px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--section-divider); font-size: 1.25rem; font-weight: 600; color: var(--text); max-width: 400px; animation: popIn 0.3s ease-out; position:relative;';
+        if (slide.type === 'q_and_a') {
+           const upvoteCount = r.upvotes ? r.upvotes.length : 0;
+           const badge = upvoteCount > 0 ? `<div style="position:absolute; top:-12px; right:-12px; background:#0ea5e9; color:white; font-size:0.8rem; font-weight:bold; padding:4px 10px; border-radius:9999px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">🔥 ${upvoteCount}</div>` : '';
+           card.innerHTML = `${badge}<div style="font-size: 0.9rem; color: #0ea5e9; font-weight: 700; margin-bottom: 8px;">${r.participantName || 'Anonymous'} asks:</div><div>${maskProfanity(r.answer)}</div>`;
+        } else {
+           card.textContent = maskProfanity(r.answer);
+        }
+        div.appendChild(card);
+      });
+    }
+    else if (slide.type === 'word_cloud') {
+      const div = document.getElementById('survey-live-open-ended');
+      
+      if (typeof WordCloud === 'undefined') {
+        div.innerHTML = '<div style="color:var(--text-secondary); margin-top:40px; text-align:center;">Loading Word Cloud engine...</div>';
+        if (!document.getElementById('wordcloud-script')) {
+          const script = document.createElement('script');
+          script.id = 'wordcloud-script';
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js";
+          script.onload = () => renderLiveVisuals(responses);
+          document.head.appendChild(script);
+        }
+        return;
+      }
+      
+      div.innerHTML = '';
+      if(responses.length === 0) {
+        div.innerHTML = '<div style="color:var(--text-secondary); margin-top:40px; text-align:center;">Waiting for responses...</div>';
         return;
       }
       
       const freq = {};
       responses.forEach(r => {
-        const words = (r.answer || '').split(/\s+/);
-        words.forEach(w => {
-          const cw = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const phrase = maskProfanity((r.answer || '').trim());
+        if (phrase) {
+          // Do not tokenize by space. Keep the phrase intact. Only remove special characters but keep spaces.
+          // However, asterisk * shouldn't be counted if it's purely profanity, but we let it pass as a phrase.
+          const cw = phrase.toLowerCase().replace(/[^a-z0-9 *]/g, '').replace(/\s+/g, ' ').trim();
           if(cw) freq[cw] = (freq[cw] || 0) + 1;
-        });
+        }
       });
       
       const maxFreq = Math.max(...Object.values(freq), 1);
       
-      // Shuffle keys for random layout
-      const keys = Object.keys(freq).sort(() => Math.random() - 0.5);
+      // Setup Canvas
+      const canvas = document.createElement('canvas');
+      canvas.id = 'wordcloud-canvas';
+      // Give canvas strict pixel dimensions based on container to avoid blurry rendering
+      const width = div.clientWidth || 800;
+      const height = 400; // Fixed height for word cloud container
+      canvas.width = width;
+      canvas.height = height;
+      canvas.style.cssText = `width: 100%; height: ${height}px; animation: popIn 0.8s ease-out;`;
+      div.appendChild(canvas);
       
-      const colors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+      const colors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#eab308', '#06b6d4', '#14b8a6'];
       
-      keys.forEach((w, idx) => {
-        const count = freq[w];
-        // Scale font size from 1rem to 4rem based on frequency
-        const size = 1 + (count / maxFreq) * 3;
-        const color = colors[idx % colors.length];
-        
-        const span = document.createElement('span');
-        span.style.cssText = `font-size: ${size}rem; font-weight: 800; color: ${color}; margin: 8px; line-height: 1; transition: all 0.3s;`;
-        span.textContent = w;
-        div.appendChild(span);
+      const list = Object.keys(freq).map(w => {
+        // Base size 24. Words scale up to 4x based on frequency relative to maxFreq.
+        const baseSize = Math.max(16, (width / 40)); 
+        const size = baseSize * (1 + (freq[w] / maxFreq) * 3);
+        return [w, size];
       });
+      
+      if (typeof WordCloud !== 'undefined') {
+        WordCloud(canvas, {
+          list: list,
+          gridSize: Math.round(16 * width / 1024), // Tighter grid for better packing
+          weightFactor: function (size) {
+            return size; 
+          },
+          fontFamily: 'Inter, system-ui, sans-serif',
+          color: function (word, weight) {
+            return colors[Math.floor(Math.random() * colors.length)];
+          },
+          rotateRatio: 0.3, // 30% chance for vertical rotation (Mentimeter style)
+          rotationSteps: 2, // Only 0 or 90 degrees
+          backgroundColor: 'transparent',
+          shrinkToFit: true,
+          drawOutOfBound: false,
+          shape: 'circle'
+        });
+      }
     }
   }
 })();

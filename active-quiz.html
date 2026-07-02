@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="css/base.css?v=8">
   <link rel="stylesheet" href="css/animations.css?v=8">
   <link rel="stylesheet" href="css/components.css?v=12">
-  <link rel="stylesheet" href="css/sections.css?v=12">
+  <link rel="stylesheet" href="css/sections.css?v=13">
 
   <!-- Firebase Compat Libraries -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -68,20 +68,20 @@
       </div>
 
       <!-- Step 2: Mode Selection -->
-      <div id="portal-step-mode" class="portal-step" style="display: none;">
+      <div id="portal-step-mode" class="portal-step" style="display: none; padding-top: 32px;">
         <h3 style="font-size: var(--fs-2xl); margin-bottom: var(--space-2);" id="greeting-title">Hi there!</h3>
         <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">What would you like to play today?</p>
         
         <div class="mode-choices" id="mode-choices">
-          <button class="mode-choice-card" id="btn-portal-tournament" style="flex: 1 1 0%; min-width: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 260px; background: #f1f5f9; border: 2px solid transparent; border-radius: 20px; padding: 40px 20px; text-align: center; transition: all 0.2s; box-sizing: border-box;">
+          <button class="mode-choice-card" id="btn-portal-tournament">
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32" style="vertical-align: middle; margin-right: 8px; margin-bottom: 8px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><br>Tournament</h3>
             <p style="color: var(--text-tertiary); font-size: var(--fs-base); margin-top: 12px; line-height: 1.4;">Private matches with access code.</p>
           </button>
-          <button class="mode-choice-card" id="btn-portal-practice" style="flex: 1 1 0%; min-width: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 260px; background: #f1f5f9; border: 2px solid transparent; border-radius: 20px; padding: 40px 20px; text-align: center; transition: all 0.2s; box-sizing: border-box;">
+          <button class="mode-choice-card" id="btn-portal-practice">
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32" style="vertical-align: middle; margin-right: 8px; margin-bottom: 8px;"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg><br>Practice Match</h3>
             <p style="color: var(--text-tertiary); font-size: var(--fs-base); margin-top: 12px; line-height: 1.4;">Enter the arena for public quizzes.</p>
           </button>
-          <button class="mode-choice-card" id="btn-portal-survey" style="flex: 1 1 0%; min-width: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 260px; background: #f1f5f9; border: 2px solid transparent; border-radius: 20px; padding: 40px 20px; text-align: center; transition: all 0.2s; box-sizing: border-box;">
+          <button class="mode-choice-card" id="btn-portal-survey">
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32" style="vertical-align: middle; margin-right: 8px; margin-bottom: 8px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><br>Live Survey</h3>
             <p style="color: var(--text-tertiary); font-size: var(--fs-base); margin-top: 12px; line-height: 1.4;">Join a live presentation (Menti).</p>
           </button>
@@ -129,6 +129,20 @@
         <div style="display: flex; gap: 16px; margin-top: 24px;">
           <button class="btn" id="btn-survey-back" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 14px 24px; color: #111827; font-weight: 600;">Back</button>
           <button id="btn-survey-join" style="flex: 1; padding: 14px 24px; font-size: 1.1rem; border-radius: 9999px; background: #0ea5e9; color: #ffffff; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(14,165,233,0.3);">Join Survey</button>
+        </div>
+      </div>
+
+      <!-- Survey Step 1.5: Name Entry -->
+      <div id="portal-step-survey-name" class="portal-step" style="display: none; max-width: 500px; margin: 0 auto;">
+        <h3 style="font-size: 1.75rem; margin-bottom: 8px;">What's your name?</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">This survey requires you to identify yourself.</p>
+        
+        <input type="text" id="inp-survey-name" placeholder="Enter your name..." style="width: 100%; padding: 16px; border: 2px solid var(--section-divider); border-radius: 8px; outline: none; font-size: 1.25rem; font-weight: 600; text-align: center; margin-bottom: 16px;">
+        
+        <p class="err" id="survey-name-err" style="margin-bottom:16px; color:#ef4444; font-size:0.9rem; display:none;"></p>
+        
+        <div style="display: flex; gap: 16px; margin-top: 24px;">
+          <button id="btn-survey-name-join" style="flex: 1; padding: 14px 24px; font-size: 1.1rem; border-radius: 9999px; background: #0ea5e9; color: #ffffff; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(14,165,233,0.3);">Continue</button>
         </div>
       </div>
 
@@ -189,24 +203,70 @@
       </div>
 
       <!-- Step 3C: Tournament Lobby (Waiting Area) -->
+      <style>
+        @media (max-width: 900px) {
+          .portal-card {
+            padding: 8px !important;
+            border: none !important;
+          }
+          #portal-step-lobby {
+            padding: 0 !important; 
+          }
+          .lobby-grid {
+            display: flex !important;
+            flex-direction: column-reverse !important;
+            gap: 16px !important;
+            width: 100% !important;
+          }
+          .lobby-chat-col {
+            height: 400px !important; /* Made chat box even taller */
+            width: 100% !important;
+          }
+          .lobby-status-col {
+            width: 100% !important;
+          }
+          .lobby-status-card {
+            padding: 16px !important;
+          }
+          #tournament-lobby-title {
+            margin-top: 24px !important;
+          }
+          #btn-lobby-send {
+            padding: 0 !important;
+            width: 44px !important;
+            height: 44px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          #btn-lobby-send .send-text { display: none !important; }
+          #btn-lobby-send .send-icon { display: block !important; }
+        }
+      </style>
       <div id="portal-step-lobby" class="portal-step" style="display: none; width: 100%; max-width: 1200px; max-height: 80vh; overflow-y: auto; padding: 10px;">
-        <h4 style="margin-bottom: var(--space-4); text-align: center; font-size: 2rem; font-weight: 800; color: var(--primary);">Tournament Lobby</h4>
+        <h4 id="tournament-lobby-title" style="margin-bottom: var(--space-4); text-align: center; font-size: 2rem; font-weight: 800; color: var(--primary);">Tournament Lobby</h4>
         
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: stretch;">
+        <div class="lobby-grid">
           <!-- Left side: Chat -->
-          <div style="background: var(--surface); border: 1px solid #e5e7eb; border-radius: 16px; display: flex; flex-direction: column; height: 350px; overflow: hidden;">
+          <div class="lobby-chat-col">
             <div id="lobby-chat-messages" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
               <!-- Messages injected here -->
             </div>
             <div style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: #fafafa;">
               <input type="text" id="lobby-chat-input" placeholder="Type a message..." style="flex: 1; padding: 10px 16px; border-radius: 9999px; border: 1px solid #e5e7eb; background: #ffffff; outline: none; font-family: inherit;">
-              <button id="btn-lobby-send" style="background: #0ea5e9; border: none; border-radius: 9999px; padding: 0 20px; color: white; font-weight: 600; cursor: pointer;">Send</button>
+              <button id="btn-lobby-send" style="background: #0ea5e9; border: none; border-radius: 9999px; padding: 0 20px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <span class="send-text">Send</span>
+                <svg class="send-icon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
             </div>
           </div>
           
           <!-- Right side: Status -->
-          <div style="display: flex; flex-direction: column; gap: 16px; text-align: center; height: 100%;">
-            <div style="flex: 1; padding: 24px; background: var(--surface); border: 1px solid #e5e7eb; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="lobby-status-col">
+            <div class="lobby-status-card">
               <div id="lobby-quiz-info" style="margin-bottom: 24px;">
                 <h3 id="lobby-quiz-name" style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 0 0 8px 0;">Loading...</h3>
                 <p id="lobby-quiz-meta" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-weight: 600;"></p>
@@ -215,8 +275,10 @@
               <p style="color: var(--text-secondary); font-size: 0.9rem;" id="lobby-participants-count">Participants joined: 1</p>
             </div>
             
-            <button class="btn btn-primary" id="btn-lobby-start" style="background: #10B981; border: none; border-radius: 9999px; padding: 16px 24px; font-size: 1.1rem; color: #ffffff; font-weight: 700; width: 100%; display: none; box-shadow: 0 4px 12px rgba(16,185,129,0.3); animation: pulse 2s infinite;">Enter Match Now</button>
-            <button class="btn" id="btn-lobby-leave" style="background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 24px; color: #ef4444; font-weight: 600; width: 100%;">Leave Lobby</button>
+            <div class="lobby-action-buttons" style="display: flex; gap: 12px; width: 100%;">
+              <button class="btn" id="btn-lobby-leave" style="flex: 1; background: #f1f5f9; border: none; border-radius: 9999px; padding: 12px 16px; color: #ef4444; font-weight: 600;">Leave Lobby</button>
+              <button class="btn btn-primary" id="btn-lobby-start" style="flex: 1; background: #0ea5e9; border: none; border-radius: 9999px; padding: 12px 16px; font-size: 1.1rem; color: #ffffff; font-weight: 700; display: none; box-shadow: 0 4px 12px rgba(14,165,233,0.3); animation: pulse 2s infinite;">Start Quiz</button>
+            </div>
           </div>
         </div>
       </div>

@@ -3,6 +3,62 @@
    50+ trivia questions, date-based rotation, flip interaction
    ============================================================ */
 
+// IndexedDB Helpers for Offline Caching
+let dbPromise = null;
+function getIDB() {
+  if (!dbPromise) {
+    dbPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open('qs-offline-db', 1);
+      request.onupgradeneeded = (e) => {
+        const idb = e.target.result;
+        if (!idb.objectStoreNames.contains('offline_submissions')) {
+          idb.createObjectStore('offline_submissions', { autoIncrement: true });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+  return dbPromise;
+}
+
+async function saveAttemptToIDB(attemptData) {
+  try {
+    const idb = await getIDB();
+    const tx = idb.transaction('offline_submissions', 'readwrite');
+    tx.objectStore('offline_submissions').add(attemptData);
+    console.log('Submission saved offline.');
+  } catch(e) {
+    console.error('Failed to save to IndexedDB', e);
+  }
+}
+
+async function syncOfflineAttempts() {
+  if (!navigator.onLine || !window.db) return;
+  try {
+    const idb = await getIDB();
+    const tx = idb.transaction('offline_submissions', 'readonly');
+    const store = tx.objectStore('offline_submissions');
+    const request = store.getAll();
+    request.onsuccess = async () => {
+      const attempts = request.result;
+      if (attempts && attempts.length > 0) {
+        console.log(`Syncing ${attempts.length} offline attempts...`);
+        for (const attempt of attempts) {
+          try {
+            await window.db.collection('quiz_attempts').add(attempt);
+          } catch(e) { console.error('Sync failed for attempt', e); }
+        }
+        const delTx = idb.transaction('offline_submissions', 'readwrite');
+        delTx.objectStore('offline_submissions').clear();
+      }
+    };
+  } catch(e) { console.error('Error syncing offline attempts', e); }
+}
+
+window.addEventListener('online', syncOfflineAttempts);
+document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
+
 (function () {
   'use strict';
 
@@ -624,24 +680,56 @@
   // ────────────────────────────────────────────
   let lobbyChatUnsubscribe = null;
   let lobbyQuizUnsubscribe = null;
-
   let lobbyParticipantsUnsubscribe = null;
+  let mySessionUnsubscribe = null;
 
   async function joinLobby(quizId) {
-    window.currentLiveSessionId = `live_${quizId}_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    const mySid = getStudentId();
+    window.currentLiveSessionId = `live_${quizId}_${mySid}`;
     
     if (!window.db) return;
     
     try {
-      await window.db.collection('live_sessions').doc(window.currentLiveSessionId).set({
+      const docRef = window.db.collection('live_sessions').doc(window.currentLiveSessionId);
+      const doc = await docRef.get();
+      
+      if (doc.exists && doc.data().status === 'kicked') {
+        alert("You have been banned from this match.");
+        window.location.reload();
+        return;
+      }
+      
+      await docRef.set({
         quizId: quizId,
         participantName: participantName,
+        sid: mySid,
         status: 'waiting',
         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      }, { merge: true });
     } catch (e) {
       console.error("Error joining lobby:", e);
     }
+    
+    // Listen to own session for bans and mutes
+    mySessionUnsubscribe = window.db.collection('live_sessions').doc(window.currentLiveSessionId).onSnapshot(snap => {
+      if (snap.exists) {
+        const data = snap.data();
+        if (data.status === 'kicked') {
+          alert("You have been removed from this match.");
+          window.location.reload();
+        }
+        window.isMuted = !!data.isMuted;
+        const chatInput = document.getElementById('lobby-chat-input');
+        const chatBtn = document.getElementById('btn-lobby-send');
+        if (window.isMuted) {
+          if (chatInput) { chatInput.disabled = true; chatInput.placeholder = "You are muted."; }
+          if (chatBtn) chatBtn.disabled = true;
+        } else {
+          if (chatInput) { chatInput.disabled = false; chatInput.placeholder = "Type a message..."; }
+          if (chatBtn) chatBtn.disabled = false;
+        }
+      }
+    });
 
     // Listen to participant count (querying live_sessions for waiting or active users)
     lobbyParticipantsUnsubscribe = window.db.collection('live_sessions')
@@ -670,40 +758,67 @@
     // Listen to chat messages
     const msgsDiv = document.getElementById('lobby-chat-messages');
     msgsDiv.innerHTML = '';
-    lobbyChatUnsubscribe = window.db.collection('live_chats')
-      .where('quizId', '==', quizId)
-      .onSnapshot((snapshot) => {
+    if (window.rtdb) {
+      const chatRef = window.rtdb.ref('live_chats/' + quizId);
+      chatRef.on('value', (snapshot) => {
         const msgs = [];
-        snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
+        snapshot.forEach(child => { msgs.push({ id: child.key, ...child.val() }); });
         msgs.sort((a, b) => {
-          const t1 = (a.timestamp && typeof a.timestamp.toMillis === 'function') ? a.timestamp.toMillis() : Date.now();
-          const t2 = (b.timestamp && typeof b.timestamp.toMillis === 'function') ? b.timestamp.toMillis() : Date.now();
+          const t1 = a.timestamp || Date.now();
+          const t2 = b.timestamp || Date.now();
           return t1 - t2;
         });
         msgsDiv.innerHTML = '';
         msgs.forEach(msg => {
           const div = document.createElement('div');
           const isMe = msg.sender === participantName;
-          const bg = isMe ? '#0ea5e9' : '#ef4444';
-          const color = 'white';
-          div.style.cssText = `margin-bottom:8px; padding:10px 14px; border-radius:12px; background:${bg}; color:${color}; width:fit-content; max-width:85%; align-self:${isMe?'flex-end':'flex-start'}; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: none; line-height: 1.4;`;
-          div.innerHTML = `<strong style="font-size:0.75rem; opacity:0.9; display:block; margin-bottom:4px;">${msg.sender}</strong>${msg.message}`;
+          const isAdmin = msg.sender === 'Admin';
+          
+          let bg, color, border, textAlign;
+          if (msg.isPinned) {
+            bg = '#fef08a'; // Yellow
+            color = '#854d0e';
+            border = '1px solid #fde047';
+            textAlign = 'center';
+          } else if (isMe) {
+            bg = '#0ea5e9'; // Blue
+            color = '#ffffff';
+            border = 'none';
+            textAlign = 'right';
+          } else if (isAdmin) {
+            bg = '#ef4444'; // Red
+            color = '#ffffff';
+            border = 'none';
+            textAlign = 'left';
+          } else {
+            bg = '#ffffff'; // White
+            color = '#1e293b'; // Dark text
+            border = '1px solid #e5e7eb';
+            textAlign = 'left';
+          }
+          
+          div.style.cssText = `margin-bottom:8px; padding:6px 10px; border-radius:12px; background:${bg}; color:${color}; width:fit-content; max-width:85%; align-self:${isMe?'flex-end':'flex-start'}; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: ${border}; line-height: 1.4; font-size: 0.8rem; text-align: ${textAlign};`;
+          div.innerHTML = `<strong style="font-size:0.7rem; opacity:0.9; display:block; margin-bottom:2px; color:${isMe || isAdmin ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)'}">${msg.sender}</strong>${msg.message}`;
           msgsDiv.appendChild(div);
         });
         msgsDiv.scrollTop = msgsDiv.scrollHeight;
       });
+      lobbyChatUnsubscribe = () => chatRef.off('value');
+    }
 
     // Handle sending chat
     document.getElementById('btn-lobby-send').onclick = () => {
+      if (window.isMuted) return;
       const input = document.getElementById('lobby-chat-input');
       const text = input.value.trim();
       if (text) {
-        window.db.collection('live_chats').add({
-          quizId: quizId,
-          sender: participantName,
-          message: text,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        if (window.rtdb) {
+          window.rtdb.ref('live_chats/' + quizId).push({
+            sender: participantName,
+            message: text,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          });
+        }
         input.value = '';
       }
     };
@@ -921,16 +1036,13 @@
 
       // Listen for chat from admin
       let initialLoad = true;
-      activeQuizState.chatUnsubscribe = window.db.collection('live_chats')
-        .where('quizId', '==', quizId)
-        .orderBy('timestamp', 'asc')
-        .onSnapshot(snap => {
-          if (initialLoad) { initialLoad = false; return; }
-          snap.docChanges().forEach(change => {
-            if (change.type === 'added') {
-              const msg = change.doc.data();
-              if (msg.sender === 'Admin') {
-                const toastContainer = document.getElementById('chat-toast-container');
+      if (window.rtdb) {
+        const chatRef = window.rtdb.ref('live_chats/' + quizId).orderByChild('timestamp');
+        chatRef.on('child_added', snap => {
+          if (initialLoad) return;
+          const msg = snap.val();
+          if (msg.sender === 'Admin') {
+            const toastContainer = document.getElementById('chat-toast-container');
                 if (toastContainer) {
                   const toast = document.createElement('div');
                   toast.style.background = '#0ea5e9';
@@ -947,10 +1059,13 @@
                     setTimeout(() => toast.remove(), 300);
                   }, 5000);
                 }
+                }
               }
-            }
-          });
         });
+        // Initial load debounce
+        chatRef.once('value').then(() => { initialLoad = false; });
+        activeQuizState.chatUnsubscribe = () => chatRef.off('child_added');
+      }
     }
 
     document.getElementById('active-quiz-container').style.display = 'flex';
@@ -1080,19 +1195,32 @@
   }
 
   // ── Timer — pause / resume / start ──
+  let pendingSessionUpdate = false;
+  
+  function queueSessionUpdate() {
+    pendingSessionUpdate = true;
+  }
+  
+  setInterval(() => {
+    if (pendingSessionUpdate && activeQuizState && activeQuizState.liveSessionId && window.db) {
+      pendingSessionUpdate = false;
+      const state = activeQuizState;
+      const attemptedCount = state.userAnswers.filter(a => a !== null && a !== undefined && a !== '').length;
+      const skippedCount = state.currentIndex > 0 ? state.currentIndex - attemptedCount : 0;
+      
+      window.db.collection('live_sessions').doc(state.liveSessionId).update({
+        currentQuestion: state.currentIndex,
+        attemptedCount: attemptedCount,
+        skippedCount: skippedCount,
+        tabSwitches: state.tabSwitches,
+        minimizes: state.minimizes,
+        timeOnCurrentQ: state.timeSpent[state.currentIndex] || 0
+      }).catch(e => { /* ignore */ });
+    }
+  }, 3000);
+
   function syncLiveSession() {
-    if (!window.db || !activeQuizState || !activeQuizState.liveSessionId) return;
-    const attemptedCount = activeQuizState.userAnswers.filter(a => a !== null && a !== undefined && a !== '').length;
-    const skippedCount = activeQuizState.currentIndex > 0 ? activeQuizState.currentIndex - attemptedCount : 0;
-    
-    window.db.collection('live_sessions').doc(activeQuizState.liveSessionId).update({
-      currentQuestion: activeQuizState.currentIndex,
-      attemptedCount: attemptedCount,
-      skippedCount: skippedCount,
-      tabSwitches: activeQuizState.tabSwitches,
-      minimizes: activeQuizState.minimizes,
-      timeOnCurrentQ: activeQuizState.timeSpent[activeQuizState.currentIndex] || 0
-    }).catch(e => { /* document may not exist yet, ignore or set */ });
+    queueSessionUpdate();
   }
 
   function pauseTimer() {
@@ -1483,7 +1611,7 @@
   }
 
   // ── Final Submit — 20-Point Analysis Dashboard ──
-  function finalSubmit() {
+  async function finalSubmit() {
     try {
       pauseTimer();
     saveCurrentAnswer();
@@ -1498,6 +1626,26 @@
       window.db.collection('live_sessions').doc(state.liveSessionId).delete().catch(console.error);
     }
     const questions = state.data.questions;
+    
+    // FETCH SECRETS FOR GRADING
+    if (window.db && state.data && state.data.id) {
+       try {
+         const secretSnap = await window.db.collection('quiz_secrets').doc(String(state.data.id)).get();
+         if (secretSnap.exists) {
+            const secrets = secretSnap.data().secrets || [];
+            secrets.forEach(sec => {
+               const q = questions.find(qst => qst.id === sec.id);
+               if (q) {
+                  if (sec.ans !== undefined) q.ans = sec.ans;
+                  if (sec.answer !== undefined) q.answer = sec.answer;
+                  if (sec.correctAnswers !== undefined) q.correctAnswers = sec.correctAnswers;
+               }
+            });
+         }
+       } catch(e) {
+         console.error("Failed to fetch quiz secrets", e);
+       }
+    }
     let correct = 0, wrong = 0, skipped = 0, timedOut = 0;
     let currentStreak = 0, maxStreak = 0;
     let correctTime = 0, wrongTime = 0;
@@ -1576,7 +1724,17 @@
         minimizes: state.minimizes || 0,
         submittedAt: new Date().toISOString()
       };
-      window.db.collection('quiz_attempts').add(attemptData).catch(e => console.error("Telemetry Error:", e));
+      
+      // Try to submit, if offline save to IndexedDB
+      if (navigator.onLine) {
+        window.db.collection('quiz_attempts').add(attemptData).catch(e => {
+          console.error("Telemetry Error:", e);
+          saveAttemptToIDB(attemptData);
+        });
+      } else {
+        saveAttemptToIDB(attemptData);
+        alert('You are currently offline. Your submission has been saved locally and will be synced when you reconnect.');
+      }
     }
 
     const m = Math.floor(totalTime / 60).toString().padStart(2, '0');
@@ -2102,7 +2260,7 @@
         const btn = document.createElement('button');
         btn.style.cssText = 'width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 600; background: #f8fafc; border: 2px solid var(--section-divider); border-radius: 12px; color: var(--text); cursor: pointer; transition: all 0.2s; text-align: center;';
         btn.textContent = opt;
-        btn.onclick = () => submitSurveyResponse(slide.id, opt);
+        btn.onclick = () => submitSurveyResponse(slide, opt);
         btn.onmouseover = () => { btn.style.borderColor = '#0ea5e9'; btn.style.background = 'rgba(14,165,233,0.05)'; };
         btn.onmouseout = () => { btn.style.borderColor = 'var(--section-divider)'; btn.style.background = '#f8fafc'; };
         interactiveArea.appendChild(btn);
@@ -2121,7 +2279,7 @@
       
       btn.onclick = () => {
         if(inp.value.trim()) {
-          submitSurveyResponse(slide.id, inp.value.trim());
+          submitSurveyResponse(slide, inp.value.trim());
         }
       };
       
@@ -2130,23 +2288,46 @@
     }
   }
 
-  async function submitSurveyResponse(slideId, answerText) {
-    document.getElementById('survey-interactive-area').style.display = 'none';
-    document.getElementById('survey-submitted-msg').style.display = 'block';
+  async function submitSurveyResponse(slide, answerText) {
+    const isMultiple = (slide.type === 'word_cloud' && slide.allowMultiple);
+
+    if (!isMultiple) {
+      document.getElementById('survey-interactive-area').style.display = 'none';
+      document.getElementById('survey-submitted-msg').style.display = 'block';
+    } else {
+      // Clear input so they can submit again
+      const inp = document.getElementById('survey-interactive-area').querySelector('input');
+      if (inp) inp.value = '';
+      
+      // Briefly show a success indicator
+      const btn = document.getElementById('survey-interactive-area').querySelector('button');
+      if (btn) {
+        const oldText = btn.textContent;
+        btn.textContent = 'Sent! ✓';
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+          btn.textContent = oldText;
+          btn.style.background = '#0ea5e9';
+        }, 1500);
+      }
+    }
     
     try {
-      await window.db.collection('survey_responses').add({
-        code: currentSurveyCode,
-        slideId: slideId,
-        participantName: participantName || 'Anonymous',
-        answer: answerText,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      if (window.rtdb) {
+        await window.rtdb.ref(`survey_responses/${slide.id}`).push({
+          code: currentSurveyCode,
+          participantName: participantName || 'Anonymous',
+          answer: answerText,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
     } catch(e) {
       console.error("Failed to submit response:", e);
       alert("Failed to submit response. Please try again.");
-      document.getElementById('survey-interactive-area').style.display = 'flex';
-      document.getElementById('survey-submitted-msg').style.display = 'none';
+      if (!isMultiple) {
+        document.getElementById('survey-interactive-area').style.display = 'flex';
+        document.getElementById('survey-submitted-msg').style.display = 'none';
+      }
     }
   }
 

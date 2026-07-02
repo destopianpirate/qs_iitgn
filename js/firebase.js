@@ -16,5 +16,14 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = firebase.firestore();
 
-// Make the database accessible globally
+// Initialize Realtime Database
+let rtdb = null;
+try {
+  rtdb = firebase.database();
+} catch(e) {
+  console.warn("RTDB initialization failed", e);
+}
+
+// Make the databases accessible globally
 window.db = db;
+window.rtdb = rtdb;

@@ -143,8 +143,12 @@
     async function fetchQuizzesFromDB() {
       if (window.db) {
         try {
-          const docRef = window.db.collection('global').doc('allQuizzes');
-          const docSnap = await docRef.get();
+          let docRef = window.db.collection('global').doc('adminQuizzes');
+          let docSnap = await docRef.get();
+          if (!docSnap.exists) {
+            docRef = window.db.collection('global').doc('allQuizzes');
+            docSnap = await docRef.get();
+          }
           if (docSnap.exists) {
             const dataStr = docSnap.data().data;
             quizzes = JSON.parse(dataStr);
@@ -163,8 +167,41 @@
       const dataStr = JSON.stringify(quizzes);
       localStorage.setItem(STORAGE_KEY, dataStr);
       if (window.db) {
-        window.db.collection('global').doc('allQuizzes').set({ data: dataStr })
-          .catch(e => console.error("Error saving to Firebase:", e));
+        // Save full admin version
+        window.db.collection('global').doc('adminQuizzes').set({ data: dataStr })
+          .catch(e => console.error("Error saving adminQuizzes to Firebase:", e));
+          
+        // Create stripped public version and secret mappings
+        const publicQuizzes = quizzes.map(q => {
+           let pq = { ...q };
+           if (pq.questions) {
+             pq.questions = pq.questions.map(qst => {
+                let pQst = { ...qst };
+                delete pQst.ans;
+                delete pQst.correctAnswers;
+                delete pQst.answer;
+                return pQst;
+             });
+           }
+           return pq;
+        });
+        
+        window.db.collection('global').doc('allQuizzes').set({ data: JSON.stringify(publicQuizzes) })
+          .catch(e => console.error("Error saving public allQuizzes to Firebase:", e));
+          
+        // Save secrets for each quiz
+        quizzes.forEach(q => {
+           if (q.questions) {
+             const secrets = q.questions.map(qst => ({
+               id: qst.id,
+               ans: qst.ans,
+               correctAnswers: qst.correctAnswers,
+               answer: qst.answer
+             }));
+             window.db.collection('quiz_secrets').doc(String(q.id)).set({ secrets })
+               .catch(e => console.error("Error saving secrets:", e));
+           }
+        });
       }
     }
     function genId() {
@@ -185,8 +222,11 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const el = document.getElementById(id);
       if (el) el.classList.add('active');
-      if (id !== 'screen-login' && typeof initSidebar === 'function') {
-        initSidebar();
+      
+      if (id === 'screen-survey-live-admin') {
+        if (typeof window.hideSidebar === 'function') window.hideSidebar();
+      } else if (id !== 'screen-login' && typeof window.initSidebar === 'function') {
+        window.initSidebar();
       }
     };
     // Keep local reference for existing code in this file
@@ -805,15 +845,15 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
     }
 
     // Function to show sidebar
-    function initSidebar() {
+    window.initSidebar = function() {
       sidebar.style.display = 'flex';
       body.classList.add('has-sidebar');
-    }
-    function hideSidebar() {
+    };
+    window.hideSidebar = function() {
       sidebar.style.display = 'none';
       body.classList.remove('has-sidebar');
       body.classList.remove('sidebar-collapsed');
-    }
+    };
   
     // â”€â”€ APPLICATIONS SCREEN LOGIC â”€â”€
     let loadedApplications = [];
@@ -1122,18 +1162,36 @@ globalCharts);
       liveChatBtn.addEventListener('click', async () => {
       const input = document.getElementById('live-chat-input');
       const txt = input.value.trim();
-      if (!txt || !currentQAQuizId || !window.db) return;
+      if (!txt || !currentQAQuizId || !window.rtdb) return;
       
       input.value = '';
       try {
-        await window.db.collection('live_chats').add({
-          quizId: currentQAQuizId,
+        await window.rtdb.ref('live_chats/' + currentQAQuizId).push({
           sender: 'Admin',
           message: txt,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          timestamp: firebase.database.ServerValue.TIMESTAMP
         });
       } catch(e) { console.error("Error sending chat:", e); }
     });
+    }
+
+    const liveChatPinBtn = document.getElementById('btn-live-chat-pin');
+    if (liveChatPinBtn) {
+      liveChatPinBtn.addEventListener('click', async () => {
+        const input = document.getElementById('live-chat-input');
+        const txt = input.value.trim();
+        if (!txt || !currentQAQuizId || !window.rtdb) return;
+        
+        input.value = '';
+        try {
+          await window.rtdb.ref('live_chats/' + currentQAQuizId).push({
+            sender: 'Admin',
+            message: txt,
+            isPinned: true,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          });
+        } catch(e) { console.error("Error sending pinned chat:", e); }
+      });
     }
 
     const liveChatInput = document.getElementById('live-chat-input');
@@ -1146,6 +1204,118 @@ globalCharts);
       });
     }
 
+    window.removeParticipant = async function(uid) {
+      if(!confirm('Are you sure you want to kick this participant from the tournament?')) return;
+      try {
+        await window.db.collection('live_sessions').doc(uid).update({ status: 'kicked' });
+      } catch(e) { console.error('Error removing participant:', e); }
+    };
+
+    window.muteParticipant = async function(uid, muteState) {
+      try {
+        await window.db.collection('live_sessions').doc(uid).update({ isMuted: muteState });
+      } catch(e) { console.error('Error muting participant:', e); }
+    };
+
+    window.unbanParticipant = async function(uid) {
+      if(!confirm('Are you sure you want to unban this participant?')) return;
+      try {
+        await window.db.collection('live_sessions').doc(uid).update({ status: 'active' });
+      } catch(e) { console.error('Error unbanning participant:', e); }
+    };
+
+    const btnClearChat = document.getElementById('btn-clear-chat');
+    if (btnClearChat) {
+      btnClearChat.addEventListener('click', async () => {
+        if (!currentQAQuizId || !window.rtdb) return;
+        if (!confirm('Are you sure you want to clear all chat messages for this tournament?')) return;
+        try {
+          await window.rtdb.ref('live_chats/' + currentQAQuizId).remove();
+        } catch(e) { console.error('Error clearing chat:', e); }
+      });
+    }
+
+    const btnGenerateReport = document.getElementById('btn-generate-report');
+    if (btnGenerateReport) {
+      btnGenerateReport.addEventListener('click', async () => {
+        if (!currentQAQuizId || !window.db) return;
+        try {
+          const snap = await window.db.collection('quiz_attempts')
+            .where('quizId', '==', currentQAQuizId)
+            .get();
+          
+          if (snap.empty) {
+            alert('No past attempts found for this quiz to generate a report.');
+            return;
+          }
+          
+          const qStats = {};
+          snap.forEach(doc => {
+            const data = doc.data();
+            if (data.analysis) {
+              data.analysis.forEach(a => {
+                const qText = a.q || 'Untitled';
+                if (!qStats[qText]) qStats[qText] = { total: 0, correct: 0, time: 0 };
+                qStats[qText].total++;
+                if (a.status === 'correct') qStats[qText].correct++;
+                qStats[qText].time += (a.timeSpent || 0);
+              });
+            }
+          });
+          
+          let hardestQ = 'N/A', easiestQ = 'N/A', fastestQ = 'N/A';
+          let minCorrectRate = 100, maxCorrectRate = -1, minAvgTime = 999999;
+          
+          Object.keys(qStats).forEach(qText => {
+            const stat = qStats[qText];
+            if (stat.total === 0) return;
+            const correctRate = (stat.correct / stat.total) * 100;
+            const avgTime = stat.time / stat.total;
+            
+            if (correctRate < minCorrectRate) { minCorrectRate = correctRate; hardestQ = qText; }
+            if (correctRate > maxCorrectRate) { maxCorrectRate = correctRate; easiestQ = qText; }
+            if (avgTime < minAvgTime) { minAvgTime = avgTime; fastestQ = qText; }
+          });
+
+          let csv = '--- QUESTION ANALYTICS SUMMARY ---\\n';
+          csv += `Most Difficult Question,${hardestQ} (${minCorrectRate === 100 ? 0 : minCorrectRate.toFixed(1)}% correct)\\n`;
+          csv += `Easiest Question,${easiestQ} (${maxCorrectRate === -1 ? 0 : maxCorrectRate.toFixed(1)}% correct)\\n`;
+          csv += `Fastest Answered Question,${fastestQ} (${minAvgTime === 999999 ? 0 : minAvgTime.toFixed(1)}s avg)\\n`;
+          csv += '------------------------------------\\n\\n';
+          
+          csv += 'Name,UID,Score,Attempted,Skipped,Time Taken (s),Tab Switches,Minimizes,Timestamp\\n';
+          snap.forEach(doc => {
+            const data = doc.data();
+            const name = data.participantName || data.studentName || 'Anonymous';
+            const uid = data.uid || data.sid || doc.id;
+            const score = data.score || 0;
+            const att = data.attemptedCount || data.totalQuestions || 0;
+            const skip = data.skippedCount || 0;
+            const time = data.timeTaken || 0;
+            const tabs = data.tabSwitches || 0;
+            const mins = data.minimizes || 0;
+            const ts = data.submittedAt || (data.timestamp ? new Date(data.timestamp.toMillis()).toLocaleString() : '');
+            
+            const cleanName = '"' + name.replace(/"/g, '""') + '"';
+            csv += `${cleanName},${uid},${score},${att},${skip},${time},${tabs},${mins},"${ts}"\\n`;
+          });
+          
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', `tournament_report_${currentQAQuizId}.csv`);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+        } catch(e) {
+          console.error('Error generating CSV:', e);
+          alert('Failed to generate report.');
+        }
+      });
+    }
 
     window.openQuizAnalytics = function(quizId) {
       try {
@@ -1410,6 +1580,59 @@ globalCharts);
         }]
       }, { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }, qaCharts);
       
+      // Question Analytics Table Population
+      const qaBody = document.getElementById('question-analytics-tbody');
+      if (qaBody) {
+        if (qaData.length === 0) {
+          qaBody.innerHTML = '<tr><td colspan="6" style="padding: 16px; text-align: center; color: var(--text-secondary);">No data yet.</td></tr>';
+        } else {
+          const qStats = {};
+          qaData.forEach(a => {
+            if (a.analysis && Array.isArray(a.analysis)) {
+              a.analysis.forEach(q => {
+                const idx = q.originalIndex !== undefined ? q.originalIndex : q.idx;
+                if (idx === undefined) return;
+                if (!qStats[idx]) {
+                  qStats[idx] = { text: q.q, attempts: 0, correct: 0, timeSpent: 0 };
+                }
+                qStats[idx].attempts++;
+                if (q.status === 'correct') qStats[idx].correct++;
+                qStats[idx].timeSpent += (q.timeSpent || 0);
+              });
+            }
+          });
+          
+          const sortedIndices = Object.keys(qStats).map(Number).sort((a,b)=>a-b);
+          if (sortedIndices.length === 0) {
+            qaBody.innerHTML = '<tr><td colspan="6" style="padding: 16px; text-align: center; color: var(--text-secondary);">No detailed question data found.</td></tr>';
+          } else {
+            let rows = '';
+            sortedIndices.forEach(idx => {
+              const s = qStats[idx];
+              const cRate = s.attempts > 0 ? Math.round((s.correct / s.attempts) * 100) : 0;
+              const wRate = 100 - cRate;
+              const avgTime = s.attempts > 0 ? Math.round(s.timeSpent / s.attempts) : 0;
+              const cColor = cRate > 50 ? '#10B981' : (cRate > 20 ? '#F59E0B' : '#EF4444');
+              
+              let txt = s.text;
+              if (txt.length > 60) txt = txt.substring(0, 57) + '...';
+              
+              rows += `
+                <tr>
+                  <td style="padding: 10px;">${idx + 1}</td>
+                  <td style="padding: 10px; max-width: 250px;" title="${s.text}">${txt}</td>
+                  <td style="padding: 10px;">${s.attempts}</td>
+                  <td style="padding: 10px; color:${cColor}; font-weight:600;">${cRate}%</td>
+                  <td style="padding: 10px;">${wRate}%</td>
+                  <td style="padding: 10px;">${avgTime}s</td>
+                </tr>
+              `;
+            });
+            qaBody.innerHTML = rows;
+          }
+        }
+      }
+
       renderDeploymentAttemptsTable(qaData);
       } catch (e) { console.error(e); }
     }
@@ -1535,19 +1758,55 @@ globalCharts);
           let totalPercent = 0;
           let pRows = '';
           let tRows = '';
+          let dRows = '';
+          let mRows = '';
+          
+          let activeCount = 0;
 
           if (sessions.length === 0) {
-            if (participantsBody) participantsBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:10px;">No active participants</td></tr>';
-            if (trackingBody) trackingBody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:10px;">No active participants</td></tr>';
+            if (participantsBody) participantsBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:10px;">No active participants</td></tr>';
+            if (trackingBody) trackingBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:10px;">No active participants</td></tr>';
             if (avgEl) avgEl.textContent = '0%';
             return;
           }
 
           sessions.sort((a,b) => (b.currentQuestion || 0) - (a.currentQuestion || 0));
+          
+          if (!window.previousSessionIndices) window.previousSessionIndices = {};
+          let currentIndices = {};
 
-          sessions.forEach(s => {
+          sessions.forEach((s, index) => {
+            currentIndices[s.uid] = index;
+            let animClass = '';
+            let prevIndex = window.previousSessionIndices[s.uid];
+            if (prevIndex !== undefined) {
+               if (index < prevIndex) animClass = 'row-slide-up';
+               else if (index > prevIndex) animClass = 'row-slide-down';
+            }
             const name = s.participantName || 'Anonymous';
-            const uidStr = s.uid ? s.uid.substring(0, 8) : 'Unknown';
+            const sidStr = s.sid || 'N/A';
+
+            if (s.status === 'kicked') {
+              const unbanBtn = `<button onclick="window.unbanParticipant('${s.uid}')" style="background:rgba(16,185,129,0.1); border:none; color:#10B981; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.75rem;">Unban</button>`;
+              dRows += `<tr><td style="padding:10px; border-bottom: 1px solid var(--section-divider);">${name}</td><td style="padding:10px; border-bottom: 1px solid var(--section-divider);">${sidStr}</td><td style="padding:10px; text-align:right; border-bottom: 1px solid var(--section-divider);">${unbanBtn}</td></tr>`;
+              return;
+            }
+            
+            activeCount++;
+
+            const muteBtnColor = s.isMuted ? '#ef4444' : '#10B981';
+            const muteBtnIcon = s.isMuted 
+              ? `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><line x1="17" y1="9" x2="23" y2="15"></line><line x1="23" y1="9" x2="17" y2="15"></line></svg>` 
+              : `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>`;
+            
+            const muteBtn = `<button onclick="window.muteParticipant('${s.uid}', ${!s.isMuted})" style="background:transparent; border:none; color:${muteBtnColor}; cursor:pointer; margin-right:8px;" title="${s.isMuted ? 'Unmute Participant' : 'Mute Participant'}">${muteBtnIcon}</button>`;
+            const delBtn = `<button onclick="window.removeParticipant('${s.uid}')" style="background:transparent; border:none; color:#ef4444; cursor:pointer;" title="Remove Participant"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path></svg></button>`;
+
+            if (s.isMuted) {
+              const unmuteBtn = `<button onclick="window.muteParticipant('${s.uid}', false)" style="background:rgba(16,185,129,0.1); border:none; color:#10B981; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.75rem;">Unmute</button>`;
+              mRows += `<tr><td style="padding:10px; border-bottom: 1px solid var(--section-divider);">${name}</td><td style="padding:10px; border-bottom: 1px solid var(--section-divider);">${sidStr}</td><td style="padding:10px; text-align:right; border-bottom: 1px solid var(--section-divider);">${unmuteBtn}</td></tr>`;
+            }
+
             const isWaiting = s.status === 'waiting';
             const curQ = isWaiting ? 'Lobby' : (s.currentQuestion || 0);
             const att = isWaiting ? '-' : (s.attemptedCount || 0);
@@ -1560,8 +1819,8 @@ globalCharts);
             let pct = isWaiting ? 0 : Math.min(100, Math.round((curQ / totalQ) * 100));
             totalPercent += pct;
 
-            pRows += `<tr><td style="padding:10px;">${name}</td><td style="padding:10px;">${uidStr}</td></tr>`;
-            tRows += `<tr>
+            pRows += `<tr><td style="padding:10px;">${name}</td><td style="padding:10px;">${sidStr}</td><td style="padding:10px; text-align:right;">${muteBtn}${delBtn}</td></tr>`;
+            tRows += `<tr class="${animClass}">
               <td style="padding:10px;">${name}</td>
               <td style="padding:10px;">${isWaiting ? curQ : 'Q'+curQ}</td>
               <td style="padding:10px;">${att}</td>
@@ -1570,48 +1829,62 @@ globalCharts);
               <td style="padding:10px; color:${min>0?'#f59e0b':'inherit'}">${min}</td>
               <td style="padding:10px;">${isWaiting ? '-' : tQ+'s'}</td>
               <td style="padding:10px;">${isWaiting ? '-' : elapsedSec+'s'}</td>
+              <td style="padding:10px; text-align:right;">${muteBtn}${delBtn}</td>
             </tr>`;
           });
 
           if (participantsBody) participantsBody.innerHTML = pRows;
           if (trackingBody) trackingBody.innerHTML = tRows;
-          if (avgEl) avgEl.textContent = Math.round(totalPercent / sessions.length) + '%';
+          
+          window.previousSessionIndices = currentIndices;
+          
+          const dBody = document.getElementById('live-banned-tbody');
+          if (dBody) dBody.innerHTML = dRows || '<tr><td colspan="3" style="text-align:center; padding:10px;">No banned users</td></tr>';
+          
+          const mBody = document.getElementById('live-muted-tbody');
+          if (mBody) mBody.innerHTML = mRows || '<tr><td colspan="3" style="text-align:center; padding:10px;">No muted users</td></tr>';
+          
+          if (avgEl) avgEl.textContent = activeCount > 0 ? Math.round(totalPercent / activeCount) + '%' : '0%';
         });
 
       // 2. Listen to Live Chats
-      liveChatsUnsubscribe = window.db.collection('live_chats')
-        .where('quizId', '==', quizId)
-        .onSnapshot(snap => {
+      if (window.rtdb) {
+        const chatRef = window.rtdb.ref('live_chats/' + quizId);
+        chatRef.on('value', snap => {
           if (!chatMessages) return;
           chatMessages.innerHTML = '';
-          if (snap.empty) {
+          if (!snap.exists()) {
             chatMessages.innerHTML = '<div style="text-align:center; color:gray; font-size:0.85rem; padding: 16px;">No messages yet.</div>';
             return;
           }
           const msgs = [];
-          snap.forEach(doc => msgs.push(doc.data()));
+          snap.forEach(child => { msgs.push(child.val()); });
           msgs.sort((a, b) => {
-            const t1 = (a.timestamp && typeof a.timestamp.toMillis === 'function') ? a.timestamp.toMillis() : Date.now();
-            const t2 = (b.timestamp && typeof b.timestamp.toMillis === 'function') ? b.timestamp.toMillis() : Date.now();
+            const t1 = a.timestamp || Date.now();
+            const t2 = b.timestamp || Date.now();
             return t1 - t2;
           });
           msgs.forEach(msg => {
             const isAdmin = msg.sender === 'Admin';
-            const align = isAdmin ? 'flex-end' : 'flex-start';
-            const bg = isAdmin ? '#0ea5e9' : '#ffffff';
-            const color = isAdmin ? 'white' : 'var(--text)';
+            const align = msg.isPinned ? 'center' : (isAdmin ? 'flex-end' : 'flex-start');
+            const bg = msg.isPinned ? '#fef08a' : (isAdmin ? '#0ea5e9' : '#ffffff');
+            const color = msg.isPinned ? '#854d0e' : (isAdmin ? 'white' : 'var(--text)');
+            const textAlign = msg.isPinned ? 'center' : (isAdmin ? 'right' : 'left');
+            const border = msg.isPinned ? '1px solid #fde047' : '1px solid #e5e7eb';
+            const senderColor = msg.isPinned ? 'var(--text)' : 'var(--text-secondary)';
             
             chatMessages.innerHTML += `
               <div style="display:flex; flex-direction:column; align-items:${align}; margin-bottom:8px;">
-                <span style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:2px; font-weight:600;">${msg.sender}</span>
-                <div style="background:${bg}; color:${color}; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.9rem; word-break:break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+                <span style="font-size:0.7rem; color:${senderColor}; margin-bottom:2px; font-weight:600;">${msg.isPinned ? '📌 ' : ''}${msg.sender}</span>
+                <div style="background:${bg}; color:${color}; padding:6px 10px; border-radius:12px; max-width:80%; font-size:0.8rem; text-align:${textAlign}; word-break:break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: ${border};">
                   ${msg.message}
                 </div>
               </div>
             `;
-          });
           chatMessages.scrollTop = chatMessages.scrollHeight;
         });
+        liveChatsUnsubscribe = () => chatRef.off('value');
+      }
     };
 
     window.stopLiveTournamentStats = function() {

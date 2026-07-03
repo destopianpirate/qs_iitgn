@@ -991,7 +991,23 @@ integer,"Vertices in triangle?","",3,30,Math
           </select>
         </div>
 
-        <div style="margin-bottom: 24px;">
+        <div style="margin-bottom: 16px; border-top: 1px solid var(--section-divider); padding-top: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Custom Slide Background</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+            <input type="color" oninput="window.applySlideStyle('background', this.value)" style="border:none; width:32px; height:32px; cursor:pointer; background:none; padding:0;" title="Custom Color">
+            <input type="text" placeholder="Image URL..." onchange="window.applySlideStyle('backgroundImage', this.value)" style="flex:1; border:1px solid var(--section-divider); border-radius:4px; padding:4px 8px; font-size:0.85rem;" title="Background Image URL">
+          </div>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            <button onclick="window.applySlideStyle('design', 'glass')" style="background:rgba(255,255,255,0.2); border:1px solid rgba(0,0,0,0.2); border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Glass</button>
+            <button onclick="window.applySlideStyle('design', 'solid-dark')" style="background:#1e293b; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Dark</button>
+            <button onclick="window.applySlideStyle('design', 'solid-light')" style="background:#ffffff; color:#1e293b; border:1px solid #e2e8f0; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Light</button>
+            <button onclick="window.applySlideStyle('design', 'gradient-ocean')" style="background:linear-gradient(135deg, #0ea5e9, #3b82f6); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Ocean</button>
+            <button onclick="window.applySlideStyle('design', 'gradient-sunset')" style="background:linear-gradient(135deg, #f97316, #ec4899); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Sunset</button>
+            <button onclick="window.applySlideStyle('clear', '')" style="background:none; border:1px dashed #ef4444; color:#ef4444; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">Clear</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px; border-top: 1px solid var(--section-divider); padding-top: 16px;">
           <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Allowed Reactions</label>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;" id="survey-reactions-container">
             <label style="cursor: pointer; display: flex; align-items: center; gap: 4px;"><input type="checkbox" class="survey-reaction-cb" value="like"> <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></label>
@@ -1043,7 +1059,7 @@ integer,"Vertices in triangle?","",3,30,Math
       <span style="font-weight: 700; font-size: 1.1rem;" id="live-survey-title">Survey Name</span>
     </div>
     <div class="center" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
-      <span style="font-size: 1rem; color: var(--text-secondary);">Go to <strong>survey.com</strong> and use code:</span>
+      <span style="font-size: 1rem; color: var(--text-secondary);">Use code:</span>
       <div id="live-survey-code" style="background: var(--surface); padding: 8px 24px; border-radius: 12px; font-size: 2rem; font-weight: 800; letter-spacing: 0.1em; color: var(--primary); border: 1px solid var(--section-divider);">123456</div>
     </div>
     <div class="right" style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
@@ -1051,6 +1067,7 @@ integer,"Vertices in triangle?","",3,30,Math
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         0
       </div>
+      <button class="btn-danger" id="btn-end-live-survey" style="padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem;">End Survey</button>
     </div>
   </div>
   
@@ -1102,7 +1119,9 @@ integer,"Vertices in triangle?","",3,30,Math
 </div>
 
 <script src="js/admin-core.js?v=2"></script>
-<script src="js/admin-surveys.js?v=1"></script>
+<script src="js/admin-survey-state.js"></script>
+<script src="js/admin-survey-editor.js"></script>
+<script src="js/admin-survey-presenter.js"></script>
 <!-- Floating Rich Text Toolbar -->
         <div id="rich-text-toolbar" style="display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; gap: 8px; z-index: 100; align-items: center; border: 1px solid var(--section-divider); flex-wrap: wrap; width: max-content; max-width: 90vw;">
           <button class="rt-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-weight:bold; font-size:1.1rem; color:var(--text);" title="Bold">B</button>
@@ -1151,6 +1170,7 @@ integer,"Vertices in triangle?","",3,30,Math
         <div id="style-toolbar" style="display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 12px; gap: 12px; z-index: 99; align-items: center; border: 1px solid var(--section-divider); flex-wrap: wrap; width: max-content; max-width: 90vw;">
           <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Background</div>
           <input type="color" id="st-bg-color" oninput="window.applyStyleToActiveTarget('background', this.value)" style="border:none; width:32px; height:32px; cursor:pointer; background:none; padding:0;" title="Custom Color">
+          <input type="text" id="st-bg-image" placeholder="Image URL..." onchange="window.applyStyleToActiveTarget('backgroundImage', this.value)" style="border:1px solid var(--section-divider); border-radius:4px; padding:4px 8px; font-size:0.85rem; width:120px;" title="Background Image URL">
           
           <div style="width:1px; height:24px; background:var(--section-divider); margin:0 4px;"></div>
           

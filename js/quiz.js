@@ -2167,6 +2167,8 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
   //                         SURVEY LOGIC                         
   // ═══════════════════════════════════════════════════════════
   let currentSurveyCode = null;
+  let currentSurveyParticipantId = null;
+  let participantName = null;
   let liveSurveyUnsubscribe = null;
   let currentSurveySlideId = null;
 
@@ -2206,6 +2208,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
         }
         
         currentSurveyCode = codeInp;
+        currentSurveyParticipantId = 'p_' + Math.random().toString(36).substring(2, 9);
         errEl.style.display = 'none';
         
         document.getElementById('portal-step-survey-code').style.display = 'none';
@@ -2255,6 +2258,11 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
     const s = slide.styles || {};
     if (s.slide) {
       container.style.background = s.slide.background || '';
+      if (s.slide.backgroundImage) {
+        container.style.backgroundImage = `url('${s.slide.backgroundImage}')`;
+        container.style.backgroundSize = 'cover';
+        container.style.backgroundPosition = 'center';
+      }
       if (s.slide.design === 'glass') { container.style.background = 'rgba(255,255,255,0.2)'; container.style.backdropFilter = 'blur(12px)'; container.style.color = 'var(--text)'; }
       else if (s.slide.design === 'solid-dark') { container.style.background = '#1e293b'; container.style.color = 'white'; }
       else if (s.slide.design === 'solid-light') { container.style.background = '#ffffff'; container.style.color = '#1e293b'; }
@@ -2359,6 +2367,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
       if (window.rtdb) {
         await window.rtdb.ref(`survey_responses/${slide.id}`).push({
           code: currentSurveyCode,
+          participantId: currentSurveyParticipantId,
           participantName: participantName || 'Anonymous',
           answer: answerText,
           timestamp: firebase.database.ServerValue.TIMESTAMP

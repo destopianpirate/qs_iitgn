@@ -360,3 +360,22 @@
 }
 .row-slide-up { animation: slideRowUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important; display: table-row; }
 .row-slide-down { animation: slideRowDown 0.6s ease-out !important; display: table-row; }
+
+/* Slide Transitions */
+@keyframes slideInRight {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.slide-transition-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-transition-exit {
+  animation: fadeOut 0.2s ease forwards;
+}

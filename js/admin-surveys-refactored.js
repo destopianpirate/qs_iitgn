@@ -18,24 +18,33 @@ const REACTION_SVGS = {
 };
 
 (function() {
-  let db = null;
+window.SurveyState = window.SurveyState || {
+  surveys: [],
+  currentSurveyId: null,
+  activeSlideIndex: 0,
+  liveSurveyUnsubscribe: null,
+  liveResponsesUnsubscribe: null,
+  liveChart: null
+};
+
+  
   // Wait for firebase to load
   const initInterval = setInterval(() => {
     if (window.db) {
-      db = window.db;
+      window.db = window.db;
       clearInterval(initInterval);
       setupSurveys();
     }
   }, 100);
 
-  let surveys = [];
-  let currentSurveyId = null;
-  let activeSlideIndex = 0;
+  
+  
+  
   
   // Live Presenter vars
-  let liveSurveyUnsubscribe = null;
-  let liveResponsesUnsubscribe = null;
-  let liveChart = null;
+  
+  
+  
 
   function setupSurveys() {
     // Buttons
@@ -48,21 +57,21 @@ const REACTION_SVGS = {
         ],
         createdAt: Date.now()
       };
-      surveys.push(newSurvey);
-      await saveSurveys();
+      window.SurveyState.surveys.push(newSurvey);
+      await window.SurveyState.saveSurveys();
       editSurvey(newSurvey.id);
     });
 
     document.getElementById('btn-survey-editor-back')?.addEventListener('click', () => {
-      window.showScreen('screen-surveys-dashboard');
+      window.showScreen('screen-window.SurveyState.surveys-dashboard');
       window.renderSurveysDashboard();
     });
 
     document.getElementById('btn-save-survey')?.addEventListener('click', async () => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
       if (survey) {
         survey.name = document.getElementById('survey-title-input').value;
-        await saveSurveys();
+        await window.SurveyState.saveSurveys();
         alert('Survey Saved!');
       }
     });
@@ -81,10 +90,10 @@ const REACTION_SVGS = {
       const container = document.getElementById('survey-title-container');
       e.target.setAttribute('readonly', 'true');
       if (container) container.style.borderColor = 'transparent';
-      const survey = surveys.find(s => s.id === currentSurveyId);
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
       if (survey) {
         survey.name = e.target.value || 'Untitled Survey';
-        await saveSurveys();
+        await window.SurveyState.saveSurveys();
       }
     });
 
@@ -93,7 +102,7 @@ const REACTION_SVGS = {
     });
 
     document.getElementById('btn-add-slide')?.addEventListener('click', () => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
       if (survey) {
         survey.slides.push({
           id: 'sl_' + Date.now(),
@@ -101,33 +110,33 @@ const REACTION_SVGS = {
           question: 'New Question',
           options: ['Option 1', 'Option 2']
         });
-        activeSlideIndex = survey.slides.length - 1;
+        window.SurveyState.activeSlideIndex = survey.slides.length - 1;
         renderEditor();
       }
     });
 
     document.getElementById('survey-slide-type')?.addEventListener('change', (e) => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex]) {
-        survey.slides[activeSlideIndex].type = e.target.value;
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
+        survey.slides[window.SurveyState.activeSlideIndex].type = e.target.value;
         if (e.target.value !== 'multiple_choice' && e.target.value !== 'scales' && e.target.value !== 'ranking') {
-          survey.slides[activeSlideIndex].options = [];
+          survey.slides[window.SurveyState.activeSlideIndex].options = [];
         }
         renderEditor();
       }
     });
     
     document.getElementById('survey-allow-multiple')?.addEventListener('change', (e) => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex]) {
-        survey.slides[activeSlideIndex].allowMultiple = e.target.checked;
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
+        survey.slides[window.SurveyState.activeSlideIndex].allowMultiple = e.target.checked;
       }
     });
 
     document.getElementById('survey-question-text')?.addEventListener('input', (e) => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex]) {
-        survey.slides[activeSlideIndex].question = e.target.value;
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
+        survey.slides[window.SurveyState.activeSlideIndex].question = e.target.value;
         document.getElementById('preview-question').innerHTML = e.target.value || 'Untitled Question';
       }
     });
@@ -196,70 +205,70 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
       });
       
       previewContainer.addEventListener('input', (e) => {
-        const survey = surveys.find(s => s.id === currentSurveyId);
-        if (!survey || !survey.slides[activeSlideIndex]) return;
+        const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+        if (!survey || !survey.slides[window.SurveyState.activeSlideIndex]) return;
         
         if (e.target.id === 'preview-question') {
-          survey.slides[activeSlideIndex].question = e.target.innerHTML;
+          survey.slides[window.SurveyState.activeSlideIndex].question = e.target.innerHTML;
           document.getElementById('survey-question-text').value = e.target.innerHTML;
         } else if (e.target.hasAttribute('data-option-idx')) {
           const idx = parseInt(e.target.getAttribute('data-option-idx'));
           window.updateOption(idx, e.target.innerHTML, true);
         } else if (e.target.id === 'preview-submit-btn-text') {
-          if(!survey.slides[activeSlideIndex].styles) survey.slides[activeSlideIndex].styles = {};
-          survey.slides[activeSlideIndex].styles.submitText = e.target.innerHTML;
+          if(!survey.slides[window.SurveyState.activeSlideIndex].styles) survey.slides[window.SurveyState.activeSlideIndex].styles = {};
+          survey.slides[window.SurveyState.activeSlideIndex].styles.submitText = e.target.innerHTML;
         }
-        debouncedSaveSurveys();
+        window.SurveyState.debouncedSaveSurveys();
       });
     }
 
     document.getElementById('btn-survey-add-option')?.addEventListener('click', () => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
-        survey.slides[activeSlideIndex].options.push('New Option');
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[window.SurveyState.activeSlideIndex].type)) {
+        survey.slides[window.SurveyState.activeSlideIndex].options.push('New Option');
         renderEditor();
       }
     });
     
     document.getElementById('survey-require-name')?.addEventListener('change', (e) => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
       if (survey) {
         survey.requireName = e.target.checked;
       }
     });
 
     document.getElementById('survey-slide-theme')?.addEventListener('change', (e) => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex]) {
-        survey.slides[activeSlideIndex].theme = e.target.value;
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
+        survey.slides[window.SurveyState.activeSlideIndex].theme = e.target.value;
         renderEditor(); // update preview
       }
     });
 
     document.querySelectorAll('.survey-reaction-cb').forEach(cb => {
       cb.addEventListener('change', (e) => {
-        const survey = surveys.find(s => s.id === currentSurveyId);
-        if (survey && survey.slides[activeSlideIndex]) {
-          let reactions = survey.slides[activeSlideIndex].reactions || [];
+        const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+        if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
+          let reactions = survey.slides[window.SurveyState.activeSlideIndex].reactions || [];
           const val = e.target.value;
           if (e.target.checked && !reactions.includes(val)) {
             reactions.push(val);
           } else if (!e.target.checked && reactions.includes(val)) {
             reactions = reactions.filter(r => r !== val);
           }
-          survey.slides[activeSlideIndex].reactions = reactions;
+          survey.slides[window.SurveyState.activeSlideIndex].reactions = reactions;
         }
       });
     });
 
     document.getElementById('btn-preview-survey')?.addEventListener('click', () => {
-      const survey = surveys.find(s => s.id === currentSurveyId);
-      if (survey && survey.slides[activeSlideIndex]) {
+      const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+      if (survey && survey.slides[window.SurveyState.activeSlideIndex]) {
         const modal = document.getElementById('survey-preview-modal');
         const container = document.getElementById('survey-preview-container');
         modal.style.display = 'flex';
         // Need to render the slide similarly to quiz.js
-        renderSimulatedStudentSlide(container, survey.slides[activeSlideIndex], survey.requireName);
+        renderSimulatedStudentSlide(container, survey.slides[window.SurveyState.activeSlideIndex], survey.requireName);
       }
     });
 
@@ -269,7 +278,7 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
     
     document.getElementById('btn-live-survey-back')?.addEventListener('click', () => {
       stopLiveSurvey();
-      window.showScreen('screen-surveys-dashboard');
+      window.showScreen('screen-window.SurveyState.surveys-dashboard');
       window.renderSurveysDashboard();
     });
     
@@ -300,30 +309,30 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
 
   // --- DASHBOARD LOGIC ---
   window.renderSurveysDashboard = async function() {
-    const grid = document.getElementById('grid-surveys');
+    const grid = document.getElementById('grid-window.SurveyState.surveys');
     if (!grid) return;
     grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-secondary);">Loading...</div>';
     
     try {
-      const doc = await db.collection('global').doc('allSurveys').get();
-      if (doc.exists && doc.data().surveys) {
-        surveys = doc.data().surveys;
+      const doc = await window.db.collection('global').doc('allSurveys').get();
+      if (doc.exists && doc.data().window.SurveyState.surveys) {
+        window.SurveyState.surveys = doc.data().window.SurveyState.surveys;
       } else {
-        surveys = [];
+        window.SurveyState.surveys = [];
       }
     } catch (e) {
       console.error(e);
-      surveys = [];
+      window.SurveyState.surveys = [];
     }
 
     grid.innerHTML = '';
     
-    if (surveys.length === 0) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-secondary);">No surveys yet. Click Create New Survey!</div>';
+    if (window.SurveyState.surveys.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-secondary);">No window.SurveyState.surveys yet. Click Create New Survey!</div>';
       return;
     }
 
-    surveys.forEach(s => {
+    window.SurveyState.surveys.forEach(s => {
       const card = document.createElement('div');
       card.className = 'quiz-card';
       card.style.cursor = 'pointer';
@@ -344,8 +353,8 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   };
 
   window.openSurveyDetail = function(id) {
-    currentSurveyId = id;
-    const survey = surveys.find(s => s.id === id);
+    window.SurveyState.currentSurveyId = id;
+    const survey = window.SurveyState.surveys.find(s => s.id === id);
     if (!survey) return;
     
     window.showScreen('screen-survey-dashboard-detail');
@@ -360,51 +369,51 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
 
   // Bind back button for detail screen
   document.getElementById('btn-survey-detail-back')?.addEventListener('click', () => {
-    window.showScreen('screen-surveys-dashboard');
+    window.showScreen('screen-window.SurveyState.surveys-dashboard');
     window.renderSurveysDashboard();
   });
 
-  async function saveSurveys() {
+  window.SurveyState.saveSurveys = async function() {
     try {
-      await db.collection('global').doc('allSurveys').set({ surveys: surveys }, { merge: true });
+      await window.db.collection('global').doc('allSurveys').set({ window.SurveyState.surveys: window.SurveyState.surveys }, { merge: true });
     } catch(e) {
-      console.error('Error saving surveys:', e);
+      console.error('Error saving window.SurveyState.surveys:', e);
     }
   }
 
   let saveTimeout;
-  function debouncedSaveSurveys() {
+  window.SurveyState.debouncedSaveSurveys = function() {
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
-      saveSurveys();
+      window.SurveyState.saveSurveys();
     }, 750);
   }
 
   // --- EDITOR LOGIC ---
   window.editSurvey = function(id) {
-    currentSurveyId = id;
-    const survey = surveys.find(s => s.id === id);
+    window.SurveyState.currentSurveyId = id;
+    const survey = window.SurveyState.surveys.find(s => s.id === id);
     if (survey) {
       window.showScreen('screen-survey-editor');
       document.getElementById('survey-title-input').value = survey.name;
       const rnCheckbox = document.getElementById('survey-require-name');
       if (rnCheckbox) rnCheckbox.checked = !!survey.requireName;
-      activeSlideIndex = 0;
+      window.SurveyState.activeSlideIndex = 0;
       renderEditor();
     }
   };
 
   window.selectSlide = function(idx) {
-    activeSlideIndex = idx;
+    window.SurveyState.activeSlideIndex = idx;
     renderEditor();
   };
 
   window.deleteSlide = function(idx, e) {
     e.stopPropagation();
-    const survey = surveys.find(s => s.id === currentSurveyId);
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
     if(survey && survey.slides.length > 1) {
       survey.slides.splice(idx, 1);
-      if(activeSlideIndex >= survey.slides.length) activeSlideIndex = survey.slides.length - 1;
+      if(window.SurveyState.activeSlideIndex >= survey.slides.length) window.SurveyState.activeSlideIndex = survey.slides.length - 1;
       renderEditor();
     } else {
       alert("Survey must have at least one slide.");
@@ -412,14 +421,14 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   };
 
   function renderEditor() {
-    const survey = surveys.find(s => s.id === currentSurveyId);
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
     if (!survey) return;
 
     // Render left sidebar slide list
     const slidesList = document.getElementById('survey-slides-list');
     slidesList.innerHTML = '';
     survey.slides.forEach((slide, idx) => {
-      const activeClass = idx === activeSlideIndex ? 'box-shadow: 0 0 0 2px #0ea5e9;' : 'border: 1px solid var(--section-divider);';
+      const activeClass = idx === window.SurveyState.activeSlideIndex ? 'box-shadow: 0 0 0 2px #0ea5e9;' : 'border: 1px solid var(--section-divider);';
       const div = document.createElement('div');
       div.style.cssText = `padding: 12px; background: var(--surface); border-radius: 8px; cursor: pointer; position: relative; ${activeClass}`;
       div.onclick = () => window.selectSlide(idx);
@@ -439,7 +448,7 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
       slidesList.appendChild(div);
     });
 
-    const activeSlide = survey.slides[activeSlideIndex];
+    const activeSlide = survey.slides[window.SurveyState.activeSlideIndex];
     if (!activeSlide) return;
 
     // Populate right sidebar
@@ -507,25 +516,25 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   }
 
   window.updateGuessSettings = function() {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'guess_number') {
-      survey.slides[activeSlideIndex].targetNumber = parseFloat(document.getElementById('guess-target').value) || 0;
-      survey.slides[activeSlideIndex].tolerance = parseFloat(document.getElementById('guess-tolerance').value) || 0;
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if(survey && survey.slides[window.SurveyState.activeSlideIndex] && survey.slides[window.SurveyState.activeSlideIndex].type === 'guess_number') {
+      survey.slides[window.SurveyState.activeSlideIndex].targetNumber = parseFloat(document.getElementById('guess-target').value) || 0;
+      survey.slides[window.SurveyState.activeSlideIndex].tolerance = parseFloat(document.getElementById('guess-tolerance').value) || 0;
       renderEditor();
     }
   };
   window.updateWordCloudSettings = function() {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && survey.slides[activeSlideIndex].type === 'word_cloud') {
-      survey.slides[activeSlideIndex].allowMultiple = document.getElementById('survey-allow-multiple').checked;
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if(survey && survey.slides[window.SurveyState.activeSlideIndex] && survey.slides[window.SurveyState.activeSlideIndex].type === 'word_cloud') {
+      survey.slides[window.SurveyState.activeSlideIndex].allowMultiple = document.getElementById('survey-allow-multiple').checked;
       renderEditor();
     }
   };
 
   window.updateOption = function(idx, val, skipRender = false) {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
-      survey.slides[activeSlideIndex].options[idx] = val;
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if(survey && survey.slides[window.SurveyState.activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[window.SurveyState.activeSlideIndex].type)) {
+      survey.slides[window.SurveyState.activeSlideIndex].options[idx] = val;
       if (!skipRender) {
         renderEditor();
       } else {
@@ -540,35 +549,35 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   };
 
   window.deleteOption = function(idx) {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if(survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
-      survey.slides[activeSlideIndex].options.splice(idx, 1);
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if(survey && survey.slides[window.SurveyState.activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[window.SurveyState.activeSlideIndex].type)) {
+      survey.slides[window.SurveyState.activeSlideIndex].options.splice(idx, 1);
       renderEditor();
     }
   };
 
   window.applyStyleToActiveTarget = function(prop, val) {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if (!survey || !survey.slides[activeSlideIndex]) return;
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if (!survey || !survey.slides[window.SurveyState.activeSlideIndex]) return;
     
-    if (!survey.slides[activeSlideIndex].styles) {
-      survey.slides[activeSlideIndex].styles = {};
+    if (!survey.slides[window.SurveyState.activeSlideIndex].styles) {
+      survey.slides[window.SurveyState.activeSlideIndex].styles = {};
     }
     
     const type = window.activeStylingTargetType;
     if (!type) return;
     
-    if (!survey.slides[activeSlideIndex].styles[type]) {
-      survey.slides[activeSlideIndex].styles[type] = {};
+    if (!survey.slides[window.SurveyState.activeSlideIndex].styles[type]) {
+      survey.slides[window.SurveyState.activeSlideIndex].styles[type] = {};
     }
     
     if (prop === 'clear') {
-      survey.slides[activeSlideIndex].styles[type] = {};
+      survey.slides[window.SurveyState.activeSlideIndex].styles[type] = {};
     } else {
-      survey.slides[activeSlideIndex].styles[type][prop] = val;
+      survey.slides[window.SurveyState.activeSlideIndex].styles[type][prop] = val;
     }
     
-    debouncedSaveSurveys();
+    window.SurveyState.debouncedSaveSurveys();
     renderEditor();
   };
   window.renderSimulatedStudentSlide = function(container, slide, requireName, isInline = false) {
@@ -684,8 +693,8 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   let currentLiveSurvey = null;
 
   window.presentSurvey = async function(id) {
-    currentSurveyId = id;
-    currentLiveSurvey = surveys.find(s => s.id === id);
+    window.SurveyState.currentSurveyId = id;
+    currentLiveSurvey = window.SurveyState.surveys.find(s => s.id === id);
     if (!currentLiveSurvey) return;
 
     window.showScreen('screen-survey-live-admin');
@@ -695,18 +704,18 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
     currentLiveCode = Math.floor(100000 + Math.random() * 900000).toString();
     document.getElementById('live-survey-code').textContent = currentLiveCode;
     
-    activeSlideIndex = 0;
+    window.SurveyState.activeSlideIndex = 0;
     
     // Render slide immediately before network request
     renderLiveSlide();
     
     try {
       // Create session in live_surveys
-      await db.collection('live_surveys').doc(currentLiveCode).set({
+      await window.db.collection('live_surveys').doc(currentLiveCode).set({
         surveyId: currentLiveSurvey.id,
         surveyName: currentLiveSurvey.name,
         requireName: currentLiveSurvey.requireName || false,
-        activeSlideIndex: activeSlideIndex,
+        window.SurveyState.activeSlideIndex: window.SurveyState.activeSlideIndex,
         totalSlides: currentLiveSurvey.slides.length,
         slides: currentLiveSurvey.slides, // include full structure so clients don't need to fetch global
         status: 'active',
@@ -722,10 +731,10 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   let liveReactionsUnsubscribe = null;
 
   function startListeningToLiveResponses() {
-    if (liveResponsesUnsubscribe) liveResponsesUnsubscribe();
+    if (window.SurveyState.liveResponsesUnsubscribe) window.SurveyState.liveResponsesUnsubscribe();
     if (liveReactionsUnsubscribe) liveReactionsUnsubscribe();
     
-    const slideId = currentLiveSurvey.slides[activeSlideIndex].id;
+    const slideId = currentLiveSurvey.slides[window.SurveyState.activeSlideIndex].id;
     
     if (window.rtdb) {
       const responsesRef = window.rtdb.ref(`survey_responses/${slideId}`);
@@ -745,7 +754,7 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
         
         renderLiveVisuals(responses);
       });
-      liveResponsesUnsubscribe = () => responsesRef.off('value');
+      window.SurveyState.liveResponsesUnsubscribe = () => responsesRef.off('value');
       
       // Listen for reactions
       let initialReactions = true;
@@ -777,18 +786,18 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   }
 
   function stopLiveSurvey() {
-    if (liveResponsesUnsubscribe) liveResponsesUnsubscribe();
+    if (window.SurveyState.liveResponsesUnsubscribe) window.SurveyState.liveResponsesUnsubscribe();
     if (liveReactionsUnsubscribe) liveReactionsUnsubscribe();
-    liveResponsesUnsubscribe = null;
+    window.SurveyState.liveResponsesUnsubscribe = null;
     liveReactionsUnsubscribe = null;
     
-    if (liveChart) {
-      liveChart.destroy();
-      liveChart = null;
+    if (window.SurveyState.liveChart) {
+      window.SurveyState.liveChart.destroy();
+      window.SurveyState.liveChart = null;
     }
     
     if (currentLiveCode) {
-      db.collection('live_surveys').doc(currentLiveCode).update({
+      window.db.collection('live_surveys').doc(currentLiveCode).update({
         status: 'ended'
       }).catch(console.error);
       currentLiveCode = null;
@@ -797,18 +806,18 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
 
   
   window.applyStyleToActiveTarget = function(prop, val) {
-    const survey = surveys.find(s => s.id === currentSurveyId);
-    if (!survey || !survey.slides[activeSlideIndex]) return;
-    if (!survey.slides[activeSlideIndex].styles) survey.slides[activeSlideIndex].styles = {};
+    const survey = window.SurveyState.surveys.find(s => s.id === window.SurveyState.currentSurveyId);
+    if (!survey || !survey.slides[window.SurveyState.activeSlideIndex]) return;
+    if (!survey.slides[window.SurveyState.activeSlideIndex].styles) survey.slides[window.SurveyState.activeSlideIndex].styles = {};
     
     const type = window.activeStylingTargetType;
     if (!type) return;
-    if (!survey.slides[activeSlideIndex].styles[type]) survey.slides[activeSlideIndex].styles[type] = {};
+    if (!survey.slides[window.SurveyState.activeSlideIndex].styles[type]) survey.slides[window.SurveyState.activeSlideIndex].styles[type] = {};
     
     if (prop === 'clear') {
-      survey.slides[activeSlideIndex].styles[type] = {};
+      survey.slides[window.SurveyState.activeSlideIndex].styles[type] = {};
     } else {
-      survey.slides[activeSlideIndex].styles[type][prop] = val;
+      survey.slides[window.SurveyState.activeSlideIndex].styles[type][prop] = val;
     }
     
     renderEditor(); // This will trigger a re-render of the preview inline
@@ -816,12 +825,12 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
 
   async function changeLiveSlide(delta) {
     if(!currentLiveSurvey) return;
-    const newIdx = activeSlideIndex + delta;
+    const newIdx = window.SurveyState.activeSlideIndex + delta;
     if(newIdx >= 0 && newIdx < currentLiveSurvey.slides.length) {
-      activeSlideIndex = newIdx;
+      window.SurveyState.activeSlideIndex = newIdx;
       try {
-        await db.collection('live_surveys').doc(currentLiveCode).update({
-          activeSlideIndex: activeSlideIndex
+        await window.db.collection('live_surveys').doc(currentLiveCode).update({
+          window.SurveyState.activeSlideIndex: window.SurveyState.activeSlideIndex
         });
         
         const container = document.getElementById('screen-survey-live-admin');
@@ -846,9 +855,9 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   }
 
   function renderLiveSlide() {
-    const slide = currentLiveSurvey.slides[activeSlideIndex];
+    const slide = currentLiveSurvey.slides[window.SurveyState.activeSlideIndex];
     document.getElementById('live-survey-question').innerHTML = slide.question || 'Untitled Question';
-    document.getElementById('survey-slide-counter').textContent = `${activeSlideIndex + 1} / ${currentLiveSurvey.slides.length}`;
+    document.getElementById('survey-slide-counter').textContent = `${window.SurveyState.activeSlideIndex + 1} / ${currentLiveSurvey.slides.length}`;
     
     document.getElementById('survey-live-chart-wrapper').style.display = 'none';
     document.getElementById('survey-live-open-ended').style.display = 'none';
@@ -883,9 +892,9 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
     }
 
     
-    if(liveChart) {
-      liveChart.destroy();
-      liveChart = null;
+    if(window.SurveyState.liveChart) {
+      window.SurveyState.liveChart.destroy();
+      window.SurveyState.liveChart = null;
     }
     
     if(['multiple_choice', 'scales', 'ranking'].includes(slide.type)) {
@@ -893,7 +902,7 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
       wrapper.style.display = 'block';
       const ctx = document.getElementById('survey-live-chart');
       // Setup Chart.js
-      liveChart = new Chart(ctx, {
+      window.SurveyState.liveChart = new Chart(ctx, {
         type: slide.type === 'scales' ? 'bar' : (slide.type === 'ranking' ? 'bar' : 'bar'),
         data: {
           labels: slide.options || [],
@@ -922,20 +931,20 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
   }
 
   function renderLiveVisuals(responses) {
-    const slide = currentLiveSurvey.slides[activeSlideIndex];
+    const slide = currentLiveSurvey.slides[window.SurveyState.activeSlideIndex];
     if(!slide) return;
     
-    if (slide.type === 'multiple_choice' && liveChart) {
+    if (slide.type === 'multiple_choice' && window.SurveyState.liveChart) {
       // count votes
       const counts = new Array((slide.options || []).length).fill(0);
       responses.forEach(r => {
         const idx = slide.options.indexOf(r.answer);
         if(idx !== -1) counts[idx]++;
       });
-      liveChart.data.datasets[0].data = counts;
-      liveChart.update();
+      window.SurveyState.liveChart.data.datasets[0].data = counts;
+      window.SurveyState.liveChart.update();
     }
-    else if (slide.type === 'scales' && liveChart) {
+    else if (slide.type === 'scales' && window.SurveyState.liveChart) {
       const totals = new Array((slide.options || []).length).fill(0);
       const counts = new Array((slide.options || []).length).fill(0);
       responses.forEach(r => {
@@ -950,10 +959,10 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
         } catch(e){}
       });
       const avgs = totals.map((t, i) => counts[i] > 0 ? (t / counts[i]) : 0);
-      liveChart.data.datasets[0].data = avgs;
-      liveChart.update();
+      window.SurveyState.liveChart.data.datasets[0].data = avgs;
+      window.SurveyState.liveChart.update();
     }
-    else if (slide.type === 'ranking' && liveChart) {
+    else if (slide.type === 'ranking' && window.SurveyState.liveChart) {
       const totals = new Array((slide.options || []).length).fill(0);
       const counts = new Array((slide.options || []).length).fill(0);
       responses.forEach(r => {
@@ -969,8 +978,8 @@ styleToolbar.style.left = Math.max(0, leftPos) + 'px';
         } catch(e){}
       });
       const avgs = totals.map((t, i) => counts[i] > 0 ? (t / counts[i]) : 0);
-      liveChart.data.datasets[0].data = avgs;
-      liveChart.update();
+      window.SurveyState.liveChart.data.datasets[0].data = avgs;
+      window.SurveyState.liveChart.update();
     }
     else if (slide.type === 'guess_number') {
       const div = document.getElementById('survey-live-open-ended');

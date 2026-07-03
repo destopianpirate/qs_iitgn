@@ -699,6 +699,30 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       if (!confirmed) return;
       quizzes = quizzes.filter(q => q.id !== currentQuizId);
       save();
+      
+      try {
+        // Clean up Realtime DB chat
+        if (window.rtdb) {
+          window.rtdb.ref('chat_' + currentQuizId).remove();
+        }
+        
+        // Find and delete all attempts for this quiz
+        const attemptsSnap = await window.db.collection('attempts').where('quizId', '==', currentQuizId).get();
+        const batch = window.db.batch();
+        attemptsSnap.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        // Find and delete all live sessions for this quiz
+        const sessionsSnap = await window.db.collection('live_sessions').where('quizId', '==', currentQuizId).get();
+        sessionsSnap.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        await batch.commit();
+      } catch (err) {
+        console.error('Error cleaning up quiz data:', err);
+      }
       showScreen('screen-dash');
       renderDashboard();
     });

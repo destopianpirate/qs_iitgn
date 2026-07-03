@@ -97,9 +97,9 @@
     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
     Back to Arena
   </a>
-  <div class="login-card">
-    <h2>Admin Login</h2>
-    <p class="sub">Enter credentials to access the Quiz Dashboard</p>
+  <div class="login-card" style="box-shadow: none !important; border: none !important; background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; padding: 0 !important; max-width: 380px; margin: 0 auto; transform: scale(0.95); transform-origin: top center; text-align: left;">
+    <h2 style="text-align: center;">Admin Login</h2>
+    <p class="sub" style="text-align: center;">Enter credentials to access the Quiz Dashboard</p>
     <form id="login-form">
       <div class="fg"><label>Email Address</label><input type="email" id="inp-user" placeholder="admin@example.com" required></div>
       <div class="fg">
@@ -112,7 +112,7 @@
       <p class="err" id="login-err">Invalid credentials. Please try again.</p>
       <button type="submit" class="btn-sky" style="margin-top:16px;">Login</button>
     </form>
-    <div style="margin-top: 24px; font-size: 0.95rem; font-weight: 600; color: black;">
+    <div style="margin-top: 24px; font-size: 0.95rem; font-weight: 600; color: black; text-align: center;">
       Want to become Admin? <a href="admin-signup.html" style="color: #0ea5e9; text-decoration: none; cursor: pointer;">Signup</a>
     </div>
   </div>
@@ -918,7 +918,12 @@ integer,"Vertices in triangle?","",3,30,Math
     <!-- Left Sidebar: Slides List -->
     <div style="width: 250px; background: white; border-right: 1px solid var(--section-divider); display: flex; flex-direction: column;">
       <div style="padding: 16px; border-bottom: 1px solid var(--section-divider);">
-        <input type="text" id="survey-title-input" value="Untitled Survey" placeholder="Survey Name" style="width: 100%; font-size: 1.1rem; font-weight: 700; border: none; outline: none; background: transparent; color: var(--text); margin-bottom: 12px;">
+        <div id="survey-title-container" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; border: 1px solid transparent; transition: border 0.2s; border-radius: 4px; padding: 2px;">
+          <input type="text" id="survey-title-input" value="Untitled Survey" placeholder="Survey Name" readonly style="width: 100%; font-size: 1.1rem; font-weight: 700; border: none; outline: none; background: transparent; color: var(--text);">
+          <button id="btn-edit-survey-title" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Edit Name">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          </button>
+        </div>
         <button id="btn-add-slide" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(14,165,233,0.1); color: #0ea5e9; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New Slide
@@ -937,23 +942,12 @@ integer,"Vertices in triangle?","",3,30,Math
     
     <!-- Center: Preview -->
     <div class="no-scrollbar" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; overflow-y: auto; position: relative;">
-      <div id="survey-slide-preview" class="theme-default" style="width: 100%; max-width: 800px; aspect-ratio: 16/9; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); padding: 40px; display: flex; flex-direction: column; text-align: center; transition: all 0.3s ease;">
+      <div id="survey-slide-preview" class="theme-default" data-style-target="slide" style="width: 100%; max-width: 800px; aspect-ratio: 16/9; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); padding: 40px; display: flex; flex-direction: column; text-align: center; transition: all 0.3s ease;">
         <h2 id="preview-question" contenteditable="true" spellcheck="false" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 32px; color: inherit; outline: none; border-bottom: 1px dashed transparent; cursor: text;">Question Text</h2>
         
-        <!-- Floating Rich Text Toolbar -->
-        <div id="rich-text-toolbar" style="display: none; position: absolute; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; gap: 8px; z-index: 100; align-items: center; border: 1px solid var(--section-divider);">
-          <button class="rt-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-weight:bold; font-size:1.1rem; color:var(--text);">B</button>
-          <button class="rt-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-style:italic; font-size:1.1rem; color:var(--text);">I</button>
-          <button class="rt-btn" onclick="document.execCommand('underline', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; text-decoration:underline; font-size:1.1rem; color:var(--text);">U</button>
-          <div style="width:1px; height:20px; background:var(--section-divider); margin:0 4px;"></div>
-          <input type="color" id="rt-color" onchange="document.execCommand('foreColor', false, this.value)" style="border:none; width:24px; height:24px; cursor:pointer; background:none; padding:0;">
-          <select id="rt-size" onchange="document.execCommand('fontSize', false, this.value)" style="border:1px solid var(--section-divider); border-radius:4px; padding:4px; outline:none; cursor:pointer; background:var(--surface);">
-            <option value="3">Normal</option>
-            <option value="4">Large</option>
-            <option value="5">Huge</option>
-            <option value="6">Massive</option>
-          </select>
-        </div>
+        
+
+        
         <div id="preview-content" style="flex: 1; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: inherit; opacity: 0.9;">
           Content Preview
         </div>
@@ -961,7 +955,7 @@ integer,"Vertices in triangle?","",3,30,Math
     </div>
     
     <!-- Right Sidebar: Slide Settings -->
-    <div style="width: 350px; background: white; border-left: 1px solid var(--section-divider); display: flex; flex-direction: column;">
+    <div style="width: 280px; background: white; border-left: 1px solid var(--section-divider); display: flex; flex-direction: column;">
       <div class="no-scrollbar" style="padding: 24px; flex: 1; overflow-y: auto;">
         <h3 style="margin-bottom: 16px; font-weight: 700;">Slide Settings</h3>
         <select id="survey-slide-type" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--section-divider); font-size: 1rem; margin-bottom: 16px;">
@@ -1109,5 +1103,66 @@ integer,"Vertices in triangle?","",3,30,Math
 
 <script src="js/admin-core.js?v=2"></script>
 <script src="js/admin-surveys.js?v=1"></script>
+<!-- Floating Rich Text Toolbar -->
+        <div id="rich-text-toolbar" style="display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; gap: 8px; z-index: 100; align-items: center; border: 1px solid var(--section-divider); flex-wrap: wrap; width: max-content; max-width: 90vw;">
+          <button class="rt-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-weight:bold; font-size:1.1rem; color:var(--text);" title="Bold">B</button>
+          <button class="rt-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-style:italic; font-size:1.1rem; color:var(--text);" title="Italic">I</button>
+          <button class="rt-btn" onclick="document.execCommand('underline', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; text-decoration:underline; font-size:1.1rem; color:var(--text);" title="Underline">U</button>
+          <div style="width:1px; height:20px; background:var(--section-divider); margin:0 4px;"></div>
+          
+          <button class="rt-btn" onclick="document.execCommand('justifyLeft', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 8px; cursor:pointer; color:var(--text);" title="Align Left"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></button>
+          <button class="rt-btn" onclick="document.execCommand('justifyCenter', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 8px; cursor:pointer; color:var(--text);" title="Align Center"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg></button>
+          <button class="rt-btn" onclick="document.execCommand('justifyRight', false, null)" style="background:none; border:none; border-radius:4px; padding:6px 8px; cursor:pointer; color:var(--text);" title="Align Right"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg></button>
+          <div style="width:1px; height:20px; background:var(--section-divider); margin:0 4px;"></div>
+          
+          <div style="display:flex; align-items:center; gap:4px;" title="Text Color">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2L2 22h4l2-5h8l2 5h4L12 2zm-4 13l4-10 4 10H8z"/></svg>
+            <input type="color" id="rt-color" onchange="document.execCommand('foreColor', false, this.value)" style="border:none; width:24px; height:24px; cursor:pointer; background:none; padding:0;">
+          </div>
+          
+          <div style="display:flex; align-items:center; gap:4px;" title="Highlight Color">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l22 22"/></svg>
+            <input type="color" id="rt-bg-color" oninput="document.execCommand('hiliteColor', false, this.value)" style="border:none; width:24px; height:24px; cursor:pointer; background:none; padding:0;">
+          </div>
+          
+          <div style="width:1px; height:20px; background:var(--section-divider); margin:0 4px;"></div>
+          
+          <select id="rt-size" onchange="document.execCommand('fontSize', false, this.value)" style="border:1px solid var(--section-divider); border-radius:4px; padding:4px; outline:none; cursor:pointer; background:var(--surface);">
+            <option value="3">Normal</option>
+            <option value="4">Large</option>
+            <option value="5">Huge</option>
+            <option value="6">Massive</option>
+          </select>
+          
+          <select id="rt-font" onchange="document.execCommand('fontName', false, this.value)" style="border:1px solid var(--section-divider); border-radius:4px; padding:4px; outline:none; cursor:pointer; background:var(--surface); max-width:120px;">
+            <option value="Arial">Arial</option>
+            <option value="Comic Sans MS">Comic Sans</option>
+            <option value="Courier New">Courier</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Impact">Impact</option>
+            <option value="Palatino Linotype">Palatino</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Times New Roman">Times</option>
+            <option value="Trebuchet MS">Trebuchet</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+        </div>
+<!-- Floating Style Toolbar -->
+        <div id="style-toolbar" style="display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 12px; gap: 12px; z-index: 99; align-items: center; border: 1px solid var(--section-divider); flex-wrap: wrap; width: max-content; max-width: 90vw;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Background</div>
+          <input type="color" id="st-bg-color" oninput="window.applyStyleToActiveTarget('background', this.value)" style="border:none; width:32px; height:32px; cursor:pointer; background:none; padding:0;" title="Custom Color">
+          
+          <div style="width:1px; height:24px; background:var(--section-divider); margin:0 4px;"></div>
+          
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Presets</div>
+          <button onclick="window.applyStyleToActiveTarget('design', 'glass')" style="background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.4); border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Glass</button>
+          <button onclick="window.applyStyleToActiveTarget('design', 'solid-dark')" style="background:#1e293b; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Dark</button>
+          <button onclick="window.applyStyleToActiveTarget('design', 'solid-light')" style="background:#ffffff; color:#1e293b; border:1px solid #e2e8f0; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Light</button>
+          <button onclick="window.applyStyleToActiveTarget('design', 'gradient-ocean')" style="background:linear-gradient(135deg, #0ea5e9, #3b82f6); color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Ocean</button>
+          <button onclick="window.applyStyleToActiveTarget('design', 'gradient-sunset')" style="background:linear-gradient(135deg, #f97316, #ec4899); color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Sunset</button>
+          
+          <div style="width:1px; height:24px; background:var(--section-divider); margin:0 4px;"></div>
+          <button onclick="window.applyStyleToActiveTarget('clear', '')" style="background:none; border:1px dashed #ef4444; color:#ef4444; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Clear Styles</button>
+        </div>
 </body>
 </html>

@@ -67,6 +67,31 @@ const REACTION_SVGS = {
       }
     });
 
+    document.getElementById('btn-edit-survey-title')?.addEventListener('click', () => {
+      const input = document.getElementById('survey-title-input');
+      const container = document.getElementById('survey-title-container');
+      if (input && container) {
+        input.removeAttribute('readonly');
+        container.style.borderColor = '#e2e8f0';
+        input.focus();
+      }
+    });
+
+    document.getElementById('survey-title-input')?.addEventListener('blur', async (e) => {
+      const container = document.getElementById('survey-title-container');
+      e.target.setAttribute('readonly', 'true');
+      if (container) container.style.borderColor = 'transparent';
+      const survey = surveys.find(s => s.id === currentSurveyId);
+      if (survey) {
+        survey.name = e.target.value || 'Untitled Survey';
+        await saveSurveys();
+      }
+    });
+
+    document.getElementById('survey-title-input')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') e.target.blur();
+    });
+
     document.getElementById('btn-add-slide')?.addEventListener('click', () => {
       const survey = surveys.find(s => s.id === currentSurveyId);
       if (survey) {
@@ -107,29 +132,82 @@ const REACTION_SVGS = {
       }
     });
 
-    const pq = document.getElementById('preview-question');
-    const rtToolbar = document.getElementById('rich-text-toolbar');
     
-    if (pq && rtToolbar) {
-      pq.addEventListener('focus', () => {
-        rtToolbar.style.display = 'flex';
-        // Position it just below the question
-        const rect = pq.getBoundingClientRect();
-        const containerRect = pq.parentElement.getBoundingClientRect();
-        rtToolbar.style.top = (rect.bottom - containerRect.top + 8) + 'px';
-      });
-      
-      document.addEventListener('mousedown', (e) => {
-        if (!pq.contains(e.target) && !rtToolbar.contains(e.target)) {
+    const previewContainer = document.getElementById('survey-slide-preview');
+    const rtToolbar = document.getElementById('rich-text-toolbar');
+    const styleToolbar = document.getElementById('style-toolbar');
+    
+    window.activeEditingTarget = null;
+    window.activeStylingTargetType = null;
+    
+    if (previewContainer && rtToolbar && styleToolbar) {
+      previewContainer.addEventListener('mousedown', (e) => {
+        if (rtToolbar.contains(e.target) || styleToolbar.contains(e.target)) return;
+        
+        let isTextTarget = false;
+        let isStyleTarget = false;
+        
+        if (e.target.hasAttribute('contenteditable') || e.target.closest('[contenteditable]')) {
+          isTextTarget = true;
+          const target = e.target.hasAttribute('contenteditable') ? e.target : e.target.closest('[contenteditable]');
+          window.activeEditingTarget = target;
+          
+          previewContainer.querySelectorAll('[contenteditable]').forEach(el => el.style.outline = 'none');
+          target.style.outline = '2px dashed rgba(14,165,233,0.5)';
+          target.style.outlineOffset = '4px';
+          
+          rtToolbar.style.display = 'flex';
+          styleToolbar.style.display = 'none';
+          
+          const rect = target.getBoundingClientRect();
+          const pRect = previewContainer.parentElement.getBoundingClientRect();
+          rtToolbar.style.top = (rect.bottom + 8) + 'px';
+          
+          let leftPos = rect.left;
+          if (leftPos + 400 > window.innerWidth) leftPos = window.innerWidth - 400; // prevent overflow
+          rtToolbar.style.left = Math.max(0, leftPos) + 'px';
+        } else {
           rtToolbar.style.display = 'none';
+          previewContainer.querySelectorAll('[contenteditable]').forEach(el => el.style.outline = 'none');
+        }
+        
+        const styleEl = e.target.closest('[data-style-target]');
+        if (styleEl && !isTextTarget) {
+          isStyleTarget = true;
+          window.activeStylingTargetType = styleEl.getAttribute('data-style-target');
+          
+          styleToolbar.style.display = 'flex';
+          const rect = styleEl.getBoundingClientRect();
+          styleToolbar.style.top = (rect.bottom + 8) + 'px';
+let leftPos = rect.left;
+if (leftPos + 300 > window.innerWidth) leftPos = window.innerWidth - 300;
+styleToolbar.style.left = Math.max(0, leftPos) + 'px';
+        } else if (!isTextTarget) {
+          styleToolbar.style.display = 'none';
         }
       });
       
-      pq.addEventListener('input', (e) => {
+      document.addEventListener('mousedown', (e) => {
+        if (!previewContainer.contains(e.target) && !rtToolbar.contains(e.target) && !styleToolbar.contains(e.target)) {
+          rtToolbar.style.display = 'none';
+          styleToolbar.style.display = 'none';
+          previewContainer.querySelectorAll('[contenteditable]').forEach(el => el.style.outline = 'none');
+        }
+      });
+      
+      previewContainer.addEventListener('input', (e) => {
         const survey = surveys.find(s => s.id === currentSurveyId);
-        if (survey && survey.slides[activeSlideIndex]) {
+        if (!survey || !survey.slides[activeSlideIndex]) return;
+        
+        if (e.target.id === 'preview-question') {
           survey.slides[activeSlideIndex].question = e.target.innerHTML;
           document.getElementById('survey-question-text').value = e.target.innerHTML;
+        } else if (e.target.hasAttribute('data-option-idx')) {
+          const idx = parseInt(e.target.getAttribute('data-option-idx'));
+          window.updateOption(idx, e.target.innerHTML, true);
+        } else if (e.target.id === 'preview-submit-btn-text') {
+          if(!survey.slides[activeSlideIndex].styles) survey.slides[activeSlideIndex].styles = {};
+          survey.slides[activeSlideIndex].styles.submitText = e.target.innerHTML;
         }
       });
     }
@@ -435,11 +513,20 @@ const REACTION_SVGS = {
     }
   };
 
-  window.updateOption = function(idx, val) {
+  window.updateOption = function(idx, val, skipRender = false) {
     const survey = surveys.find(s => s.id === currentSurveyId);
     if(survey && survey.slides[activeSlideIndex] && ['multiple_choice', 'scales', 'ranking'].includes(survey.slides[activeSlideIndex].type)) {
       survey.slides[activeSlideIndex].options[idx] = val;
-      renderEditor();
+      if (!skipRender) {
+        renderEditor();
+      } else {
+        // Just update the right sidebar input so they stay in sync
+        const optsList = document.getElementById('survey-options-list');
+        if (optsList) {
+          const inputs = optsList.querySelectorAll('input[type="text"]');
+          if (inputs[idx]) inputs[idx].value = val;
+        }
+      }
     }
   };
 
@@ -451,55 +538,100 @@ const REACTION_SVGS = {
     }
   };
 
+  window.applyStyleToActiveTarget = function(prop, val) {
+    const survey = surveys.find(s => s.id === currentSurveyId);
+    if (!survey || !survey.slides[activeSlideIndex]) return;
+    
+    if (!survey.slides[activeSlideIndex].styles) {
+      survey.slides[activeSlideIndex].styles = {};
+    }
+    
+    const type = window.activeStylingTargetType;
+    if (!type) return;
+    
+    if (!survey.slides[activeSlideIndex].styles[type]) {
+      survey.slides[activeSlideIndex].styles[type] = {};
+    }
+    
+    if (prop === 'clear') {
+      survey.slides[activeSlideIndex].styles[type] = {};
+    } else {
+      survey.slides[activeSlideIndex].styles[type][prop] = val;
+    }
+    
+    saveSurveys();
+    renderEditor();
+  };
   window.renderSimulatedStudentSlide = function(container, slide, requireName, isInline = false) {
     let contentHtml = '';
     const themeClass = slide.theme || 'theme-default';
     
-    // Base layout mimicking quiz.js
+    const s = slide.styles || {};
+    
+    function buildCss(stylesObj, defaults) {
+      let str = defaults || '';
+      if (!stylesObj) return str;
+      if (stylesObj.background) str += `background:${stylesObj.background} !important; `;
+      if (stylesObj.design === 'glass') str += 'background:rgba(255,255,255,0.2) !important; backdrop-filter:blur(12px) !important; border:1px solid rgba(255,255,255,0.4) !important; box-shadow:0 8px 32px rgba(0,0,0,0.1) !important; color:var(--text) !important; ';
+      if (stylesObj.design === 'solid-dark') str += 'background:#1e293b !important; color:white !important; border:none !important; ';
+      if (stylesObj.design === 'solid-light') str += 'background:#ffffff !important; color:#1e293b !important; border:1px solid #e2e8f0 !important; ';
+      if (stylesObj.design === 'gradient-ocean') str += 'background:linear-gradient(135deg, #0ea5e9, #3b82f6) !important; color:white !important; border:none !important; ';
+      if (stylesObj.design === 'gradient-sunset') str += 'background:linear-gradient(135deg, #f97316, #ec4899) !important; color:white !important; border:none !important; ';
+      return str;
+    }
+    
+    const slideCss = buildCss(s.slide, '');
+    const optionCss = buildCss(s.option, 'padding:16px 24px; background:rgba(255,255,255,0.8); border:2px solid rgba(0,0,0,0.1); border-radius:9999px; font-weight:700; color:#1e293b; ');
+    const inputCss = buildCss(s.input, 'padding:12px; border:1px solid #cbd5e1; border-radius:9999px; outline:none; font-size:1.1rem; width:100%; ');
+    const textareaCss = buildCss(s.input, 'padding:12px; border:1px solid #cbd5e1; border-radius:24px; outline:none; font-size:1.1rem; width:100%; resize:none; ');
+    const btnCss = buildCss(s.button, 'width:100%; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer; ');
+    
+    const submitText = s.submitText || 'Submit';
+    const btnHtml = `<button style="${btnCss}" data-style-target="button">${isInline ? `<span id="preview-submit-btn-text" contenteditable="true" style="outline:none;">${submitText}</span>` : submitText}</button>`;
+
     if (slide.type === 'multiple_choice') {
       contentHtml = `<div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:400px;">
-        ${(slide.options || []).map(o => `<div style="padding:16px 24px; background:rgba(255,255,255,0.8); border:2px solid rgba(0,0,0,0.1); border-radius:9999px; font-weight:700; color:#1e293b; cursor:pointer; text-align:center;">${o}</div>`).join('')}
+        ${(slide.options || []).map((o, i) => `<div data-style-target="option" style="${optionCss} text-align:center; outline:none; cursor:pointer;"><span data-option-idx="${i}" ${isInline ? 'contenteditable="true"' : ''} style="cursor:${isInline ? 'text' : 'pointer'}; outline:none; display:inline-block; min-width:50px; pointer-events:${isInline ? 'auto' : 'none'};">${o}</span></div>`).join('')}
       </div>`;
     } else if (slide.type === 'word_cloud') {
       contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:400px;">
-        <input type="text" placeholder="Enter a word..." style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:9999px; outline:none; font-size:1.1rem; margin-bottom:12px;">
-        <button style="width:100%; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+        <input type="text" placeholder="Enter a word..." ${isInline ? 'disabled' : ''} data-style-target="input" style="${inputCss} margin-bottom:12px; ${isInline ? 'opacity:0.7;' : ''}">
+        ${btnHtml}
       </div>`;
     } else if (slide.type === 'open_ended' || slide.type === 'q_and_a') {
       contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:500px;">
-        <textarea rows="4" placeholder="${slide.type === 'q_and_a' ? 'Ask a question...' : 'Type your answer here...'}" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:24px; outline:none; font-size:1.1rem; margin-bottom:12px; resize:none;"></textarea>
-        <button style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+        <textarea rows="4" placeholder="${slide.type === 'q_and_a' ? 'Ask a question...' : 'Type your answer here...'}" ${isInline ? 'disabled' : ''} data-style-target="input" style="${textareaCss} margin-bottom:12px; ${isInline ? 'opacity:0.7;' : ''}"></textarea>
+        ${(s.button && (s.button.background || s.button.design)) ? btnHtml : btnHtml.replace('#0ea5e9', '#10b981')}
       </div>`;
     } else if (slide.type === 'scales') {
       contentHtml = `<div style="width:100%; max-width:500px; display:flex; flex-direction:column; gap:16px;">
-        ${(slide.options || []).map(o => `
+        ${(slide.options || []).map((o, i) => `
           <div style="background:rgba(255,255,255,0.8); padding:16px; border-radius:12px;">
-            <div style="font-weight:700; margin-bottom:12px; color:#1e293b;">${o}</div>
-            <input type="range" min="1" max="5" value="3" style="width:100%;">
+            <div style="font-weight:700; margin-bottom:12px; color:#1e293b; outline:none;"><span data-option-idx="${i}" ${isInline ? 'contenteditable="true"' : ''} style="cursor:${isInline ? 'text' : 'pointer'}; outline:none; display:inline-block; min-width:50px; pointer-events:${isInline ? 'auto' : 'none'};">${o}</span></div>
+            <input type="range" min="1" max="5" value="3" ${isInline ? 'disabled' : ''} style="width:100%;">
             <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#64748b; margin-top:4px;"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
           </div>
         `).join('')}
-        <button style="width:100%; padding:12px; background:#8b5cf6; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+        <div style="margin-top:8px;">${(s.button && (s.button.background || s.button.design)) ? btnHtml : btnHtml.replace('#0ea5e9', '#8b5cf6')}</div>
       </div>`;
     } else if (slide.type === 'ranking') {
       contentHtml = `<div style="width:100%; max-width:400px; display:flex; flex-direction:column; gap:12px;">
         <div style="font-size:0.9rem; margin-bottom:8px;">Drag to rank options (1st is highest)</div>
         ${(slide.options || []).map((o, i) => `
-          <div style="padding:16px 24px; background:rgba(255,255,255,0.8); border:2px solid rgba(0,0,0,0.1); border-radius:9999px; font-weight:700; display:flex; align-items:center; gap:12px; color:#1e293b;">
+          <div data-style-target="option" style="${optionCss} display:flex; align-items:center; gap:12px; padding:16px 24px;">
             <div style="background:#e2e8f0; color:#475569; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink: 0;">${i+1}</div>
-            ${o}
+            <div style="flex:1; outline:none;"><span data-option-idx="${i}" ${isInline ? 'contenteditable="true"' : ''} style="cursor:${isInline ? 'text' : 'pointer'}; outline:none; display:inline-block; min-width:50px; pointer-events:${isInline ? 'auto' : 'none'};">${o}</span></div>
           </div>
         `).join('')}
-        <button style="width:100%; padding:12px; background:#ec4899; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer; margin-top:8px;">Submit</button>
+        <div style="margin-top:8px;">${(s.button && (s.button.background || s.button.design)) ? btnHtml : btnHtml.replace('#0ea5e9', '#ec4899')}</div>
       </div>`;
     } else if (slide.type === 'guess_number') {
       contentHtml = `<div style="padding:16px; background:rgba(255,255,255,0.8); border-radius:12px; width:100%; max-width:400px; display:flex; flex-direction:column; gap:12px;">
-        <input type="number" placeholder="Enter your guess..." style="width:100%; padding:16px; border:2px solid #cbd5e1; border-radius:9999px; outline:none; font-size:1.5rem; text-align:center;">
-        <button style="width:100%; padding:12px; background:#f59e0b; color:white; border:none; border-radius:9999px; font-weight:700; font-size:1.1rem; cursor:pointer;">Submit</button>
+        <input type="number" placeholder="Enter your guess..." ${isInline ? 'disabled' : ''} data-style-target="input" style="${inputCss} font-size:1.5rem; text-align:center; ${isInline ? 'opacity:0.7;' : ''}">
+        ${(s.button && (s.button.background || s.button.design)) ? btnHtml : btnHtml.replace('#0ea5e9', '#f59e0b')}
       </div>`;
     }
 
-    // Reaction Bar
     let reactionHtml = '';
     if ((slide.reactions || []).length > 0) {
       reactionHtml = `<div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:12px; background:rgba(255,255,255,0.9); padding:12px 24px; border-radius:999px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
@@ -510,10 +642,22 @@ const REACTION_SVGS = {
     let innerContent = '';
     if (isInline) {
       innerContent = contentHtml;
+      // Apply slide style to the preview container in editor
+      const previewWrapper = document.getElementById('survey-slide-preview');
+      if (previewWrapper) {
+         const slideStyles = s.slide || {};
+         previewWrapper.style.background = slideStyles.background || '';
+         if (slideStyles.design === 'glass') { previewWrapper.style.background = 'rgba(255,255,255,0.2)'; previewWrapper.style.backdropFilter = 'blur(12px)'; previewWrapper.style.color = 'var(--text)'; previewWrapper.style.border = '1px solid rgba(255,255,255,0.4)'; }
+         else if (slideStyles.design === 'solid-dark') { previewWrapper.style.background = '#1e293b'; previewWrapper.style.color = 'white'; previewWrapper.style.border = 'none'; }
+         else if (slideStyles.design === 'solid-light') { previewWrapper.style.background = '#ffffff'; previewWrapper.style.color = '#1e293b'; previewWrapper.style.border = '1px solid #e2e8f0'; }
+         else if (slideStyles.design === 'gradient-ocean') { previewWrapper.style.background = 'linear-gradient(135deg, #0ea5e9, #3b82f6)'; previewWrapper.style.color = 'white'; previewWrapper.style.border = 'none'; }
+         else if (slideStyles.design === 'gradient-sunset') { previewWrapper.style.background = 'linear-gradient(135deg, #f97316, #ec4899)'; previewWrapper.style.color = 'white'; previewWrapper.style.border = 'none'; }
+         else { previewWrapper.style.backdropFilter = ''; previewWrapper.style.color = ''; previewWrapper.style.border = 'none'; }
+      }
     } else {
       innerContent = `
-        <div class="${themeClass}" style="width:100%; min-height:100%; padding:40px 20px; display:flex; flex-direction:column; align-items:center; position:relative;">
-          <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 40px; text-align:center; max-width:800px;">${slide.question || 'Untitled Question'}</h2>
+        <div class="${themeClass}" data-style-target="slide" style="width:100%; min-height:100%; padding:40px 20px; display:flex; flex-direction:column; align-items:center; position:relative; ${slideCss}">
+          <h2 id="preview-question" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 40px; text-align:center; max-width:800px;">${slide.question || 'Untitled Question'}</h2>
           ${contentHtml}
           ${reactionHtml}
         </div>
@@ -524,6 +668,7 @@ const REACTION_SVGS = {
   };
 
   // --- LIVE PRESENTER LOGIC ---
+
   
   let currentLiveCode = null;
   let currentLiveSurvey = null;
@@ -640,6 +785,25 @@ const REACTION_SVGS = {
     }
   }
 
+  
+  window.applyStyleToActiveTarget = function(prop, val) {
+    const survey = surveys.find(s => s.id === currentSurveyId);
+    if (!survey || !survey.slides[activeSlideIndex]) return;
+    if (!survey.slides[activeSlideIndex].styles) survey.slides[activeSlideIndex].styles = {};
+    
+    const type = window.activeStylingTargetType;
+    if (!type) return;
+    if (!survey.slides[activeSlideIndex].styles[type]) survey.slides[activeSlideIndex].styles[type] = {};
+    
+    if (prop === 'clear') {
+      survey.slides[activeSlideIndex].styles[type] = {};
+    } else {
+      survey.slides[activeSlideIndex].styles[type][prop] = val;
+    }
+    
+    renderEditor(); // This will trigger a re-render of the preview inline
+  };
+
   async function changeLiveSlide(delta) {
     if(!currentLiveSurvey) return;
     const newIdx = activeSlideIndex + delta;
@@ -674,6 +838,22 @@ const REACTION_SVGS = {
       if(cls.startsWith('theme-')) container.classList.remove(cls);
     });
     container.classList.add(themeClass);
+    
+    // Apply custom slide styles
+    if (slide.styles && slide.styles.slide) {
+      const s = slide.styles.slide;
+      container.style.background = s.background || '';
+      if (s.design === 'glass') { container.style.background = 'rgba(255,255,255,0.2)'; container.style.backdropFilter = 'blur(12px)'; container.style.color = 'var(--text)'; }
+      else if (s.design === 'solid-dark') { container.style.background = '#1e293b'; container.style.color = 'white'; }
+      else if (s.design === 'solid-light') { container.style.background = '#ffffff'; container.style.color = '#1e293b'; }
+      else if (s.design === 'gradient-ocean') { container.style.background = 'linear-gradient(135deg, #0ea5e9, #3b82f6)'; container.style.color = 'white'; }
+      else if (s.design === 'gradient-sunset') { container.style.background = 'linear-gradient(135deg, #f97316, #ec4899)'; container.style.color = 'white'; }
+    } else {
+      container.style.background = '';
+      container.style.backdropFilter = '';
+      container.style.color = '';
+    }
+
     
     if(liveChart) {
       liveChart.destroy();

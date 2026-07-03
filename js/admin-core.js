@@ -1881,6 +1881,7 @@ globalCharts);
                 </div>
               </div>
             `;
+          });
           chatMessages.scrollTop = chatMessages.scrollHeight;
         });
         liveChatsUnsubscribe = () => chatRef.off('value');

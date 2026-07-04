@@ -842,6 +842,40 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       isSidebarOpen = !isSidebarOpen;
       sidebar.classList.toggle('collapsed', !isSidebarOpen);
       body.classList.toggle('sidebar-collapsed', !isSidebarOpen);
+      // On mobile, also close the overlay
+      if (window.innerWidth <= 768) {
+        closeMobileSidebar();
+      }
+    });
+
+    // ── MOBILE SIDEBAR OVERLAY LOGIC ──
+    function openMobileSidebar() {
+      sidebar.classList.add('mobile-open');
+      document.getElementById('sidebar-backdrop').classList.add('active');
+    }
+    function closeMobileSidebar() {
+      sidebar.classList.remove('mobile-open');
+      document.getElementById('sidebar-backdrop').classList.remove('active');
+    }
+    const mobileSidebarBtn = document.getElementById('mobile-sidebar-btn');
+    if (mobileSidebarBtn) {
+      mobileSidebarBtn.addEventListener('click', () => {
+        if (sidebar.classList.contains('mobile-open')) {
+          closeMobileSidebar();
+        } else {
+          openMobileSidebar();
+        }
+      });
+    }
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    if (sidebarBackdrop) {
+      sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+    }
+    // Auto-close sidebar on mobile when a nav item is clicked
+    document.querySelectorAll('.sb-item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 768) closeMobileSidebar();
+      });
     });
   
     document.getElementById('sb-nav-dash').addEventListener('click', () => {

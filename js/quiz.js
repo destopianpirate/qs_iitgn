@@ -2168,7 +2168,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
   // ═══════════════════════════════════════════════════════════
   let currentSurveyCode = null;
   let currentSurveyParticipantId = null;
-  let participantName = null;
+  // participantName is already declared on line 955
   let liveSurveyUnsubscribe = null;
   let currentSurveySlideId = null;
 

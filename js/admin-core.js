@@ -378,7 +378,9 @@
   
     // New Quiz
     document.getElementById('btn-new-quiz').addEventListener('click', function() {
+      console.log("Create New Quiz button clicked.");
       try {
+        if (!Array.isArray(quizzes)) quizzes = [];
         window.isAddingNewQuiz = true;
         const newQuiz = {
           id: genId(),
@@ -666,7 +668,9 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       document.getElementById('btn-add-q').textContent = 'Add Question';
       document.getElementById('btn-cancel-edit').style.display = 'none';
   
-      quillEditor.setText('');
+      if (typeof quillEditor !== 'undefined' && quillEditor) {
+        quillEditor.setText('');
+      }
       document.querySelectorAll('#aq-opts-wrap .aq-opt').forEach(i => i.value = '');
       document.querySelectorAll('#aq-opts-wrap .aq-chk').forEach(c => c.checked = false);
       document.getElementById('aq-int-val').value = '';

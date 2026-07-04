@@ -378,20 +378,25 @@
   
     // New Quiz
     document.getElementById('btn-new-quiz').addEventListener('click', function() {
-      window.isAddingNewQuiz = true;
-      const newQuiz = {
-        id: genId(),
-        name: 'New Quiz',
-        totalTime: 900,
-        isPublic: false,
-        visibility: 'archive',
-        accessCode: '',
-        questions: [],
-        created_at: new Date().toISOString()
-      };
-      quizzes.push(newQuiz);
-      save();
-      openEditor(newQuiz.id);
+      try {
+        window.isAddingNewQuiz = true;
+        const newQuiz = {
+          id: genId(),
+          name: 'New Quiz',
+          totalTime: 900,
+          isPublic: false,
+          visibility: 'archive',
+          accessCode: '',
+          questions: [],
+          created_at: new Date().toISOString()
+        };
+        quizzes.push(newQuiz);
+        save();
+        openEditor(newQuiz.id);
+      } catch (e) {
+        alert("Error creating quiz: " + e.message);
+        console.error(e);
+      }
     });
   
     // â”€â”€ EDITOR â”€â”€

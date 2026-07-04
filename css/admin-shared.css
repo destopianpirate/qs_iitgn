@@ -280,7 +280,7 @@
       .editor-body { grid-template-columns: 1fr; }
       .editor-right { position: static; }
     }
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       /* ── SIDEBAR: Hide on mobile, show as overlay when toggled ── */
       .admin-sidebar {
         width: 260px !important;
@@ -351,10 +351,11 @@
       .login-card h2 { font-size: 1.75rem !important; }
 
       /* ── SURVEY EDITOR: Stack three-panel layout ── */
-      #screen-survey-editor > div[style*="display: flex"][style*="flex: 1"] { flex-direction: column !important; overflow: visible !important; }
-      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 250px"] { width: 100% !important; max-height: 200px; border-right: none !important; border-bottom: 1px solid var(--section-divider); }
-      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 280px"] { width: 100% !important; border-left: none !important; border-top: 1px solid var(--section-divider); }
-      #screen-survey-editor > div[style*="display: flex"] > div[style*="flex: 1"][style*="padding: 40px"] { padding: 16px !important; min-height: 250px; }
+      #screen-survey-editor { height: auto !important; min-height: 100vh; overflow: visible !important; display: flex !important; flex-direction: column !important; }
+      #screen-survey-editor > div[style*="display: flex"][style*="flex: 1"] { flex-direction: column !important; overflow: visible !important; height: auto !important; flex: none !important; }
+      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 250px"] { width: 100% !important; max-height: 200px; border-right: none !important; border-bottom: 1px solid var(--section-divider); overflow-y: auto !important; flex: none !important; }
+      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 280px"] { width: 100% !important; border-left: none !important; border-top: 1px solid var(--section-divider); flex: none !important; overflow-y: auto !important; }
+      #screen-survey-editor > div[style*="display: flex"] > div[style*="flex: 1"][style*="padding: 40px"] { padding: 16px !important; min-height: 250px; flex: none !important; overflow: visible !important; }
       #survey-slide-preview { aspect-ratio: auto !important; min-height: 200px; padding: 20px !important; }
       #survey-slide-preview h2 { font-size: 1.5rem !important; }
 

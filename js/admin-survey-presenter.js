@@ -65,11 +65,15 @@
           else uniqueParticipants.add(r.participantName || 'Anonymous');
         });
         
-        document.getElementById('live-survey-participant-count').innerHTML = `
+        const htmlStr = `
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           ${uniqueParticipants.size}
         `;
+        document.getElementById('live-survey-participant-count').innerHTML = htmlStr;
+        const fsEl = document.getElementById('live-survey-fullscreen-participants');
+        if (fsEl) fsEl.innerHTML = htmlStr;
         
+        window.SurveyState.lastLiveResponses = responses;
         renderLiveVisuals(responses);
       });
       window.SurveyState.liveResponsesUnsubscribe = () => responsesRef.off('value');
@@ -120,7 +124,20 @@
       }).catch(console.error);
       currentLiveCode = null;
     }
+    
+    if (currentLiveSurvey && window.rtdb) {
+      currentLiveSurvey.slides.forEach(slide => {
+        window.rtdb.ref(`survey_responses/${slide.id}`).remove();
+        window.rtdb.ref(`survey_reactions/${slide.id}`).remove();
+      });
+    }
   }
+
+  window.addEventListener('beforeunload', () => {
+    if (currentLiveCode) {
+      window.stopLiveSurvey();
+    }
+  });
 
   
   window.applyStyleToActiveTarget = function(prop, val) {
@@ -381,41 +398,58 @@
         }
       });
       
-      const maxFreq = Math.max(...Object.values(freq), 1);
+      const list = Object.keys(freq).map(w => {
+        return [w, freq[w]];
+      }).sort((a, b) => b[1] - a[1]).slice(0, 30);
+
+      if (list.length === 0) return;
+      
+      const maxFreq = list[0][1];
+      const minFreq = list[list.length - 1][1];
       
       // Setup Canvas
       const canvas = document.createElement('canvas');
       canvas.id = 'wordcloud-canvas';
-      // Give canvas strict pixel dimensions based on container to avoid blurry rendering
-      const width = div.clientWidth || 800;
-      const height = 400; // Fixed height for word cloud container
+      
+      const width = Math.max(div.clientWidth || 800, 300);
+      let height = window.innerWidth <= 1024 ? 250 : 400;
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        height = window.innerHeight - 250; // Larger area in fullscreen
+      }
+      
       canvas.width = width;
       canvas.height = height;
-      canvas.style.cssText = `width: 100%; height: ${height}px; animation: popIn 0.8s ease-out;`;
+      canvas.style.cssText = `width: ${width}px; max-width: 100%; height: auto; aspect-ratio: ${width} / ${height}; animation: popIn 0.8s ease-out; display: block; margin: 0 auto;`;
       div.appendChild(canvas);
       
-      const colors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#eab308', '#06b6d4', '#14b8a6'];
+      // Wordcloud Colors based on size to make bigger words stand out more
+      const primaryColors = ['#0ea5e9', '#ec4899', '#f59e0b', '#8b5cf6'];
+      const secondaryColors = ['#10b981', '#06b6d4', '#14b8a6', '#64748b'];
       
-      const list = Object.keys(freq).map(w => {
-        // Base size 24. Words scale up to 4x based on frequency relative to maxFreq.
-        const baseSize = Math.max(16, (width / 40)); 
-        const size = baseSize * (1 + (freq[w] / maxFreq) * 3);
-        return [w, size];
+      const finalSizes = list.map(item => {
+        const w = item[0];
+        const f = item[1];
+        // Normalize frequency between 0 and 1
+        const normalized = maxFreq === minFreq ? 1 : ((f - minFreq) / (maxFreq - minFreq));
+        // Base size 16 to 48
+        const size = 16 + (normalized * 60) * (width / 800);
+        return [w, size, normalized];
       });
       
       if (typeof WordCloud !== 'undefined') {
         WordCloud(canvas, {
-          list: list,
-          gridSize: Math.round(16 * width / 1024), // Tighter grid for better packing
-          weightFactor: function (size) {
-            return size; 
-          },
+          list: finalSizes.map(i => [i[0], i[1]]),
+          gridSize: Math.round(16 * width / 1024),
+          weightFactor: function (size) { return size; },
           fontFamily: 'Inter, system-ui, sans-serif',
-          color: function (word, weight) {
-            return colors[Math.floor(Math.random() * colors.length)];
+          color: function (word, weight, fontSize, distance, theta, index) {
+             const data = finalSizes.find(i => i[0] === word);
+             const norm = data ? data[2] : 0;
+             if (norm > 0.5) return primaryColors[Math.floor(Math.random() * primaryColors.length)];
+             return secondaryColors[Math.floor(Math.random() * secondaryColors.length)];
           },
-          rotateRatio: 0.3, // 30% chance for vertical rotation (Mentimeter style)
-          rotationSteps: 2, // Only 0 or 90 degrees
+          rotateRatio: 0.2,
+          rotationSteps: 2,
           backgroundColor: 'transparent',
           shrinkToFit: true,
           drawOutOfBound: false,
@@ -424,4 +458,36 @@
       }
     }
   }
+
+  // Idle timeout for floating controls
+  let idleTimeout;
+  const screenEl = document.getElementById('screen-survey-live-admin');
+  function resetIdleTimeout() {
+    const controls = document.querySelectorAll('.live-floating-control');
+    controls.forEach(c => c.classList.remove('idle-hidden'));
+    clearTimeout(idleTimeout);
+    idleTimeout = setTimeout(() => {
+      // Only hide if we are not hovering over the controls themselves
+      if (!screenEl.querySelector('.live-floating-control:hover')) {
+        controls.forEach(c => c.classList.add('idle-hidden'));
+      }
+    }, 2000);
+  }
+  
+  if (screenEl) {
+    screenEl.addEventListener('mousemove', resetIdleTimeout);
+    screenEl.addEventListener('touchstart', resetIdleTimeout);
+    // Check periodically for hover state to re-hide if needed
+    setInterval(() => {
+      if (!document.querySelector('.live-floating-control:hover') && idleTimeout) {
+         // if it's not hidden but should be
+      }
+    }, 1000);
+  }
+  
+  document.addEventListener('fullscreenchange', () => {
+    if (window.SurveyState && window.SurveyState.lastLiveResponses) {
+      renderLiveVisuals(window.SurveyState.lastLiveResponses);
+    }
+  });
 })();

@@ -308,11 +308,12 @@
         order: 2; flex: 0 0 auto; display: flex !important; justify-content: flex-end;
         margin-top: 0; padding-top: 0; border-top: none; gap: 8px; flex-wrap: wrap;
       }
-      .dash-topbar .center, .editor-topbar .center {
+      .dash-topbar .center {
         order: 3; position: static !important; transform: none !important;
         flex: 0 0 100%; font-size: 1.75rem !important; text-align: left; font-weight: 800;
         color: var(--text); white-space: normal; margin-top: 12px;
       }
+      .editor-topbar .center { display: none !important; }
 
       /* ── CONTENT ── */
       .dash-body { padding: 16px !important; }
@@ -329,8 +330,8 @@
       .type-pills { flex-wrap: wrap; }
       .type-pill { font-size: 0.8rem; padding: 6px 14px; }
       .section-title { font-size: 1.35rem !important; }
-      .dash-actions { flex-wrap: nowrap; gap: 8px; justify-content: space-between; }
-      .btn-create { font-size: 0.85rem !important; padding: 10px 16px !important; white-space: nowrap; }
+      .dash-actions { flex-wrap: wrap; gap: 8px; justify-content: space-between; position: relative; z-index: 10; }
+      .btn-create { font-size: 0.85rem !important; padding: 10px 16px !important; white-space: normal; text-align: center; line-height: 1.2; }
       .btn-logout { font-size: 0.8rem !important; padding: 8px 12px !important; }
       .btn-back { font-size: 0.8rem !important; padding: 8px 12px !important; }
 
@@ -350,13 +351,36 @@
       .login-card h2 { font-size: 1.75rem !important; }
 
       /* ── SURVEY EDITOR: Stack three-panel layout ── */
+      #screen-survey-editor * { box-sizing: border-box; }
       #screen-survey-editor.active { height: auto !important; min-height: 100vh; overflow: visible !important; display: flex !important; flex-direction: column !important; }
+      #screen-survey-editor > .dash-topbar { flex-wrap: wrap !important; height: auto !important; padding: 12px !important; gap: 12px !important; }
+      #screen-survey-editor > .dash-topbar .left { width: 100%; justify-content: flex-start; }
+      #screen-survey-editor > .dash-topbar .right { width: 100%; justify-content: flex-start; margin: 0; }
       #screen-survey-editor > div[style*="display: flex"][style*="flex: 1"] { flex-direction: column !important; overflow: visible !important; height: auto !important; flex: none !important; }
-      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 250px"] { width: 100% !important; max-height: 200px; border-right: none !important; border-bottom: 1px solid var(--section-divider); overflow-y: auto !important; flex: none !important; }
-      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 280px"] { width: 100% !important; border-left: none !important; border-top: 1px solid var(--section-divider); flex: none !important; overflow-y: auto !important; }
+      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 250px"] { width: 100% !important; max-height: none !important; border-right: none !important; border-bottom: 1px solid var(--section-divider); overflow: visible !important; flex: none !important; }
+      #screen-survey-editor > div[style*="display: flex"] > div[style*="width: 280px"] { width: 100% !important; border-left: none !important; border-top: 1px solid var(--section-divider); flex: none !important; overflow: visible !important; }
       #screen-survey-editor > div[style*="display: flex"] > div[style*="flex: 1"][style*="padding: 40px"] { padding: 16px !important; min-height: 250px; flex: none !important; overflow: visible !important; }
-      #survey-slide-preview { aspect-ratio: auto !important; min-height: 200px; padding: 20px !important; }
-      #survey-slide-preview h2 { font-size: 1.5rem !important; }
+      #survey-slide-preview { width: 100% !important; max-width: 100% !important; aspect-ratio: auto !important; min-height: 200px; padding: 20px !important; margin: 0 !important; }
+
+      /* ── LIVE SURVEY ADMIN (Present Survey) ── */
+      #screen-survey-live-admin .dash-topbar { flex-wrap: nowrap !important; height: 48px !important; padding: 0 12px !important; gap: 8px !important; }
+      #screen-survey-live-admin .dash-topbar .center { order: 2 !important; width: auto !important; margin-top: 0 !important; font-size: 1rem !important; }
+      #screen-survey-live-admin .dash-topbar .right { order: 3 !important; flex: 1 !important; justify-content: flex-end !important; }
+      #screen-survey-live-admin #live-survey-title { display: none !important; }
+      #screen-survey-live-admin .center span { display: none !important; }
+      #screen-survey-live-admin #live-survey-code { font-size: 1.25rem !important; padding: 4px 10px !important; border-radius: 6px !important; letter-spacing: 1px !important; }
+      #screen-survey-live-admin #btn-end-live-survey { padding: 4px 8px !important; font-size: 0.75rem !important; }
+      #screen-survey-live-admin .btn-back { width: 32px !important; height: 32px !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+      #screen-survey-live-admin .btn-back svg { width: 16px !important; height: 16px !important; }
+      #screen-survey-live-admin > div[style*="flex: 1"] { padding: 12px 12px 70px 12px !important; }
+      #live-survey-question { font-size: 1.5rem !important; margin-bottom: 12px !important; line-height: 1.1 !important; }
+      #survey-live-chart-wrapper { padding: 0 !important; max-height: 45vh !important; }
+      #screen-survey-live-admin > div[style*="position: absolute; bottom: 24px"] {
+        bottom: 12px !important;
+        padding: 8px 16px !important;
+        gap: 16px !important;
+      }
+      #btn-live-fullscreen { bottom: 12px !important; right: 12px !important; width: 44px !important; height: 44px !important; }
 
       /* ── ANALYTICS GRIDS ── */
       div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }

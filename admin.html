@@ -1012,10 +1012,35 @@ integer,"Vertices in triangle?","",3,30,Math
   #screen-survey-live-admin:fullscreen { padding-left: 0 !important; }
   #screen-survey-live-admin:-webkit-full-screen { padding-left: 0 !important; }
   #screen-survey-live-admin:-moz-full-screen { padding-left: 0 !important; }
+  #screen-survey-live-admin:fullscreen .dash-topbar { display: none !important; }
+  #screen-survey-live-admin:-webkit-full-screen .dash-topbar { display: none !important; }
+  #screen-survey-live-admin:-moz-full-screen .dash-topbar { display: none !important; }
+  
+  #live-survey-fullscreen-participants { display: none; position: absolute; top: 24px; right: 24px; font-weight: 600; color: var(--text-secondary); background: #f1f5f9; padding: 8px 16px; border-radius: 9999px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  #screen-survey-live-admin:fullscreen #live-survey-fullscreen-participants { display: flex !important; align-items: center; }
+  #screen-survey-live-admin:-webkit-full-screen #live-survey-fullscreen-participants { display: flex !important; align-items: center; }
+  #screen-survey-live-admin:-moz-full-screen #live-survey-fullscreen-participants { display: flex !important; align-items: center; }
+
+  .live-floating-control {
+    transition: opacity 1s ease, transform 0.1s !important;
+    opacity: 1;
+  }
+  .live-floating-control.idle-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .live-floating-control:hover {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
 </style>
 
 <!-- ═══════════════════════ LIVE SURVEY ADMIN (PRESENTER) ═══════════════════════ -->
 <div class="screen live-survey-screen" id="screen-survey-live-admin" style="flex-direction: column; height: 100vh; overflow: hidden; background: #f8fafc; position: relative;">
+  <div id="live-survey-fullscreen-participants">
+    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    0
+  </div>
   <div class="dash-topbar" style="background: white; border-bottom: 1px solid var(--section-divider);">
     <div class="left">
       <button class="btn-back" id="btn-live-survey-back" style="margin-right: 16px;">
@@ -1028,20 +1053,20 @@ integer,"Vertices in triangle?","",3,30,Math
       <div id="live-survey-code" style="background: var(--surface); padding: 8px 24px; border-radius: 12px; font-size: 2rem; font-weight: 800; letter-spacing: 0.1em; color: var(--primary); border: 1px solid var(--section-divider);">123456</div>
     </div>
     <div class="right" style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
-      <div id="live-survey-participant-count" style="font-weight: 600; color: var(--text-secondary); background: #f1f5f9; padding: 8px 16px; border-radius: 9999px;">
+      <div id="live-survey-participant-count" style="font-weight: 600; color: var(--text-secondary); background: #f1f5f9; padding: 8px 16px; border-radius: 9999px; white-space: nowrap;">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         0
       </div>
-      <button class="btn-danger" id="btn-end-live-survey" style="padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem;">End Survey</button>
+      <button class="btn-danger" id="btn-end-live-survey" style="width: auto; margin: 0; padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; white-space: nowrap;">End Survey</button>
     </div>
   </div>
   
-  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; padding: 40px; position: relative;">
-    <div style="width: 100%; max-width: 1200px; text-align: center; margin-bottom: 40px;">
-      <h1 id="live-survey-question" style="font-size: 3.5rem; font-weight: 800; color: var(--text); line-height: 1.2;">Question Text?</h1>
+  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; padding: 24px 40px; position: relative;">
+    <div style="width: 100%; max-width: 1000px; margin-bottom: 24px; text-align: left;">
+      <h1 id="live-survey-question" style="font-size: 2.5rem; font-weight: 800; color: var(--text); line-height: 1.2; text-align: left;">Question Text?</h1>
     </div>
     
-    <div id="live-survey-content-area" style="flex: 1; width: 100%; max-width: 1200px; display: flex; flex-direction: column; position: relative; min-height: 0;">
+    <div id="live-survey-content-area" style="flex: 1; width: 100%; max-width: 1000px; display: flex; flex-direction: column; position: relative; min-height: 0;">
       <!-- Chart.js canvas wrapper -->
       <div id="survey-live-chart-wrapper" style="display: none; position: relative; width: 100%; flex: 1; min-height: 0; margin: 0 auto; padding: 0 40px;">
         <canvas id="survey-live-chart"></canvas>
@@ -1053,7 +1078,7 @@ integer,"Vertices in triangle?","",3,30,Math
   </div>
   
   <!-- Presentation Controls -->
-  <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--section-divider); padding: 12px 24px; border-radius: 9999px; display: flex; gap: 24px; align-items: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+  <div class="live-floating-control" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--section-divider); padding: 12px 24px; border-radius: 9999px; display: flex; gap: 24px; align-items: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
     <button id="btn-survey-prev" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; font-weight: 600;">
       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg> Prev
     </button>
@@ -1064,7 +1089,7 @@ integer,"Vertices in triangle?","",3,30,Math
   </div>
   
   <!-- Fullscreen Button -->
-  <button id="btn-live-fullscreen" style="position: absolute; bottom: 24px; right: 24px; background: white; border: 1px solid var(--section-divider); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); color: var(--text-secondary); z-index: 50; transition: transform 0.1s;">
+  <button id="btn-live-fullscreen" class="live-floating-control" style="position: absolute; bottom: 24px; right: 24px; background: white; border: 1px solid var(--section-divider); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); color: var(--text-secondary); z-index: 50; transition: transform 0.1s;">
     <svg id="icon-fullscreen-enter" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
     <svg id="icon-fullscreen-exit" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" style="display: none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>
   </button>
@@ -1149,5 +1174,45 @@ integer,"Vertices in triangle?","",3,30,Math
           <div style="width:1px; height:24px; background:var(--section-divider); margin:0 4px;"></div>
           <button onclick="window.applyStyleToActiveTarget('clear', '')" style="background:none; border:1px dashed #ef4444; color:#ef4444; border-radius:4px; padding:6px 12px; cursor:pointer; font-size:0.85rem; font-weight:600;">Clear Styles</button>
         </div>
+  <button id="floating-back-btn" style="position: fixed; top: 16px; left: 16px; width: 44px; height: 44px; border-radius: 50%; background: white; color: #0ea5e9; border: 1px solid #e2e8f0; z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer;">
+    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const floatingBtn = document.getElementById('floating-back-btn');
+      if (!floatingBtn) return;
+      function checkScroll() {
+        if (window.innerWidth > 1024) {
+          floatingBtn.style.opacity = '0';
+          floatingBtn.style.pointerEvents = 'none';
+          return;
+        }
+        const activeScreen = document.querySelector('.screen.active');
+        if (!activeScreen) return;
+        let backBtn = activeScreen.querySelector('.btn-back, a.btn-logout[href="active-quiz.html"], #btn-editor-back-dynamic, #btn-analytics-back');
+        if (!backBtn) {
+          floatingBtn.style.opacity = '0';
+          floatingBtn.style.pointerEvents = 'none';
+          return;
+        }
+        const rect = backBtn.getBoundingClientRect();
+        if (rect.bottom < 0) {
+          floatingBtn.style.opacity = '1';
+          floatingBtn.style.pointerEvents = 'auto';
+        } else {
+          floatingBtn.style.opacity = '0';
+          floatingBtn.style.pointerEvents = 'none';
+        }
+      }
+      window.addEventListener('scroll', checkScroll, { passive: true });
+      setInterval(checkScroll, 500);
+      floatingBtn.addEventListener('click', () => {
+        const activeScreen = document.querySelector('.screen.active');
+        if (!activeScreen) return;
+        let backBtn = activeScreen.querySelector('.btn-back, a.btn-logout[href="active-quiz.html"], #btn-editor-back-dynamic, #btn-analytics-back');
+        if (backBtn) backBtn.click();
+      });
+    });
+  </script>
 </body>
 </html>

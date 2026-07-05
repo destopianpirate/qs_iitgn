@@ -18,6 +18,10 @@ const REACTION_SVGS = {
 };
 
 (function() {
+window.rgbToHex = function(rgb) {
+  let [r, g, b] = rgb.match(/\d+/g) || [0,0,0];
+  return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+};
 window.SurveyState = window.SurveyState || {
   surveys: [],
   currentSurveyId: null,
@@ -177,12 +181,33 @@ window.SurveyState = window.SurveyState || {
           styleToolbar.style.display = 'none';
           
           const rect = target.getBoundingClientRect();
-          const pRect = previewContainer.parentElement.getBoundingClientRect();
-          rtToolbar.style.top = (rect.bottom + 8) + 'px';
+          let topPos = rect.bottom + 8;
+          if (topPos + rtToolbar.offsetHeight > window.innerHeight) {
+            topPos = rect.top - rtToolbar.offsetHeight - 8;
+          }
+          rtToolbar.style.top = Math.max(0, topPos) + 'px';
           
           let leftPos = rect.left;
-          if (leftPos + 400 > window.innerWidth) leftPos = window.innerWidth - 400; // prevent overflow
+          if (leftPos + rtToolbar.offsetWidth > window.innerWidth) leftPos = window.innerWidth - rtToolbar.offsetWidth;
           rtToolbar.style.left = Math.max(0, leftPos) + 'px';
+          
+          // Update text editor colors to reflect current selection/element
+          const computed = window.getComputedStyle(target);
+          const foreColorInput = rtToolbar.querySelector('input[title="Text Color"]');
+          const bgInput = rtToolbar.querySelector('input[title="Highlight"]');
+          if(foreColorInput) {
+            let fc = computed.color;
+            if (document.queryCommandValue('foreColor')) fc = document.queryCommandValue('foreColor');
+            if (fc.startsWith('rgb')) fc = window.rgbToHex ? window.rgbToHex(fc) : fc;
+            if(fc.startsWith('#')) foreColorInput.value = fc;
+          }
+          if(bgInput) {
+            let bc = computed.backgroundColor;
+            if (document.queryCommandValue('hiliteColor')) bc = document.queryCommandValue('hiliteColor');
+            else if (document.queryCommandValue('backColor')) bc = document.queryCommandValue('backColor');
+            if (bc.startsWith('rgb')) bc = window.rgbToHex ? window.rgbToHex(bc) : bc;
+            if(bc.startsWith('#')) bgInput.value = bc;
+          }
         } else {
           rtToolbar.style.display = 'none';
           previewContainer.querySelectorAll('[contenteditable]').forEach(el => el.style.outline = 'none');
@@ -192,13 +217,26 @@ window.SurveyState = window.SurveyState || {
         if (styleEl && !isTextTarget) {
           isStyleTarget = true;
           window.activeStylingTargetType = styleEl.getAttribute('data-style-target');
-          
           styleToolbar.style.display = 'flex';
-          const rect = styleEl.getBoundingClientRect();
-          styleToolbar.style.top = (rect.bottom + 8) + 'px';
-let leftPos = rect.left;
-if (leftPos + 300 > window.innerWidth) leftPos = window.innerWidth - 300;
-styleToolbar.style.left = Math.max(0, leftPos) + 'px';
+          let topPos, leftPos;
+          if (styleEl.id === 'survey-slide-preview') {
+            // For the slide background, position near the cursor
+            topPos = e.clientY + 15;
+            leftPos = e.clientX + 15;
+          } else {
+            const rect = styleEl.getBoundingClientRect();
+            topPos = rect.bottom + 8;
+            if (topPos + styleToolbar.offsetHeight > window.innerHeight) {
+              topPos = rect.top - styleToolbar.offsetHeight - 8;
+            }
+            leftPos = rect.left;
+          }
+          
+          if (topPos + styleToolbar.offsetHeight > window.innerHeight) topPos = window.innerHeight - styleToolbar.offsetHeight - 8;
+          if (leftPos + styleToolbar.offsetWidth > window.innerWidth) leftPos = window.innerWidth - styleToolbar.offsetWidth - 8;
+          
+          styleToolbar.style.top = Math.max(0, topPos) + 'px';
+          styleToolbar.style.left = Math.max(0, leftPos) + 'px';
         } else if (!isTextTarget) {
           styleToolbar.style.display = 'none';
         }

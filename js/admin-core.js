@@ -193,10 +193,10 @@
         quizzes.forEach(q => {
            if (q.questions) {
              const secrets = q.questions.map(qst => ({
-               id: qst.id,
-               ans: qst.ans,
-               correctAnswers: qst.correctAnswers,
-               answer: qst.answer
+               id: qst.id !== undefined ? qst.id : null,
+               ans: qst.ans !== undefined ? qst.ans : null,
+               correctAnswers: qst.correctAnswers !== undefined ? qst.correctAnswers : null,
+               answer: qst.answer !== undefined ? qst.answer : null
              }));
              window.db.collection('quiz_secrets').doc(String(q.id)).set({ secrets })
                .catch(e => console.error("Error saving secrets:", e));

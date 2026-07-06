@@ -554,7 +554,9 @@
 /* Mobile Adjustments */
 @media (max-width: 768px) {
   .npc-container {
+    bottom: 32px;
     bottom: max(2rem, env(safe-area-inset-bottom, 20px));
+    right: 16px;
     right: max(1rem, env(safe-area-inset-right, 10px));
   }
   .npc-character {
@@ -723,17 +725,16 @@
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.95);
   z-index: 99999;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition: opacity 0.5s ease;
 }
 .matrix-mode .matrix-overlay.is-active {
+  display: flex;
   opacity: 1;
-  visibility: visible;
   pointer-events: auto;
 }
 

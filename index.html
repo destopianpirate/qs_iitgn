@@ -38,6 +38,15 @@
 </head>
 
 <body>
+  <!-- Easter Egg: Matrix Terminal Overlay -->
+  <div id="matrix-overlay" class="matrix-overlay" aria-hidden="true">
+    <div class="matrix-content">
+      <h2 class="matrix-glitch" data-text="SYSTEM COMPROMISED">SYSTEM COMPROMISED</h2>
+      <p>Initiating QS Override Protocol...</p>
+      <div id="matrix-terminal"></div>
+      <button id="matrix-exit" class="btn btn-outline" style="color: #0f0; border-color: #0f0; margin-top: var(--space-6);">ABORT PROTOCOL</button>
+    </div>
+  </div>
 
   <!-- ════════════════════════════════════════
        PAGE LOADER — Orbiting question marks
@@ -350,95 +359,28 @@
           <span class="k-badge">Mathematics</span>
           <span class="k-badge">IITGN Special</span>
         </div>
+        
+        <!-- Daily Challenge Widget -->
+        <div class="daily-challenge-widget" id="daily-challenge" data-scroll="fade-up">
+          <div class="dc-header">
+            <h3>🔥 Daily Challenge</h3>
+            <span class="dc-timer">Resets in <span id="dc-countdown">08:45:12</span></span>
+          </div>
+          <div class="dc-body">
+            <p class="dc-question">What was the first feature-length animated movie ever released?</p>
+            <div class="dc-options">
+              <button class="dc-option" data-correct="false">Pinocchio</button>
+              <button class="dc-option" data-correct="true">Snow White and the Seven Dwarfs</button>
+              <button class="dc-option" data-correct="false">Fantasia</button>
+              <button class="dc-option" data-correct="false">Gulliver's Travels</button>
+            </div>
+            <div class="dc-result" id="dc-result" style="display: none;"></div>
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- ════════════════════════════════════════
-         SECTION 5 — FEATURED EVENTS
-         ════════════════════════════════════════ -->
-    <section class="section" id="events" aria-label="Featured Events">
-      <div class="container">
-        <div class="section-header" data-scroll="fade-up">
-          <h2 class="section-title">The Arena Awaits</h2>
-          <p class="section-subtitle">Glimpses from our most prestigious tournaments and events.</p>
-        </div>
-        
-        <div class="event-showcase">
-          <div class="event-card hover-elevate" data-scroll="fade-up" data-scroll-delay="100">
-            <img src="images/event_stage.png" alt="Neon lit quiz stage">
-            <div class="event-card-overlay">
-              <h3>The Grand IITGN Quiz</h3>
-              <p>Our flagship annual tournament featuring 500+ participants.</p>
-            </div>
-          </div>
-          <div class="event-card hover-elevate" data-scroll="fade-up" data-scroll-delay="200">
-            <img src="images/event_puzzle.png" alt="Cryptic glowing puzzle">
-            <div class="event-card-overlay">
-              <h3>Cryptic Hunts</h3>
-              <p>Midnight puzzle solving and treasure hunts across campus.</p>
-            </div>
-          </div>
-          <div class="event-card hover-elevate" data-scroll="fade-up" data-scroll-delay="300">
-            <img src="images/event_trophy.png" alt="Sleek modern trophy">
-            <div class="event-card-overlay">
-              <h3>Inter-Hostel Championship</h3>
-              <p>The fierce battle for the coveted quizzing trophy.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════
-         SECTION 5 — HALL OF FAME
-         ════════════════════════════════════════ -->
-    <section class="section" id="hall-of-fame" aria-label="Hall of Fame">
-      <div class="container">
-        <div class="section-header" data-scroll="fade-up">
-          <h2 class="section-title">Hall of Fame</h2>
-          <p class="section-subtitle">Top performers of the current academic year.</p>
-        </div>
-        
-        <div class="hall-of-fame-wrapper" data-scroll="fade-up">
-          <table class="hof-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Quizzer</th>
-                <th>Points</th>
-                <th>Specialty</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="hof-rank">#1</td>
-                <td><strong style="color:var(--text);">Aryan S.</strong></td>
-                <td>12,450</td>
-                <td>Science & Tech</td>
-              </tr>
-              <tr>
-                <td class="hof-rank">#2</td>
-                <td><strong style="color:var(--text);">Meera K.</strong></td>
-                <td>11,200</td>
-                <td>Pop Culture</td>
-              </tr>
-              <tr>
-                <td class="hof-rank">#3</td>
-                <td><strong style="color:var(--text);">Rohan M.</strong></td>
-                <td>9,850</td>
-                <td>History & Geog.</td>
-              </tr>
-              <tr>
-                <td class="hof-rank">#4</td>
-                <td><strong style="color:var(--text);">Sneha P.</strong></td>
-                <td>8,900</td>
-                <td>Literature</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
 
     <!-- ════════════════════════════════════════
          SECTION 6 — TESTIMONIALS
@@ -597,10 +539,59 @@
   </footer>
 
   <!-- ════════════════════════════════════════
+       NPC MASCOT (Quizby)
+       ════════════════════════════════════════ -->
+  <div id="npc-container" class="npc-container" aria-hidden="true">
+    <div class="npc-speech-bubble" id="npc-speech-bubble">
+      Welcome to the Arena!
+    </div>
+    <div class="npc-character" id="npc-character">
+      <svg viewBox="0 0 100 100" class="npc-svg">
+        <!-- Shadow -->
+        <ellipse cx="50" cy="95" rx="25" ry="5" fill="rgba(0,0,0,0.3)" class="npc-shadow" />
+        <!-- Floating body -->
+        <g class="npc-body-group">
+          <!-- Main Body -->
+          <rect x="25" y="35" width="50" height="45" rx="20" fill="var(--brand-cyan)" class="npc-body" />
+          <rect x="35" y="45" width="30" height="15" rx="5" fill="#1e293b" />
+          <!-- Eyes -->
+          <circle cx="42" cy="52" r="3" fill="#38bdf8" class="npc-eye npc-eye-l" />
+          <circle cx="58" cy="52" r="3" fill="#38bdf8" class="npc-eye npc-eye-r" />
+          <!-- Antenna -->
+          <line x1="50" y1="35" x2="50" y2="15" stroke="var(--brand-cyan)" stroke-width="4" stroke-linecap="round" />
+          <circle cx="50" cy="12" r="5" fill="var(--brand-bright)" class="npc-antenna-bulb" />
+          <!-- Arms -->
+          <path d="M25 55 Q10 55 15 70" fill="none" stroke="var(--brand-cyan)" stroke-width="4" stroke-linecap="round" class="npc-arm-l" />
+          <path d="M75 55 Q90 55 85 70" fill="none" stroke="var(--brand-cyan)" stroke-width="4" stroke-linecap="round" class="npc-arm-r" />
+          
+          <!-- Props (hidden by default) -->
+          <!-- Glasses -->
+          <g class="npc-prop-glasses" opacity="0">
+            <rect x="32" y="48" width="14" height="10" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+            <rect x="54" y="48" width="14" height="10" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+            <line x1="46" y1="53" x2="54" y2="53" stroke="#ffffff" stroke-width="2" />
+          </g>
+          <!-- Lightbulb (Idea) -->
+          <g class="npc-prop-idea" opacity="0" transform="translate(0, -35)">
+            <circle cx="50" cy="15" r="10" fill="#fbbf24" />
+            <path d="M46 25 L54 25 L52 30 L48 30 Z" fill="#94a3b8" />
+          </g>
+          <!-- Party Hat -->
+          <g class="npc-prop-party" opacity="0" transform="translate(0, -5)">
+            <polygon points="35,38 65,38 50,10" fill="#f43f5e" />
+            <circle cx="50" cy="8" r="5" fill="#fbbf24" />
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
        SCRIPTS
        ════════════════════════════════════════ -->
   <script src="js/particles.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="js/scroll.js"></script>
   <script src="js/buzzer.js"></script>
   <script src="js/main.js"></script>

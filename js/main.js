@@ -207,6 +207,183 @@
     });
   }
 
+  /* ── NPC Scroll Effects ── */
+  function initNPCScrollEffects() {
+    const npcChar = document.getElementById('npc-character');
+    const npcBubble = document.getElementById('npc-speech-bubble');
+    if (!npcChar || !npcBubble || !window.gsap || !window.ScrollTrigger) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const states = [
+      { id: '#hero', text: 'Welcome to the Arena!', className: 'npc-state-waving' },
+      { id: '#about', text: 'Let me look closely...', className: 'npc-state-glasses' },
+      { id: '#pillars', text: 'Brilliant ideas start here!', className: 'npc-state-idea' },
+      { id: '#how-it-works', text: 'Follow these steps!', className: 'npc-state-pointing' },
+      { id: '#testimonials', text: 'Listen to this!', className: '' },
+      { id: '#join-cta', text: 'Join us today!', className: 'npc-state-waving' }
+    ];
+
+    let bubbleTimeout;
+    function updateNPC(text, className) {
+      npcBubble.textContent = text;
+      npcChar.className = 'npc-character ' + className;
+      
+      npcBubble.classList.remove('is-visible');
+      clearTimeout(bubbleTimeout);
+      setTimeout(() => {
+        npcBubble.classList.add('is-visible');
+      }, 50);
+
+      bubbleTimeout = setTimeout(() => {
+        npcBubble.classList.remove('is-visible');
+      }, 4000);
+    }
+
+    states.forEach((state) => {
+      const section = document.querySelector(state.id);
+      if (!section) return;
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 50%',
+        end: 'bottom 50%',
+        onEnter: () => updateNPC(state.text, state.className),
+        onEnterBack: () => updateNPC(state.text, state.className)
+      });
+    });
+
+    // Make NPC clickable to re-show current message
+    npcChar.addEventListener('click', () => {
+      npcBubble.classList.remove('is-visible');
+      clearTimeout(bubbleTimeout);
+      setTimeout(() => {
+        npcBubble.classList.add('is-visible');
+      }, 50);
+      bubbleTimeout = setTimeout(() => {
+        npcBubble.classList.remove('is-visible');
+      }, 4000);
+    });
+  }
+
+  /* ── Daily Challenge ── */
+  function initDailyChallenge() {
+    const options = document.querySelectorAll('.dc-option');
+    const resultDiv = document.getElementById('dc-result');
+    const npcChar = document.getElementById('npc-character');
+    const npcBubble = document.getElementById('npc-speech-bubble');
+    
+    // Inject confetti keyframes dynamically
+    if (!document.getElementById('confetti-styles')) {
+      const style = document.createElement('style');
+      style.id = 'confetti-styles';
+      style.innerHTML = `
+        @keyframes confetti-fall { 
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; } 
+          100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } 
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    if (!options.length || !resultDiv) return;
+
+    options.forEach(btn => {
+      btn.addEventListener('click', function() {
+        options.forEach(b => b.disabled = true); // Disable all
+        
+        const isCorrect = this.getAttribute('data-correct') === 'true';
+        this.classList.add(isCorrect ? 'correct' : 'wrong');
+        resultDiv.style.display = 'block';
+        
+        if (isCorrect) {
+          resultDiv.textContent = "Correct! You earned 50 Knowledge Points.";
+          resultDiv.style.color = "#10b981";
+          if (npcChar && npcBubble) {
+            npcChar.className = 'npc-character npc-state-cheer';
+            npcBubble.textContent = "You nailed it!";
+            npcBubble.classList.add('is-visible');
+          }
+          // Confetti
+          for (let i = 0; i < 40; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti-piece';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.backgroundColor = ['#38bdf8', '#f43f5e', '#fbbf24', '#10b981'][Math.floor(Math.random() * 4)];
+            confetti.style.animation = `confetti-fall ${Math.random() * 2 + 2}s linear forwards`;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 4000);
+          }
+        } else {
+          resultDiv.textContent = "Incorrect. The right answer was Snow White.";
+          resultDiv.style.color = "#ef4444";
+          document.querySelector('.dc-option[data-correct="true"]').classList.add('correct'); // Highlight correct
+          if (npcChar && npcBubble) {
+            npcChar.className = 'npc-character npc-state-facepalm';
+            npcBubble.textContent = "Oh no... try again tomorrow!";
+            npcBubble.classList.add('is-visible');
+          }
+        }
+        
+        setTimeout(() => {
+          if(npcBubble) npcBubble.classList.remove('is-visible');
+        }, 4000);
+      });
+    });
+  }
+
+  /* ── Easter Egg: Matrix Mode ── */
+  function initEasterEgg() {
+    let pressed = [];
+    const secretCode = 'quiz';
+    const overlay = document.getElementById('matrix-overlay');
+    const terminal = document.getElementById('matrix-terminal');
+    const exitBtn = document.getElementById('matrix-exit');
+    
+    window.addEventListener('keyup', (e) => {
+      pressed.push(e.key.toLowerCase());
+      pressed.splice(-secretCode.length - 1, pressed.length - secretCode.length);
+      
+      if (pressed.join('').includes(secretCode)) {
+        document.body.classList.add('matrix-mode');
+        if (overlay) {
+          overlay.classList.add('is-active');
+          simulateTerminal();
+        }
+      }
+    });
+    
+    if (exitBtn) {
+      exitBtn.addEventListener('click', () => {
+        document.body.classList.remove('matrix-mode');
+        overlay.classList.remove('is-active');
+        if (terminal) terminal.innerHTML = '';
+      });
+    }
+
+    function simulateTerminal() {
+      if (!terminal) return;
+      terminal.innerHTML = '';
+      const lines = [
+        "Accessing Mainframe...",
+        "Bypassing security protocols...",
+        "Decrypting Q-Files...",
+        "SUCCESS: Welcome to the hidden database."
+      ];
+      let i = 0;
+      function addLine() {
+        if (i < lines.length) {
+          const p = document.createElement('p');
+          p.textContent = '> ' + lines[i];
+          terminal.appendChild(p);
+          i++;
+          setTimeout(addLine, Math.random() * 500 + 300);
+        }
+      }
+      setTimeout(addLine, 500);
+    }
+  }
+
   /* ── Initialize ── */
   function init() {
     initTheme();
@@ -217,6 +394,9 @@
     initLoader();
     initFooterYear();
     initBackToTop();
+    initNPCScrollEffects();
+    initDailyChallenge();
+    initEasterEgg();
   }
 
   if (document.readyState === 'loading') {

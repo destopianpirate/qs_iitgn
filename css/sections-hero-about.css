@@ -127,11 +127,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-4) var(--space-8); /* Matched to .btn-lg */
   background: var(--primary);
   color: var(--text-on-primary);
   font-family: var(--font-body);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-base); /* Matched to .btn-lg */
   font-weight: var(--fw-bold);
   letter-spacing: var(--ls-wider);
   text-transform: uppercase;

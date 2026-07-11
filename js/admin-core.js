@@ -302,18 +302,20 @@
       });
     }
   
-    // Logout
+    window.adminLogout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          if (window.firebase) await firebase.auth().signOut();
+        } catch (ex) {}
+        sessionStorage.removeItem('qs_admin');
+        sessionStorage.removeItem('qs_admin_id');
+        window.location.href = 'active-quiz.html';
+      }
+    };
+
+    // Logout via existing button id if it exists
     if (btnLogout) {
-      btnLogout.addEventListener('click', async function() {
-        if (confirm("Are you sure you want to logout?")) {
-          try {
-            if (window.firebase) await firebase.auth().signOut();
-          } catch (ex) {}
-          sessionStorage.removeItem('qs_admin');
-          sessionStorage.removeItem('qs_admin_id');
-          window.location.href = 'active-quiz.html';
-        }
-      });
+      btnLogout.addEventListener('click', window.adminLogout);
     }
   
     // â”€â”€ DASHBOARD â”€â”€
@@ -1418,13 +1420,15 @@ globalCharts);
       const liveAccessCodeDisplay = document.getElementById('live-access-code-display');
   
       let isPrivate = qObj.visibility === 'private' || !qObj.isPublic;
+      let isArchive = qObj.visibility === 'archive';
       let quizUrl = '';
       
       // We assume the app is hosted at the current origin
       const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'active-quiz.html');
   
-      if (isPrivate) {
-        if (liveStatsPanel) liveStatsPanel.style.display = 'block';
+      if (isPrivate || isArchive) {
+        if (liveStatsPanel && !isArchive) liveStatsPanel.style.display = 'block';
+        if (liveStatsPanel && isArchive) liveStatsPanel.style.display = 'none';
         if (liveAccessCodeDisplay) liveAccessCodeDisplay.textContent = qObj.accessCode || 'N/A';
         quizUrl = `${baseUrl}?code=${qObj.accessCode}`;
         
@@ -1448,16 +1452,25 @@ globalCharts);
           if (dropdownCode) dropdownCode.style.display = 'none';
           if (liveAccessCodeDisplay) liveAccessCodeDisplay.style.display = 'none'; // Hidden by default
           btnToggleCode.textContent = 'Show Tournament Code';
-          btnToggleCode.onclick = () => {
-            const isHidden = dropdownCode ? dropdownCode.style.display === 'none' : true;
-            if (isHidden) {
-              if (dropdownCode) dropdownCode.style.display = 'block';
-              btnToggleCode.textContent = 'Hide Tournament Code';
-            } else {
-              if (dropdownCode) dropdownCode.style.display = 'none';
-              btnToggleCode.textContent = 'Show Tournament Code';
-            }
-          };
+          
+          if (isArchive) {
+            btnToggleCode.style.opacity = '0.5';
+            btnToggleCode.style.cursor = 'not-allowed';
+            btnToggleCode.onclick = () => alert("Tournament code cannot be viewed for archived tests.");
+          } else {
+            btnToggleCode.style.opacity = '1';
+            btnToggleCode.style.cursor = 'pointer';
+            btnToggleCode.onclick = () => {
+              const isHidden = dropdownCode ? dropdownCode.style.display === 'none' : true;
+              if (isHidden) {
+                if (dropdownCode) dropdownCode.style.display = 'block';
+                btnToggleCode.textContent = 'Hide Tournament Code';
+              } else {
+                if (dropdownCode) dropdownCode.style.display = 'none';
+                btnToggleCode.textContent = 'Show Tournament Code';
+              }
+            };
+          }
         }
 
         const btnDeploy = document.getElementById('btn-qa-deploy');
@@ -1471,6 +1484,10 @@ globalCharts);
           btnDeploy.textContent = qObj.isDeployed ? 'End Tournament' : 'Deploy Quiz';
           btnDeploy.style.background = qObj.isDeployed ? '#ef4444' : '#10B981';
           btnDeploy.onclick = async () => {
+            if (qObj.visibility === 'archive') {
+              alert("You cannot deploy an archived quiz.");
+              return;
+            }
             btnDeploy.disabled = true;
             qObj.isDeployed = !qObj.isDeployed;
             if (qObj.isDeployed) {
@@ -1569,9 +1586,17 @@ globalCharts);
       const btnShowQR = document.getElementById('btn-qa-show-qr');
       if (btnShowQR) {
         btnShowQR.style.display = 'inline-block';
-        btnShowQR.onclick = () => {
-          document.getElementById('qr-enlarge-modal').style.display = 'flex';
-        };
+        if (isArchive) {
+          btnShowQR.style.opacity = '0.5';
+          btnShowQR.style.cursor = 'not-allowed';
+          btnShowQR.onclick = () => alert("QR code cannot be viewed for archived tests.");
+        } else {
+          btnShowQR.style.opacity = '1';
+          btnShowQR.style.cursor = 'pointer';
+          btnShowQR.onclick = () => {
+            document.getElementById('qr-enlarge-modal').style.display = 'flex';
+          };
+        }
       }
       
       if (typeof QRious !== 'undefined') {

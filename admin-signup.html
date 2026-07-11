@@ -41,7 +41,7 @@
       gap: 12px;
     }
     .brand-header img { height: 40px; }
-    .brand-header span { font-weight: 800; font-size: 1.25rem; color: #0F172A; }
+    .brand-header span { font-weight: 800; font-size: 1.25rem; color: var(--text); }
     
     .signup-container {
       max-width: 420px;
@@ -63,7 +63,7 @@
       display: block;
       font-size: 0.9rem;
       font-weight: 700;
-      color: #334155;
+      color: var(--text-secondary);
       margin-bottom: 8px;
       margin-left: 12px;
     }
@@ -73,15 +73,17 @@
       padding: 12px 20px;
       border-radius: 9999px;
       border: none;
-      background: #f3f4f6;
+      background: var(--bg-alt);
       font-size: 0.95rem;
-      color: #111827;
+      color: var(--text);
       outline: none;
       box-sizing: border-box;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      border: 1px solid transparent;
     }
     .input-field:focus {
-      background: #e2e8f0;
+      background: var(--surface-hover);
+      border-color: var(--primary);
     }
 
     .btn-sky {
@@ -118,7 +120,7 @@
   <a href="active-quiz.html" style="position: absolute; top: 32px; right: 32px; color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-weight: 600; z-index: 10;">&larr; Back to Arena</a>
 
   <div class="signup-container">
-    <h2 style="color: black; margin-bottom: 8px; font-size: 1.75rem; font-weight: 800;">Become a Host</h2>
+    <h2 style="color: var(--text); margin-bottom: 8px; font-size: 1.75rem; font-weight: 800;">Become a Host</h2>
     <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">Create an admin account to host your own tournaments.</p>
     
     <div class="input-group">
@@ -135,7 +137,7 @@
     <div class="err-msg" id="signup-error"></div>
     
     <div class="links-row">
-      <div style="font-size: 0.95rem; font-weight: 600; color: black;">
+      <div style="font-size: 0.95rem; font-weight: 600; color: var(--text);">
         Already an Admin? <a href="admin.html" style="color: #0ea5e9; text-decoration: none; cursor: pointer;">Login</a>
       </div>
     </div>

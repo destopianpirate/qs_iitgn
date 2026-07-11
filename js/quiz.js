@@ -328,6 +328,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
   }
 
     function initPortalFlow() {
+
     const overlay = document.getElementById('portal-flow-overlay');
     if (!overlay) return;
     

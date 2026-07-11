@@ -346,6 +346,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
     }
 
     // Determine initial state
+    let currentFlow = null;
     const savedQuizId = sessionStorage.getItem('activeQuizId');
     const urlParams = new URLSearchParams(window.location.search);
     const skipWelcome = urlParams.get('skipWelcome') === 'true';
@@ -464,7 +465,6 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
     }
 
     // Generic Next flow tracking (Tournament vs Practice)
-    let currentFlow = null; 
 
     function requireUsername(flow) {
       currentFlow = flow;

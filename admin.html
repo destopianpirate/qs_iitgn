@@ -75,6 +75,10 @@
         <div class="sb-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
         <span class="sb-text">Form Submissions</span>
       </div>
+      <div class="sb-item" id="sb-nav-forms">
+        <div class="sb-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div>
+        <span class="sb-text">Forms</span>
+      </div>
       <div class="sb-item" id="sb-nav-surveys">
         <div class="sb-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>
         <span class="sb-text">Surveys (Menti)</span>
@@ -1264,6 +1268,146 @@ integer,"Vertices in triangle?","",3,30,Math
   </div>
 </div>
 
+
+<!-- ═══════════════════════ FORMS DASHBOARD SCREEN ═══════════════════════ -->
+<div class="screen forms-screen" id="screen-forms-dashboard" style="flex-direction: column; min-height: 100vh;">
+  <div class="dash-topbar">
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
+    <div class="center">Forms Dashboard</div>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-actions" style="justify-content: space-between; align-items: center;">
+      <h2 class="section-title" style="margin-bottom: 0;">My Forms</h2>
+      <button class="btn-create" id="btn-new-form">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New Form
+      </button>
+    </div>
+    <div class="quiz-grid" id="grid-forms">
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Loading forms...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FORM EDITOR SCREEN ═══════════════════════ -->
+<div class="screen editor-screen" id="screen-form-editor" style="flex-direction: column; height: 100vh; overflow: hidden;">
+  <div class="dash-topbar" style="flex-shrink: 0;">
+    <div class="left">
+      <img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span>
+      <div style="width: 1px; height: 24px; background: var(--section-divider); margin: 0 16px;"></div>
+      <button class="btn-back" id="btn-form-editor-back" style="margin-right: 16px;">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div style="font-size: 1.25rem; font-weight: 700; color: var(--text);">Form Editor</div>
+    </div>
+    <div class="center"></div>
+    <div class="right" style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
+      <button id="btn-form-preview" style="padding: 8px 20px; border-radius: 9999px; background: rgba(14,165,233,0.1); color: #0ea5e9; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        Preview
+      </button>
+      <button id="btn-form-publish" style="padding: 8px 20px; border-radius: 9999px; background: #10B981; color: white; font-weight: 700; border: none; cursor: pointer;">Publish</button>
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div style="display: flex; flex: 1; overflow: hidden;">
+    <!-- Left Sidebar: Pages & Questions List -->
+    <div id="form-editor-left" style="width: 260px; background: var(--surface); border-right: 1px solid var(--section-divider); display: flex; flex-direction: column;">
+      <div style="padding: 16px; border-bottom: 1px solid var(--section-divider);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <input type="text" id="form-title-input" value="Untitled Form" placeholder="Form Name" style="width: 100%; font-size: 1.1rem; font-weight: 700; border: none; outline: none; background: transparent; color: var(--text);">
+        </div>
+        <textarea id="form-description-input" placeholder="Form description (optional)" style="width: 100%; border: none; outline: none; background: transparent; color: var(--text-secondary); font-size: 0.85rem; resize: none; height: 40px; font-family: inherit;"></textarea>
+      </div>
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--section-divider); display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em;">Pages</span>
+        <button id="btn-form-add-page" style="background: none; border: none; cursor: pointer; color: #0ea5e9; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Page
+        </button>
+      </div>
+      <div id="form-pages-list" class="no-scrollbar" style="flex: 1; overflow-y: auto; padding: 12px;"></div>
+      <div style="padding: 16px; border-top: 1px solid var(--section-divider);">
+        <button id="btn-save-form" style="width: 100%; padding: 12px; border-radius: 9999px; background: #0ea5e9; color: white; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(14,165,233,0.3);">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          Save Form
+        </button>
+      </div>
+    </div>
+
+    <!-- Center: Question Cards -->
+    <div id="form-editor-center" class="no-scrollbar" style="flex: 1; overflow-y: auto; padding: 32px; background: var(--bg-alt);">
+      <div id="form-questions-container" style="max-width: 720px; margin: 0 auto;"></div>
+      <div style="max-width: 720px; margin: 16px auto 0;">
+        <button id="btn-form-add-question" style="width: 100%; padding: 16px; border-radius: 12px; border: 2px dashed var(--text-tertiary); background: transparent; cursor: pointer; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Question
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Question Settings -->
+    <div id="form-editor-right" style="width: 300px; background: var(--surface); border-left: 1px solid var(--section-divider); display: flex; flex-direction: column; overflow-y: auto;">
+      <div class="no-scrollbar" style="padding: 24px; flex: 1; overflow-y: auto;">
+        <div id="form-question-settings-placeholder" style="text-align: center; color: var(--text-tertiary); padding: 40px 20px;">
+          <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1" fill="none" style="opacity: 0.3; margin-bottom: 16px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <p style="font-size: 0.95rem;">Click on a question to edit its settings</p>
+        </div>
+        <div id="form-question-settings" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FORM RESPONSES SCREEN ═══════════════════════ -->
+<div class="screen" id="screen-form-responses" style="flex-direction: column; min-height: 100vh;">
+  <div class="dash-topbar">
+    <div class="left">
+      <img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span>
+      <div style="width: 1px; height: 24px; background: var(--section-divider); margin: 0 16px;"></div>
+      <button class="btn-back" id="btn-form-responses-back" style="margin-right: 16px;">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <span id="form-responses-title" style="font-weight: 700; font-size: 1.1rem;">Form Responses</span>
+    </div>
+    <div class="center"></div>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <span id="form-response-count-badge" style="background: rgba(14,165,233,0.1); color: #0ea5e9; padding: 6px 14px; border-radius: 9999px; font-weight: 700; font-size: 0.85rem;">0 responses</span>
+      <button id="btn-form-export-csv" style="padding: 8px 20px; border-radius: 9999px; background: #0ea5e9; color: white; font-weight: 700; border: none; cursor: pointer;">Export CSV</button>
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div id="form-responses-summary" style="margin-bottom: 24px;"></div>
+    <div class="settings-card" style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+        <thead>
+          <tr id="form-responses-thead" style="border-bottom: 2px solid var(--section-divider);"></tr>
+        </thead>
+        <tbody id="form-responses-tbody">
+          <tr><td colspan="20" style="text-align:center; padding: 40px; color: var(--text-secondary);">No responses yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════ SURVEY DASHBOARD SCREEN ═══════════════════════ -->
 <div class="screen surveys-screen" id="screen-surveys-dashboard" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
@@ -1593,6 +1737,7 @@ integer,"Vertices in triangle?","",3,30,Math
 </div>
 
 <script src="js/admin-core.js?v=3"></script>
+<script src="js/admin-forms.js"></script>
 <script src="js/admin-survey-state.js"></script>
 <script src="js/admin-survey-editor.js"></script>
 <script src="js/admin-survey-presenter.js"></script>

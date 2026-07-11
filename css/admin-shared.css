@@ -860,4 +860,19 @@
     flex-wrap: wrap;
     gap: 12px;
   }
+
+  /* ── FORM EDITOR: Stack three-panel layout on mobile ── */
+  #screen-form-editor.active { height: auto !important; min-height: 100vh; overflow: visible !important; display: flex !important; flex-direction: column !important; }
+  #screen-form-editor > .dash-topbar { flex-wrap: wrap !important; height: auto !important; padding: 12px !important; gap: 8px !important; }
+  #screen-form-editor > .dash-topbar .left { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  #screen-form-editor > .dash-topbar .right { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  #screen-form-editor > div[style*="display: flex"][style*="flex: 1"] { flex-direction: column !important; overflow: visible !important; height: auto !important; flex: none !important; }
+  #form-editor-left { width: 100% !important; border-right: none !important; border-bottom: 1px solid var(--section-divider); overflow: visible !important; flex: none !important; }
+  #form-editor-center { padding: 16px !important; min-height: 200px; flex: none !important; overflow: visible !important; }
+  #form-editor-right { width: 100% !important; border-left: none !important; border-top: 1px solid var(--section-divider); flex: none !important; overflow: visible !important; }
+
+  /* ── FORM RESPONSES: Responsive table ── */
+  #screen-form-responses .dash-topbar { flex-wrap: wrap !important; height: auto !important; padding: 12px !important; gap: 8px !important; }
+  #screen-form-responses .dash-topbar .left { width: 100%; flex-wrap: wrap; }
+  #screen-form-responses .dash-topbar .right { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
 }

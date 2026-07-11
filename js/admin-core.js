@@ -903,6 +903,16 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       fetchApplicationsFromDB();
     });
 
+    const sbNavForms = document.getElementById('sb-nav-forms');
+    if (sbNavForms) {
+      sbNavForms.addEventListener('click', () => {
+        document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+        sbNavForms.classList.add('active');
+        showScreen('screen-forms-dashboard');
+        if (window.renderFormsDashboard) window.renderFormsDashboard();
+      });
+    }
+
     const sbNavSurveys = document.getElementById('sb-nav-surveys');
     if (sbNavSurveys) {
       sbNavSurveys.addEventListener('click', () => {

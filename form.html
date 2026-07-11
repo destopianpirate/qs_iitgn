@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form | Quizzing Society IITGN</title>
+  <meta name="description" content="Fill out this form from Quizzing Society IITGN">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/variables.css">
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .form-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--section-divider);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .form-header .brand { display: flex; align-items: center; gap: 10px; }
+    .form-header .brand img { height: 32px; }
+    .form-header .brand span { font-weight: 800; font-size: 1.1rem; color: var(--text); }
+
+    .form-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .form-title-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border-top: 4px solid #0ea5e9;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .form-title-card h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
+    .form-title-card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+
+    .form-page-indicator {
+      text-align: center;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .page-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--section-divider);
+      transition: all 0.3s;
+    }
+    .page-dot.active { background: #0ea5e9; width: 24px; border-radius: 5px; }
+
+    .question-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: border 0.2s;
+      border: 1px solid transparent;
+    }
+    .question-card.error { border-color: #ef4444; }
+    .question-card .q-label {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .question-card .q-label .required { color: #ef4444; font-weight: 700; }
+    .question-card .q-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+    .question-card .q-error { font-size: 0.8rem; color: #ef4444; margin-top: 6px; display: none; font-weight: 600; }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--section-divider);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+    .form-input:focus { border-color: #0ea5e9; }
+    textarea.form-input { resize: vertical; min-height: 100px; }
+
+    .word-counter { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; text-align: right; }
+    .word-counter.warn { color: #f59e0b; }
+    .word-counter.error { color: #ef4444; }
+
+    .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-group label, .checkbox-group label {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      padding: 10px 14px; border-radius: 8px; border: 1px solid var(--section-divider);
+      transition: all 0.2s; font-size: 0.95rem;
+    }
+    .radio-group label:hover, .checkbox-group label:hover { background: var(--bg-alt); }
+    .radio-group input[type="radio"], .checkbox-group input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: #0ea5e9; flex-shrink: 0;
+    }
+
+    .scale-container { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .scale-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+    .scale-btn {
+      width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--section-divider);
+      background: var(--bg); color: var(--text); font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .scale-btn:hover { border-color: #0ea5e9; background: rgba(14,165,233,0.1); }
+    .scale-btn.selected { background: #0ea5e9; color: white; border-color: #0ea5e9; }
+
+    .rating-container { display: flex; gap: 8px; justify-content: center; }
+    .star-btn {
+      background: none; border: none; cursor: pointer; font-size: 2rem; transition: all 0.2s; filter: grayscale(1); opacity: 0.4;
+    }
+    .star-btn.active { filter: grayscale(0); opacity: 1; }
+
+    .form-nav {
+      display: flex; gap: 12px; margin-top: 24px; justify-content: space-between;
+    }
+    .btn-form-nav {
+      padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 1rem;
+      cursor: pointer; border: none; transition: all 0.2s; font-family: inherit;
+    }
+    .btn-form-prev { background: var(--bg-alt); color: var(--text-secondary); }
+    .btn-form-next { background: #0ea5e9; color: white; }
+    .btn-form-submit { background: #10B981; color: white; }
+
+    .success-screen {
+      display: none; text-align: center; padding: 60px 20px;
+    }
+    .success-screen h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; color: #10B981; }
+    .success-screen p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 32px; }
+    .success-check {
+      width: 80px; height: 80px; border-radius: 50%; background: rgba(16,185,129,0.1);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
+      animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+    .form-loading { text-align: center; padding: 80px 20px; color: var(--text-secondary); }
+
+    @media (max-width: 600px) {
+      .form-container { padding: 16px 12px 40px; }
+      .form-title-card { padding: 20px; }
+      .form-title-card h1 { font-size: 1.35rem; }
+      .question-card { padding: 16px; }
+      .form-nav { flex-direction: column; }
+      .btn-form-nav { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-header">
+    <div class="brand">
+      <img src="qs_logo.png" alt="QS">
+      <span>QS IITGN</span>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div id="form-loading" class="form-loading">Loading form...</div>
+
+    <div id="form-content" style="display:none;">
+      <div class="form-title-card">
+        <h1 id="public-form-title">Untitled Form</h1>
+        <p id="public-form-desc"></p>
+      </div>
+
+      <div id="form-page-indicator" class="form-page-indicator" style="display:none;"></div>
+
+      <div id="form-questions-render"></div>
+
+      <div class="form-nav">
+        <button id="btn-prev-page" class="btn-form-nav btn-form-prev" style="display:none;">← Previous</button>
+        <div style="flex:1;"></div>
+        <button id="btn-next-page" class="btn-form-nav btn-form-next" style="display:none;">Next →</button>
+        <button id="btn-submit-form" class="btn-form-nav btn-form-submit" style="display:none;">Submit</button>
+      </div>
+    </div>
+
+    <div id="form-success" class="success-screen">
+      <div class="success-check">
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="#10B981" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Response Submitted!</h2>
+      <p>Thank you for filling out this form.</p>
+      <button onclick="location.reload()" class="btn-form-nav btn-form-next" style="margin:0 auto;">Submit Another Response</button>
+    </div>
+
+    <div id="form-not-found" style="display:none; text-align:center; padding:80px 20px;">
+      <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:8px; color:var(--text);">Form Not Found</h2>
+      <p style="color:var(--text-secondary);">This form may have been deleted or is not yet published.</p>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const formId = params.get('id');
+      const isPreview = params.get('preview') === '1';
+
+      if (!formId) {
+        document.getElementById('form-loading').style.display = 'none';
+        document.getElementById('form-not-found').style.display = 'block';
+        return;
+      }
+
+      let formData = null;
+      let currentPage = 0;
+      let answers = {};
+
+      async function loadForm() {
+        if (!window.db) {
+          setTimeout(loadForm, 300);
+          return;
+        }
+        try {
+          const doc = await window.db.collection('forms').doc(formId).get();
+          if (!doc.exists) {
+            document.getElementById('form-loading').style.display = 'none';
+            document.getElementById('form-not-found').style.display = 'block';
+            return;
+          }
+          formData = { id: doc.id, ...doc.data() };
+
+          if (!formData.isPublished && !isPreview) {
+            document.getElementById('form-loading').style.display = 'none';
+            document.getElementById('form-not-found').style.display = 'block';
+            return;
+          }
+
+          document.title = formData.title + ' | QS IITGN';
+          document.getElementById('public-form-title').textContent = formData.title;
+          const descEl = document.getElementById('public-form-desc');
+          if (formData.description) { descEl.textContent = formData.description; descEl.style.display = 'block'; }
+          else descEl.style.display = 'none';
+
+          document.getElementById('form-loading').style.display = 'none';
+          document.getElementById('form-content').style.display = 'block';
+
+          renderPage();
+        } catch (e) {
+          console.error('Error loading form:', e);
+          document.getElementById('form-loading').textContent = 'Error loading form.';
+        }
+      }
+
+      function renderPage() {
+        if (!formData) return;
+        const pages = formData.pages || [];
+        const page = pages[currentPage];
+        if (!page) return;
+
+        // Page indicator
+        if (pages.length > 1) {
+          const indicator = document.getElementById('form-page-indicator');
+          indicator.style.display = 'flex';
+          indicator.innerHTML = pages.map((_, i) => `<div class="page-dot ${i === currentPage ? 'active' : ''}"></div>`).join('');
+        }
+
+        // Render questions
+        const container = document.getElementById('form-questions-render');
+        container.innerHTML = (page.questions || []).map(q => renderQuestion(q)).join('');
+
+        // Attach listeners
+        page.questions.forEach(q => attachQuestionListeners(q));
+
+        // Nav buttons
+        const btnPrev = document.getElementById('btn-prev-page');
+        const btnNext = document.getElementById('btn-next-page');
+        const btnSubmit = document.getElementById('btn-submit-form');
+
+        btnPrev.style.display = currentPage > 0 ? 'inline-block' : 'none';
+        if (currentPage < pages.length - 1) {
+          btnNext.style.display = 'inline-block';
+          btnSubmit.style.display = 'none';
+        } else {
+          btnNext.style.display = 'none';
+          btnSubmit.style.display = 'inline-block';
+        }
+      }
+
+      function renderQuestion(q) {
+        const typeRenderers = {
+          short_text: () => `<input type="text" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}">`,
+          long_text: () => {
+            const val = q.validation || {};
+            return `<textarea class="form-input" id="ans-${q.id}" rows="5" placeholder="Enter your answer...">${answers[q.id] || ''}</textarea>
+              <div class="word-counter" id="wc-${q.id}">0 words${val.minWords ? ' (min ' + val.minWords + ')' : ''}${val.maxWords ? ' (max ' + val.maxWords + ')' : ''}</div>`;
+          },
+          paragraph: () => `<textarea class="form-input" id="ans-${q.id}" rows="4">${answers[q.id] || ''}</textarea>`,
+          mcq: () => {
+            let opts = (q.options || []).map((o, i) =>
+              `<label><input type="radio" name="ans-${q.id}" value="${o}" ${answers[q.id] === o ? 'checked' : ''}> ${o}</label>`
+            ).join('');
+            if (q.hasOtherOption) opts += `<label><input type="radio" name="ans-${q.id}" value="__other__" ${(answers[q.id] || '').startsWith('__other__:') ? 'checked' : ''}> Other: <input type="text" class="form-input" id="other-${q.id}" style="flex:1; padding:6px 10px; margin-left:4px;" value="${(answers[q.id] || '').startsWith('__other__:') ? answers[q.id].replace('__other__:', '') : ''}"></label>`;
+            return `<div class="radio-group">${opts}</div>`;
+          },
+          checkbox: () => {
+            const selected = Array.isArray(answers[q.id]) ? answers[q.id] : [];
+            let opts = (q.options || []).map(o =>
+              `<label><input type="checkbox" name="ans-${q.id}" value="${o}" ${selected.includes(o) ? 'checked' : ''}> ${o}</label>`
+            ).join('');
+            if (q.hasOtherOption) opts += `<label><input type="checkbox" name="ans-${q.id}" value="__other__" ${selected.some(s => s.startsWith('__other__:')) ? 'checked' : ''}> Other: <input type="text" class="form-input" id="other-${q.id}" style="flex:1; padding:6px 10px; margin-left:4px;"></label>`;
+            return `<div class="checkbox-group">${opts}</div>`;
+          },
+          dropdown: () => `<select class="form-input" id="ans-${q.id}"><option value="">— Select —</option>${(q.options || []).map(o => `<option value="${o}" ${answers[q.id] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`,
+          linear_scale: () => {
+            const sc = q.scaleConfig || { min: 1, max: 5 };
+            let btns = '';
+            for (let i = sc.min; i <= sc.max; i++) {
+              btns += `<button type="button" class="scale-btn ${answers[q.id] == i ? 'selected' : ''}" data-val="${i}" onclick="window._selectScale('${q.id}', ${i})">${i}</button>`;
+            }
+            return `<div class="scale-container">${sc.minLabel ? `<span class="scale-label">${sc.minLabel}</span>` : ''}${btns}${sc.maxLabel ? `<span class="scale-label">${sc.maxLabel}</span>` : ''}</div>`;
+          },
+          number: () => `<input type="number" class="form-input" id="ans-${q.id}" value="${answers[q.id] != null ? answers[q.id] : ''}" ${(q.validation || {}).integerOnly ? 'step="1"' : ''}>`,
+          email: () => `<input type="email" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}" placeholder="your@email.com">`,
+          phone: () => `<input type="tel" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}" placeholder="+91 XXXXX XXXXX">`,
+          date: () => `<input type="date" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}">`,
+          time: () => `<input type="time" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}">`,
+          url: () => `<input type="url" class="form-input" id="ans-${q.id}" value="${answers[q.id] || ''}" placeholder="https://example.com">`,
+          rating: () => {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+              stars += `<button type="button" class="star-btn ${(answers[q.id] || 0) >= i ? 'active' : ''}" onclick="window._selectRating('${q.id}', ${i})">⭐</button>`;
+            }
+            return `<div class="rating-container">${stars}</div>`;
+          }
+        };
+
+        const renderer = typeRenderers[q.type] || typeRenderers.short_text;
+
+        return `
+          <div class="question-card" id="card-${q.id}">
+            <div class="q-label">${q.text || 'Untitled Question'} ${q.required ? '<span class="required">*</span>' : ''}</div>
+            ${q.description ? `<div class="q-desc">${q.description}</div>` : ''}
+            ${renderer()}
+            <div class="q-error" id="err-${q.id}"></div>
+          </div>`;
+      }
+
+      function attachQuestionListeners(q) {
+        // For long_text word counter
+        if (q.type === 'long_text') {
+          const ta = document.getElementById('ans-' + q.id);
+          const wc = document.getElementById('wc-' + q.id);
+          if (ta && wc) {
+            const update = () => {
+              const words = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+              const val = q.validation || {};
+              let cls = '';
+              if (val.minWords && words < val.minWords) cls = 'error';
+              else if (val.maxWords && words > val.maxWords) cls = 'error';
+              else if (val.minWords && words < val.minWords * 1.2) cls = 'warn';
+              wc.className = 'word-counter ' + cls;
+              wc.textContent = words + ' word' + (words !== 1 ? 's' : '') +
+                (val.minWords ? ' (min ' + val.minWords + ')' : '') +
+                (val.maxWords ? ' (max ' + val.maxWords + ')' : '');
+            };
+            ta.addEventListener('input', update);
+            update();
+          }
+        }
+      }
+
+      // Global helpers for scale & rating
+      window._selectScale = function(qId, val) {
+        answers[qId] = val;
+        document.querySelectorAll(`#card-${qId} .scale-btn`).forEach(btn => {
+          btn.classList.toggle('selected', Number(btn.dataset.val) === val);
+        });
+      };
+
+      window._selectRating = function(qId, val) {
+        answers[qId] = val;
+        document.querySelectorAll(`#card-${qId} .star-btn`).forEach((btn, i) => {
+          btn.classList.toggle('active', i < val);
+        });
+      };
+
+      function collectAnswers() {
+        const page = formData.pages[currentPage];
+        (page.questions || []).forEach(q => {
+          if (['mcq'].includes(q.type)) {
+            const checked = document.querySelector(`input[name="ans-${q.id}"]:checked`);
+            if (checked) {
+              if (checked.value === '__other__') {
+                const otherInput = document.getElementById('other-' + q.id);
+                answers[q.id] = '__other__:' + (otherInput ? otherInput.value : '');
+              } else {
+                answers[q.id] = checked.value;
+              }
+            }
+          } else if (q.type === 'checkbox') {
+            const checked = document.querySelectorAll(`input[name="ans-${q.id}"]:checked`);
+            answers[q.id] = Array.from(checked).map(c => {
+              if (c.value === '__other__') {
+                const otherInput = document.getElementById('other-' + q.id);
+                return '__other__:' + (otherInput ? otherInput.value : '');
+              }
+              return c.value;
+            });
+          } else if (!['linear_scale', 'rating'].includes(q.type)) {
+            const el = document.getElementById('ans-' + q.id);
+            if (el) answers[q.id] = el.value;
+          }
+        });
+      }
+
+      function validatePage() {
+        collectAnswers();
+        const page = formData.pages[currentPage];
+        let valid = true;
+
+        (page.questions || []).forEach(q => {
+          const errEl = document.getElementById('err-' + q.id);
+          const card = document.getElementById('card-' + q.id);
+          if (!errEl || !card) return;
+          errEl.style.display = 'none';
+          card.classList.remove('error');
+
+          const val = answers[q.id];
+          const v = q.validation || {};
+
+          // Required check
+          if (q.required) {
+            let empty = false;
+            if (Array.isArray(val)) empty = val.length === 0;
+            else if (val == null || val === '') empty = true;
+            if (empty) {
+              errEl.textContent = 'This field is required.';
+              errEl.style.display = 'block';
+              card.classList.add('error');
+              valid = false;
+              return;
+            }
+          }
+
+          if (val == null || val === '' || (Array.isArray(val) && val.length === 0)) return;
+
+          // Type-specific validation
+          if (q.type === 'email' && typeof val === 'string') {
+            if (!val.includes('@')) {
+              errEl.textContent = 'Please enter a valid email address.';
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+            if (v.emailDomain && !val.toLowerCase().endsWith('@' + v.emailDomain.toLowerCase())) {
+              errEl.textContent = 'Email must end with @' + v.emailDomain;
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+          }
+
+          if (q.type === 'long_text' && typeof val === 'string') {
+            const words = val.trim().split(/\s+/).length;
+            if (v.minWords && words < v.minWords) {
+              errEl.textContent = `Please write at least ${v.minWords} words (currently ${words}).`;
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+            if (v.maxWords && words > v.maxWords) {
+              errEl.textContent = `Please write no more than ${v.maxWords} words (currently ${words}).`;
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+          }
+
+          if (['short_text', 'paragraph'].includes(q.type) && typeof val === 'string') {
+            if (v.minLength && val.length < v.minLength) {
+              errEl.textContent = `Minimum ${v.minLength} characters required.`;
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+            if (v.maxLength && val.length > v.maxLength) {
+              errEl.textContent = `Maximum ${v.maxLength} characters allowed.`;
+              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
+            }
+          }
+
+          if (q.type === 'number') {
+            const num = Number(val);
+            if (isNaN(num)) { errEl.textContent = 'Please enter a valid number.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.integerOnly && !Number.isInteger(num)) { errEl.textContent = 'Please enter a whole number.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.min != null && num < v.min) { errEl.textContent = `Minimum value is ${v.min}.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.max != null && num > v.max) { errEl.textContent = `Maximum value is ${v.max}.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+          }
+
+          if (q.type === 'phone' && typeof val === 'string') {
+            const digits = val.replace(/\D/g, '');
+            if (v.min && digits.length < v.min) { errEl.textContent = `Please enter at least ${v.min} digits.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.max && digits.length > v.max) { errEl.textContent = `Please enter no more than ${v.max} digits.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+          }
+
+          if (q.type === 'checkbox' && Array.isArray(val)) {
+            if (v.min && val.length < v.min) { errEl.textContent = `Please select at least ${v.min} options.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.max && val.length > v.max) { errEl.textContent = `Please select no more than ${v.max} options.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+          }
+
+          if (q.type === 'url' && typeof val === 'string') {
+            try { new URL(val); } catch { errEl.textContent = 'Please enter a valid URL.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+          }
+        });
+
+        return valid;
+      }
+
+      // Navigation
+      document.getElementById('btn-next-page').addEventListener('click', () => {
+        if (!validatePage()) return;
+        currentPage++;
+        renderPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('btn-prev-page').addEventListener('click', () => {
+        collectAnswers();
+        currentPage--;
+        renderPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('btn-submit-form').addEventListener('click', async () => {
+        if (!validatePage()) return;
+        // Collect all pages
+        formData.pages.forEach((_, i) => {
+          // answers already collected for current page, collect others from memory
+        });
+
+        const btn = document.getElementById('btn-submit-form');
+        btn.textContent = 'Submitting...';
+        btn.disabled = true;
+
+        try {
+          // Clean up __other__ prefixes
+          const cleanAnswers = {};
+          Object.keys(answers).forEach(k => {
+            let v = answers[k];
+            if (typeof v === 'string' && v.startsWith('__other__:')) v = v.replace('__other__:', '');
+            if (Array.isArray(v)) v = v.map(x => typeof x === 'string' && x.startsWith('__other__:') ? x.replace('__other__:', '') : x);
+            cleanAnswers[k] = v;
+          });
+
+          await window.db.collection('form_responses').doc(formId).collection('responses').add({
+            answers: cleanAnswers,
+            submittedAt: new Date().toISOString()
+          });
+
+          // Increment response count
+          await window.db.collection('forms').doc(formId).update({
+            responseCount: firebase.firestore.FieldValue.increment(1)
+          });
+
+          document.getElementById('form-content').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } catch (e) {
+          console.error('Error submitting form:', e);
+          alert('Error submitting form. Please try again.');
+          btn.textContent = 'Submit';
+          btn.disabled = false;
+        }
+      });
+
+      // Theme
+      const savedTheme = localStorage.getItem('qs-theme');
+      if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+      // Load
+      if (window.db) loadForm();
+      else setTimeout(loadForm, 500);
+    })();
+  </script>
+</body>
+</html>

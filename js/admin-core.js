@@ -1190,12 +1190,14 @@ globalCharts);
     let currentQAQuizId = null;
   
     document.getElementById('btn-analytics-back').addEventListener('click', () => {
-      showScreen('screen-dash');
+      document.getElementById('sb-nav-dash').click();
     });
 
     const btnSettings = document.getElementById('btn-settings-sidebar');
     if (btnSettings) {
       btnSettings.addEventListener('click', () => {
+        document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+        btnSettings.classList.add('active');
         showScreen('screen-admin-settings');
       });
     }
@@ -1203,7 +1205,7 @@ globalCharts);
     const btnSettingsBack = document.getElementById('btn-settings-back');
     if (btnSettingsBack) {
       btnSettingsBack.addEventListener('click', () => {
-        showScreen('screen-dash');
+        document.getElementById('sb-nav-dash').click();
       });
     }
   
@@ -1476,11 +1478,21 @@ globalCharts);
               if (timeInput) qObj.scheduledDeployTime = timeInput.value;
               qObj.currentDeploymentId = `dep_${Date.now()}`;
               qObj.deployments = qObj.deployments || [];
-              qObj.deployments.push({ id: qObj.currentDeploymentId, startTime: new Date().toISOString() });
+              
+              let deployStart = new Date();
+              if (qObj.scheduledDeployDate && qObj.scheduledDeployTime) {
+                const target = new Date(`${qObj.scheduledDeployDate}T${qObj.scheduledDeployTime}`);
+                if (target > deployStart) deployStart = target;
+              }
+              qObj.deployments.push({ id: qObj.currentDeploymentId, startTime: deployStart.toISOString() });
             } else {
               if (qObj.deployments && qObj.deployments.length > 0) {
                 qObj.deployments[qObj.deployments.length - 1].endTime = new Date().toISOString();
               }
+              if (dateInput) dateInput.value = '';
+              if (timeInput) timeInput.value = '';
+              qObj.scheduledDeployDate = '';
+              qObj.scheduledDeployTime = '';
             }
             save(); // Sync to localStorage and Firebase
             btnDeploy.textContent = qObj.isDeployed ? 'End Tournament' : 'Deploy Quiz';
@@ -1498,38 +1510,36 @@ globalCharts);
             if (qObj.isDeployed && qObj.deployments && qObj.deployments.length > 0) {
               const currentDep = qObj.deployments[qObj.deployments.length - 1];
               const start = new Date(currentDep.startTime);
-              const diffMs = Math.max(0, Date.now() - start.getTime());
-              const hrs = Math.floor(diffMs / 3600000);
-              const mins = Math.floor((diffMs % 3600000) / 60000);
-              const secs = Math.floor((diffMs % 60000) / 1000);
+              const now = Date.now();
               const pad = n => n.toString().padStart(2, '0');
-              statusSpan.textContent = `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
-              statusSpan.style.color = '#10B981';
-              statusSpan.style.fontSize = '2.2rem';
-            } else {
-              const dVal = dateInput ? dateInput.value : '';
-              const tVal = timeInput ? timeInput.value : '';
-              if (dVal && tVal) {
-                const targetTime = new Date(`${dVal}T${tVal}`).getTime();
-                const now = Date.now();
-                if (targetTime > now) {
-                  const diff = targetTime - now;
-                  const d = Math.floor(diff / 86400000);
-                  const h = Math.floor((diff % 86400000) / 3600000);
-                  const m = Math.floor((diff % 3600000) / 60000);
-                  const s = Math.floor((diff % 60000) / 1000);
-                  
-                  let timeStr = '';
-                  if (d > 0) timeStr += `${d}d `;
-                  if (h > 0 || d > 0) timeStr += `${h}h `;
-                  timeStr += `${m}m ${s}s`;
-                  
-                  statusSpan.innerHTML = `${timeStr}<br><span style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; line-height: 1.5;">left</span>`;
-                  statusSpan.style.color = '#0ea5e9';
-                  statusSpan.style.fontSize = '1.6rem';
-                  return;
-                }
+              
+              if (start.getTime() > now) {
+                // Scheduled in the future
+                const diff = start.getTime() - now;
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                
+                let timeStr = '';
+                if (d > 0) timeStr += `${d}D `;
+                timeStr += `${pad(h)}:${pad(m)}:${pad(s)}`;
+                
+                statusSpan.innerHTML = `${timeStr}<br><span style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; line-height: 1.5;">left to start</span>`;
+                statusSpan.style.color = '#0ea5e9';
+                statusSpan.style.fontSize = '1.6rem';
+              } else {
+                // Active deployment
+                const diffMs = now - start.getTime();
+                const hrs = Math.floor(diffMs / 3600000);
+                const mins = Math.floor((diffMs % 3600000) / 60000);
+                const secs = Math.floor((diffMs % 60000) / 1000);
+                statusSpan.textContent = `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+                statusSpan.style.color = '#10B981';
+                statusSpan.style.fontSize = '2.2rem';
               }
+            } else {
+              // Not deployed
               statusSpan.textContent = 'Not Deployed';
               statusSpan.style.color = 'var(--text-secondary)';
               statusSpan.style.fontSize = '1.4rem';
@@ -2013,6 +2023,468 @@ globalCharts);
       liveSessionsUnsubscribe = null;
       liveChatsUnsubscribe = null;
     };
+
+    // ══════════════════════ ADMIN SETTINGS PAGE LOGIC ══════════════════════
+
+    // Tab Navigation
+    document.querySelectorAll('.settings-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const tabName = item.getAttribute('data-settings-tab');
+        
+        document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        
+        document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById('settings-tab-' + tabName);
+        if (panel) panel.classList.add('active');
+
+        // Populate about stats when that tab opens
+        if (tabName === 'about') {
+          const totalQ = quizzes.reduce((s, q) => s + (q.questions ? q.questions.length : 0), 0);
+          document.getElementById('about-total-quizzes').textContent = quizzes.length;
+          document.getElementById('about-total-questions').textContent = totalQ;
+          document.getElementById('about-total-attempts').textContent = globalAttempts ? globalAttempts.length : 0;
+        }
+      });
+    });
+
+    // ── Profile Save / Load ──
+    const SETTINGS_KEY = 'qs_admin_settings';
+    function loadSettings() {
+      const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+      if (s.orgName) document.getElementById('set-org-name').value = s.orgName;
+      if (s.adminName) document.getElementById('set-admin-name').value = s.adminName;
+      if (s.phone) document.getElementById('set-admin-phone').value = s.phone;
+      if (s.welcomeMsg) document.getElementById('set-welcome-msg').value = s.welcomeMsg;
+      
+      // Load email from session
+      const email = sessionStorage.getItem('qs_admin_id');
+      if (email) document.getElementById('set-admin-email').value = email;
+
+      // Load quiz defaults
+      if (s.defaultTime) document.getElementById('set-default-time').value = s.defaultTime;
+      if (s.defaultVisibility) document.getElementById('set-default-visibility').value = s.defaultVisibility;
+      if (s.defaultAttempts) document.getElementById('set-default-attempts').value = s.defaultAttempts;
+      if (s.defaultShuffle) document.getElementById('set-default-shuffle').value = s.defaultShuffle;
+      if (s.showAnswers !== undefined) document.getElementById('set-show-answers').checked = s.showAnswers;
+      if (s.tabDetection !== undefined) document.getElementById('set-tab-detection').checked = s.tabDetection;
+      if (s.autoCollapse !== undefined) document.getElementById('set-auto-collapse').checked = s.autoCollapse;
+
+      return s;
+    }
+
+    function saveSettings(partial) {
+      const current = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+      const merged = { ...current, ...partial };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged));
+      
+      // Also sync to Firebase
+      if (window.db) {
+        window.db.collection('global').doc('adminSettings').set(merged)
+          .catch(e => console.error('Error saving settings:', e));
+      }
+    }
+
+    function flashStatus(id, text) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text || '✓ Saved';
+      el.style.display = 'inline';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    }
+
+    // Initialize settings on page load
+    loadSettings();
+
+    // Session info
+    const sessionInfo = document.getElementById('set-session-info');
+    if (sessionInfo) {
+      sessionInfo.textContent = 'Active now · ' + navigator.userAgent.split('(')[1]?.split(')')[0] || 'This browser';
+    }
+
+    // Profile Save
+    const btnSaveProfile = document.getElementById('btn-save-profile');
+    if (btnSaveProfile) {
+      btnSaveProfile.addEventListener('click', () => {
+        saveSettings({
+          orgName: document.getElementById('set-org-name').value.trim(),
+          adminName: document.getElementById('set-admin-name').value.trim(),
+          phone: document.getElementById('set-admin-phone').value.trim(),
+          welcomeMsg: document.getElementById('set-welcome-msg').value.trim()
+        });
+        flashStatus('profile-save-status');
+      });
+    }
+
+    // ── Password Change ──
+    const newPassInput = document.getElementById('set-new-pass');
+    if (newPassInput) {
+      newPassInput.addEventListener('input', () => {
+        const val = newPassInput.value;
+        const fill = document.getElementById('pass-strength-fill');
+        const txt = document.getElementById('pass-strength-text');
+        let strength = 0;
+        if (val.length >= 6) strength++;
+        if (val.length >= 10) strength++;
+        if (/[A-Z]/.test(val)) strength++;
+        if (/[0-9]/.test(val)) strength++;
+        if (/[^a-zA-Z0-9]/.test(val)) strength++;
+
+        const pct = (strength / 5) * 100;
+        const colors = ['#ef4444', '#ef4444', '#f59e0b', '#10B981', '#10B981'];
+        const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        fill.style.width = pct + '%';
+        fill.style.background = colors[Math.min(strength, 4)];
+        txt.textContent = val.length > 0 ? labels[Math.min(strength, 4)] : '';
+      });
+    }
+
+    const btnUpdatePass = document.getElementById('btn-update-password');
+    if (btnUpdatePass) {
+      btnUpdatePass.addEventListener('click', async () => {
+        const current = document.getElementById('set-current-pass').value;
+        const newP = document.getElementById('set-new-pass').value;
+        const confirm = document.getElementById('set-confirm-pass').value;
+        const statusEl = document.getElementById('pass-save-status');
+
+        if (!current || !newP || !confirm) {
+          statusEl.textContent = '⚠ Please fill in all fields';
+          statusEl.style.color = '#ef4444';
+          statusEl.style.display = 'inline';
+          setTimeout(() => statusEl.style.display = 'none', 3000);
+          return;
+        }
+        if (newP !== confirm) {
+          statusEl.textContent = '⚠ Passwords do not match';
+          statusEl.style.color = '#ef4444';
+          statusEl.style.display = 'inline';
+          setTimeout(() => statusEl.style.display = 'none', 3000);
+          return;
+        }
+        if (newP.length < 6) {
+          statusEl.textContent = '⚠ Password must be at least 6 characters';
+          statusEl.style.color = '#ef4444';
+          statusEl.style.display = 'inline';
+          setTimeout(() => statusEl.style.display = 'none', 3000);
+          return;
+        }
+
+        try {
+          btnUpdatePass.textContent = 'Updating...';
+          const user = firebase.auth().currentUser;
+          const email = sessionStorage.getItem('qs_admin_id');
+          const cred = firebase.auth.EmailAuthProvider.credential(email, current);
+          await user.reauthenticateWithCredential(cred);
+          await user.updatePassword(newP);
+
+          document.getElementById('set-current-pass').value = '';
+          document.getElementById('set-new-pass').value = '';
+          document.getElementById('set-confirm-pass').value = '';
+          document.getElementById('pass-strength-fill').style.width = '0%';
+          document.getElementById('pass-strength-text').textContent = '';
+
+          statusEl.textContent = '✓ Password updated';
+          statusEl.style.color = '#10B981';
+          statusEl.style.display = 'inline';
+          setTimeout(() => statusEl.style.display = 'none', 3000);
+        } catch(e) {
+          statusEl.textContent = '⚠ ' + (e.message || 'Error updating password');
+          statusEl.style.color = '#ef4444';
+          statusEl.style.display = 'inline';
+          setTimeout(() => statusEl.style.display = 'none', 4000);
+        }
+        btnUpdatePass.textContent = 'Update Password';
+      });
+    }
+
+    // Password visibility toggle
+    window.togglePasswordVisibility = function(btn) {
+      const input = btn.parentElement.querySelector('input');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+      }
+    };
+
+    // Logout all devices
+    const btnLogoutAll = document.getElementById('btn-logout-all');
+    if (btnLogoutAll) {
+      btnLogoutAll.addEventListener('click', async () => {
+        if (!window.confirm('Log out from all devices? You will need to log in again.')) return;
+        try {
+          if (window.firebase) await firebase.auth().signOut();
+          sessionStorage.removeItem('qs_admin');
+          sessionStorage.removeItem('qs_admin_id');
+          window.location.href = 'active-quiz.html';
+        } catch(e) { console.error(e); }
+      });
+    }
+
+    // ── Theme Picker ──
+    const themeOptions = document.querySelectorAll('.theme-option');
+    function applyThemePicker() {
+      const saved = localStorage.getItem('qs-theme') || 'light';
+      const savedPref = localStorage.getItem('qs-theme-pref') || saved;
+      themeOptions.forEach(opt => {
+        opt.classList.toggle('active', opt.getAttribute('data-theme-val') === savedPref);
+      });
+    }
+    applyThemePicker();
+
+    themeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const val = opt.getAttribute('data-theme-val');
+        localStorage.setItem('qs-theme-pref', val);
+        
+        let effectiveTheme = val;
+        if (val === 'system') {
+          effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        localStorage.setItem('qs-theme', effectiveTheme);
+        document.documentElement.setAttribute('data-theme', effectiveTheme);
+        applyThemePicker();
+
+        // Update the theme toggle button icon
+        const toggleBtn = document.querySelector('.admin-theme-toggle');
+        if (toggleBtn) {
+          const sunIcon = toggleBtn.querySelector('.icon-sun');
+          const moonIcon = toggleBtn.querySelector('.icon-moon');
+          if (effectiveTheme === 'dark') {
+            if (sunIcon) sunIcon.style.display = 'none';
+            if (moonIcon) moonIcon.style.display = 'block';
+          } else {
+            if (sunIcon) sunIcon.style.display = 'block';
+            if (moonIcon) moonIcon.style.display = 'none';
+          }
+        }
+      });
+    });
+
+    // ── Quiz Defaults Save ──
+    const btnSaveDefaults = document.getElementById('btn-save-quiz-defaults');
+    if (btnSaveDefaults) {
+      btnSaveDefaults.addEventListener('click', () => {
+        saveSettings({
+          defaultTime: document.getElementById('set-default-time').value,
+          defaultVisibility: document.getElementById('set-default-visibility').value,
+          defaultAttempts: document.getElementById('set-default-attempts').value,
+          defaultShuffle: document.getElementById('set-default-shuffle').value,
+          showAnswers: document.getElementById('set-show-answers').checked,
+          tabDetection: document.getElementById('set-tab-detection').checked
+        });
+        flashStatus('defaults-save-status');
+      });
+    }
+
+    // ── Auto Collapse Sidebar ──
+    const autoCollapseToggle = document.getElementById('set-auto-collapse');
+    if (autoCollapseToggle) {
+      autoCollapseToggle.addEventListener('change', () => {
+        saveSettings({ autoCollapse: autoCollapseToggle.checked });
+      });
+    }
+
+    // ── Menti (Survey) Settings ──
+    // Load survey settings
+    (function loadSurveySettings() {
+      const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+      if (s.surveyType) { const el = document.getElementById('set-survey-type'); if (el) el.value = s.surveyType; }
+      if (s.surveyTimer !== undefined) { const el = document.getElementById('set-survey-timer'); if (el) el.value = s.surveyTimer; }
+      if (s.surveyRequireName !== undefined) { const el = document.getElementById('set-survey-require-name'); if (el) el.checked = s.surveyRequireName; }
+      if (s.surveyMultiResponse !== undefined) { const el = document.getElementById('set-survey-multi-response'); if (el) el.checked = s.surveyMultiResponse; }
+      if (s.surveyTransition) { const el = document.getElementById('set-survey-transition'); if (el) el.value = s.surveyTransition; }
+      if (s.surveyResultsDisplay) { const el = document.getElementById('set-survey-results-display'); if (el) el.value = s.surveyResultsDisplay; }
+      if (s.surveyShowCount !== undefined) { const el = document.getElementById('set-survey-show-count'); if (el) el.checked = s.surveyShowCount; }
+      if (s.surveyAutoAdvance !== undefined) { const el = document.getElementById('set-survey-auto-advance'); if (el) el.checked = s.surveyAutoAdvance; }
+    })();
+
+    // Save survey defaults
+    const btnSaveSurveyDefaults = document.getElementById('btn-save-survey-defaults');
+    if (btnSaveSurveyDefaults) {
+      btnSaveSurveyDefaults.addEventListener('click', () => {
+        saveSettings({
+          surveyType: document.getElementById('set-survey-type').value,
+          surveyTimer: document.getElementById('set-survey-timer').value,
+          surveyRequireName: document.getElementById('set-survey-require-name').checked,
+          surveyMultiResponse: document.getElementById('set-survey-multi-response').checked,
+          surveyTransition: document.getElementById('set-survey-transition').value,
+          surveyResultsDisplay: document.getElementById('set-survey-results-display').value,
+          surveyShowCount: document.getElementById('set-survey-show-count').checked,
+          surveyAutoAdvance: document.getElementById('set-survey-auto-advance').checked
+        });
+        flashStatus('survey-defaults-save-status');
+      });
+    }
+
+    // Export survey responses
+    const btnExportSurveyResponses = document.getElementById('btn-export-survey-responses');
+    if (btnExportSurveyResponses) {
+      btnExportSurveyResponses.addEventListener('click', async () => {
+        if (!window.db) { alert('Firebase not connected'); return; }
+        try {
+          btnExportSurveyResponses.textContent = 'Exporting...';
+          const snap = await window.db.collection('survey_responses').get();
+          let csv = 'Survey ID,Slide Index,Participant,Response,Submitted At\n';
+          snap.forEach(doc => {
+            const d = doc.data();
+            csv += `"${(d.surveyId||'').replace(/"/g,'""')}",${d.slideIndex||0},"${(d.participantName||'Anonymous').replace(/"/g,'""')}","${(d.response||'').replace(/"/g,'""')}","${d.timestamp||''}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `qs_survey_responses_${new Date().toISOString().slice(0,10)}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } catch(e) {
+          console.error(e);
+          alert('Error exporting: ' + e.message);
+        }
+        btnExportSurveyResponses.textContent = 'Export All Responses (CSV)';
+      });
+    }
+
+    // Clear survey responses
+    const btnClearSurveyResponses = document.getElementById('btn-clear-survey-responses');
+    if (btnClearSurveyResponses) {
+      btnClearSurveyResponses.addEventListener('click', async () => {
+        if (!window.confirm('⚠ Are you ABSOLUTELY sure? This will permanently delete ALL survey response data.')) return;
+        if (!window.confirm('This action CANNOT be undone. Click OK to proceed.')) return;
+        if (!window.db) { alert('Firebase not connected'); return; }
+        try {
+          btnClearSurveyResponses.textContent = 'Clearing...';
+          const snap = await window.db.collection('survey_responses').get();
+          const batch = window.db.batch();
+          snap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          alert('All survey responses cleared successfully.');
+        } catch(e) {
+          console.error(e);
+          alert('Error: ' + e.message);
+        }
+        btnClearSurveyResponses.textContent = 'Clear Responses';
+      });
+    }
+
+    // ── Export JSON ──
+    const btnExportJson = document.getElementById('btn-export-json');
+    if (btnExportJson) {
+      btnExportJson.addEventListener('click', () => {
+        const data = JSON.stringify(quizzes, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `qs_quizzes_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // ── Export Attempts CSV ──
+    const btnExportCsv = document.getElementById('btn-export-csv');
+    if (btnExportCsv) {
+      btnExportCsv.addEventListener('click', async () => {
+        if (!window.db) { alert('Firebase not connected'); return; }
+        try {
+          btnExportCsv.textContent = 'Exporting...';
+          const snap = await window.db.collection('quiz_attempts').get();
+          let csv = 'Quiz Name,Student Name,Score,Total Questions,Time Taken,Tab Switches,Minimizes,Submitted At\n';
+          snap.forEach(doc => {
+            const d = doc.data();
+            csv += `"${(d.quizName||'').replace(/"/g,'""')}","${(d.studentName||d.participantName||'Anonymous').replace(/"/g,'""')}",${d.score||0},${d.totalQuestions||0},${d.timeTaken||0},${d.tabSwitches||0},${d.minimizes||0},"${d.submittedAt||''}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `qs_attempts_${new Date().toISOString().slice(0,10)}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+          btnExportCsv.textContent = 'Export Attempts (CSV)';
+        } catch(e) {
+          console.error(e);
+          alert('Error exporting: ' + e.message);
+          btnExportCsv.textContent = 'Export Attempts (CSV)';
+        }
+      });
+    }
+
+    // ── Import JSON ──
+    const importDrop = document.getElementById('import-drop-zone');
+    const importInput = document.getElementById('import-file-input');
+    if (importDrop && importInput) {
+      importDrop.addEventListener('click', () => importInput.click());
+      importDrop.addEventListener('dragover', e => { e.preventDefault(); importDrop.style.borderColor = '#0ea5e9'; });
+      importDrop.addEventListener('dragleave', () => { importDrop.style.borderColor = ''; });
+      importDrop.addEventListener('drop', e => {
+        e.preventDefault();
+        importDrop.style.borderColor = '';
+        if (e.dataTransfer.files.length) processImportFile(e.dataTransfer.files[0]);
+      });
+      importInput.addEventListener('change', () => {
+        if (importInput.files.length) processImportFile(importInput.files[0]);
+      });
+    }
+
+    function processImportFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) throw new Error('Invalid format: expected an array of quizzes');
+          if (!window.confirm(`Import ${data.length} quizzes? This will REPLACE all existing quizzes.`)) return;
+          quizzes.length = 0;
+          data.forEach(q => quizzes.push(q));
+          save();
+          renderDashboard();
+          alert('Successfully imported ' + data.length + ' quizzes!');
+        } catch(err) {
+          alert('Import failed: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ── Danger Zone ──
+    const btnClearAttempts = document.getElementById('btn-clear-all-attempts');
+    if (btnClearAttempts) {
+      btnClearAttempts.addEventListener('click', async () => {
+        if (!window.confirm('⚠ Are you ABSOLUTELY sure? This will permanently delete ALL student attempt data.')) return;
+        if (!window.confirm('This action CANNOT be undone. Type "yes" by clicking OK to proceed.')) return;
+        if (!window.db) { alert('Firebase not connected'); return; }
+        try {
+          btnClearAttempts.textContent = 'Clearing...';
+          const snap = await window.db.collection('quiz_attempts').get();
+          const batch = window.db.batch();
+          snap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          globalAttempts = [];
+          alert('All attempts cleared successfully.');
+          btnClearAttempts.textContent = 'Clear Attempts';
+        } catch(e) {
+          console.error(e);
+          alert('Error: ' + e.message);
+          btnClearAttempts.textContent = 'Clear Attempts';
+        }
+      });
+    }
+
+    const btnDeleteAll = document.getElementById('btn-delete-all-quizzes');
+    if (btnDeleteAll) {
+      btnDeleteAll.addEventListener('click', () => {
+        if (!window.confirm('⚠ DELETE ALL QUIZZES? This will permanently remove every single quiz.')) return;
+        if (!window.confirm('Last chance. This CANNOT be undone. Click OK to delete everything.')) return;
+        quizzes.length = 0;
+        save();
+        renderDashboard();
+        alert('All quizzes have been deleted.');
+      });
+    }
   
   })();
   

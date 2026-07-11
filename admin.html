@@ -127,14 +127,14 @@
 <!-- ═══════════════════════ DASHBOARD SCREEN ═══════════════════════ -->
 <div class="screen dash-screen" id="screen-dash">
   <div class="dash-topbar">
-    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center">Admin Panel</div>
     <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
-      <button class="admin-theme-toggle" id="admin-theme-toggle" aria-label="Toggle dark mode">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
         <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button class="btn-logout" id="btn-logout">Logout</button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
   <div class="dash-body">
@@ -237,9 +237,13 @@
 <!-- ═══════════════════════ APPLICATIONS SCREEN ═══════════════════════ -->
 <div class="screen applications-screen" id="screen-applications" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
-    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center">Admin Panel</div>
-    <div class="right" style="display: flex; justify-content: flex-end;">
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
@@ -283,12 +287,15 @@
     </div>
   </div>
   <div class="dash-topbar">
-    <div class="left" style="display: flex; align-items: center; gap: 12px;">
-      <img src="qs_logo.png" alt="QS" style="height: 36px;">
-      <span style="font-weight: 800; font-size: 1.1rem;">QS IITGN</span>
-    </div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center">Analytics Dashboard</div>
-    <div class="right" style="display: flex; justify-content: flex-end;"></div>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
+    </div>
   </div>
   <div class="dash-body">
     <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 24px; width: 100%;" id="qa-dynamic-header">
@@ -544,34 +551,471 @@
 </div>
 
 <!-- ═══════════════════════ SETTINGS SCREEN ═══════════════════════ -->
-<div class="screen settings-screen" id="screen-admin-settings" style="display: none; flex-direction: column; min-height: 100vh;">
+<div class="screen settings-screen" id="screen-admin-settings" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
-    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px;"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center">Admin Settings</div>
-    <div class="right" style="display: flex; justify-content: flex-end;">
-      <button class="btn-logout" id="btn-settings-back" style="background: #f1f5f9; color: #334155;">Back to Dashboard</button>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
   <div class="dash-body">
-    <div style="max-width: 800px; margin: 0 auto; width: 100%;">
-      <div class="settings-card">
-        <h3>Profile Settings</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">Update your admin credentials and profile information here.</p>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div><label style="font-weight: 600; display: block; margin-bottom: 4px;">Organization Name</label><input type="text" class="aq-opt" placeholder="QS IITGN" style="width: 100%;"></div>
-          <div><label style="font-weight: 600; display: block; margin-bottom: 4px;">Admin Email</label><input type="email" class="aq-opt" placeholder="admin@example.com" style="width: 100%;"></div>
-          <button class="btn-create" style="width: fit-content; margin-top: 8px;">Save Profile</button>
+    <div class="settings-layout">
+
+      <!-- Settings Sidebar Navigation -->
+      <div class="settings-nav">
+        <div class="settings-nav-item active" data-settings-tab="profile">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Profile
+        </div>
+        <div class="settings-nav-item" data-settings-tab="security">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Security
+        </div>
+        <div class="settings-nav-item" data-settings-tab="appearance">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          Appearance
+        </div>
+        <div class="settings-nav-item" data-settings-tab="quiz-defaults">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Quiz Defaults
+        </div>
+        <div class="settings-nav-item" data-settings-tab="menti">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="2"></rect><line x1="8" y1="14" x2="8" y2="18"></line><line x1="12" y1="10" x2="12" y2="18"></line><line x1="16" y1="6" x2="16" y2="18"></line></svg>
+          Menti (Surveys)
+        </div>
+        <div class="settings-nav-item" data-settings-tab="data">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          Data Management
+        </div>
+        <div class="settings-nav-item" data-settings-tab="about">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          About
         </div>
       </div>
-      
-      <div class="settings-card" style="margin-top: 24px;">
-        <h3>Security</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">Update your password to keep your account secure.</p>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div><label style="font-weight: 600; display: block; margin-bottom: 4px;">Current Password</label><input type="password" class="aq-opt" style="width: 100%;"></div>
-          <div><label style="font-weight: 600; display: block; margin-bottom: 4px;">New Password</label><input type="password" class="aq-opt" style="width: 100%;"></div>
-          <button class="btn-create" style="width: fit-content; margin-top: 8px;">Update Password</button>
+
+      <!-- Settings Content Panels -->
+      <div class="settings-content">
+
+        <!-- ══ PROFILE ══ -->
+        <div class="settings-panel active" id="settings-tab-profile">
+          <div class="settings-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Profile Settings</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Manage your organization details and admin contact info.</p>
+
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Organization Name</label>
+                <input type="text" id="set-org-name" placeholder="e.g. Quizzing Society IITGN">
+              </div>
+              <div class="settings-field">
+                <label>Admin Display Name</label>
+                <input type="text" id="set-admin-name" placeholder="e.g. Quiz Master">
+              </div>
+            </div>
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Admin Email</label>
+                <input type="email" id="set-admin-email" placeholder="admin@example.com" readonly style="cursor: not-allowed; opacity: 0.7;">
+              </div>
+              <div class="settings-field">
+                <label>Contact Phone (Optional)</label>
+                <input type="tel" id="set-admin-phone" placeholder="+91 XXXXX XXXXX">
+              </div>
+            </div>
+            <div class="settings-field" style="margin-top: 4px;">
+              <label>Welcome Message (shown on student dashboard)</label>
+              <textarea id="set-welcome-msg" placeholder="Welcome to the quiz portal! Good luck." style="width: 100%; min-height: 80px; border-radius: 12px; padding: 12px 16px; border: none; background: var(--settings-input-bg); color: var(--text); font-family: inherit; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 12px; align-items: center;">
+              <button class="btn-create" id="btn-save-profile" style="width: fit-content;">Save Profile</button>
+              <span id="profile-save-status" style="font-size: 0.85rem; color: #10B981; font-weight: 600; display: none;">✓ Saved</span>
+            </div>
+          </div>
         </div>
+
+        <!-- ══ SECURITY ══ -->
+        <div class="settings-panel" id="settings-tab-security">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Change Password</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Update your password to keep your account secure.</p>
+
+            <div class="settings-field">
+              <label>Current Password</label>
+              <div style="position: relative;">
+                <input type="password" id="set-current-pass" placeholder="Enter current password">
+                <button class="toggle-pass-btn" onclick="togglePasswordVisibility(this)" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+            </div>
+            <div class="settings-field-group" style="margin-top: 12px;">
+              <div class="settings-field">
+                <label>New Password</label>
+                <input type="password" id="set-new-pass" placeholder="At least 6 characters">
+              </div>
+              <div class="settings-field">
+                <label>Confirm New Password</label>
+                <input type="password" id="set-confirm-pass" placeholder="Re-enter new password">
+              </div>
+            </div>
+            <div id="pass-strength-bar" style="height: 4px; border-radius: 9999px; background: var(--section-divider); margin-top: 12px; overflow: hidden;">
+              <div id="pass-strength-fill" style="height: 100%; width: 0%; border-radius: 9999px; transition: width 0.3s, background 0.3s;"></div>
+            </div>
+            <div id="pass-strength-text" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;"></div>
+            <div style="margin-top: 20px; display: flex; gap: 12px; align-items: center;">
+              <button class="btn-create" id="btn-update-password" style="width: fit-content;">Update Password</button>
+              <span id="pass-save-status" style="font-size: 0.85rem; color: #10B981; font-weight: 600; display: none;"></span>
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Active Sessions</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">You are currently logged in on this device.</p>
+            <div style="display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--settings-input-bg); border-radius: 12px;">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="#10B981" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 0.95rem;">This Device</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);" id="set-session-info">Active now</div>
+              </div>
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></div>
+            </div>
+            <button class="btn-danger" id="btn-logout-all" style="margin-top: 16px; width: fit-content; padding: 8px 20px; font-size: 0.85rem;">Log Out All Devices</button>
+          </div>
+        </div>
+
+        <!-- ══ APPEARANCE ══ -->
+        <div class="settings-panel" id="settings-tab-appearance">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Theme</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Choose how the admin panel looks for you.</p>
+
+            <div class="theme-picker-grid">
+              <div class="theme-option" data-theme-val="light">
+                <div class="theme-preview theme-preview-light">
+                  <div class="tp-bar"></div>
+                  <div class="tp-body">
+                    <div class="tp-block"></div>
+                    <div class="tp-block short"></div>
+                  </div>
+                </div>
+                <span>Light</span>
+              </div>
+              <div class="theme-option" data-theme-val="dark">
+                <div class="theme-preview theme-preview-dark">
+                  <div class="tp-bar"></div>
+                  <div class="tp-body">
+                    <div class="tp-block"></div>
+                    <div class="tp-block short"></div>
+                  </div>
+                </div>
+                <span>Dark</span>
+              </div>
+              <div class="theme-option" data-theme-val="system">
+                <div class="theme-preview theme-preview-system">
+                  <div class="tp-bar"></div>
+                  <div class="tp-body">
+                    <div class="tp-block"></div>
+                    <div class="tp-block short"></div>
+                  </div>
+                </div>
+                <span>System</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Sidebar</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Control sidebar behavior on desktop.</p>
+            <div class="settings-toggle-row">
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem;">Auto-collapse Sidebar</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Sidebar stays collapsed until you hover over it</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-auto-collapse">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ QUIZ DEFAULTS ══ -->
+        <div class="settings-panel" id="settings-tab-quiz-defaults">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Default Quiz Configuration</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">These defaults are applied to every new quiz you create.</p>
+
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Default Time per Question (seconds)</label>
+                <input type="number" id="set-default-time" placeholder="30" min="5" max="600" value="30">
+              </div>
+              <div class="settings-field">
+                <label>Default Visibility</label>
+                <select id="set-default-visibility">
+                  <option value="public">Public (Practice)</option>
+                  <option value="private">Private (Tournament)</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Default Attempts per Student</label>
+                <select id="set-default-attempts">
+                  <option value="1">1 Attempt</option>
+                  <option value="2">2 Attempts</option>
+                  <option value="3">3 Attempts</option>
+                  <option value="5">5 Attempts</option>
+                  <option value="unlimited">Unlimited</option>
+                </select>
+              </div>
+              <div class="settings-field">
+                <label>Shuffle Questions</label>
+                <select id="set-default-shuffle">
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div class="settings-toggle-row">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Show Correct Answers After Submission</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Students can review the correct answers after submitting</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-show-answers" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="settings-toggle-row" style="margin-top: 16px;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Enable Tab Switch Detection</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Track when students switch tabs during tournaments</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-tab-detection" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 12px; align-items: center;">
+              <button class="btn-create" id="btn-save-quiz-defaults" style="width: fit-content;">Save Defaults</button>
+              <span id="defaults-save-status" style="font-size: 0.85rem; color: #10B981; font-weight: 600; display: none;">✓ Saved</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ MENTI (SURVEYS) ══ -->
+        <div class="settings-panel" id="settings-tab-menti">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Survey Defaults</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Default configuration for newly created surveys.</p>
+
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Default Survey Type</label>
+                <select id="set-survey-type">
+                  <option value="poll">Live Poll</option>
+                  <option value="wordcloud">Word Cloud</option>
+                  <option value="open">Open Ended</option>
+                  <option value="scale">Scale / Rating</option>
+                  <option value="quiz">Quiz Slide</option>
+                </select>
+              </div>
+              <div class="settings-field">
+                <label>Default Timer per Slide (seconds)</label>
+                <input type="number" id="set-survey-timer" placeholder="0 = No timer" min="0" max="300" value="0">
+              </div>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <div class="settings-toggle-row">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Require Participant Name</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Ask participants for their name before they can respond</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-survey-require-name">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="settings-toggle-row" style="margin-top: 16px;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Allow Multiple Responses</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Let participants submit more than one response per slide</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-survey-multi-response">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 12px; align-items: center;">
+              <button class="btn-create" id="btn-save-survey-defaults" style="width: fit-content;">Save Survey Defaults</button>
+              <span id="survey-defaults-save-status" style="font-size: 0.85rem; color: #10B981; font-weight: 600; display: none;">✓ Saved</span>
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Presentation Settings</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Customize how surveys appear when presented live.</p>
+
+            <div class="settings-field-group">
+              <div class="settings-field">
+                <label>Slide Transition</label>
+                <select id="set-survey-transition">
+                  <option value="fade">Fade</option>
+                  <option value="slide">Slide</option>
+                  <option value="none">None (Instant)</option>
+                </select>
+              </div>
+              <div class="settings-field">
+                <label>Results Display</label>
+                <select id="set-survey-results-display">
+                  <option value="bar">Bar Chart</option>
+                  <option value="pie">Pie Chart</option>
+                  <option value="donut">Donut Chart</option>
+                  <option value="numbers">Numbers Only</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <div class="settings-toggle-row">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Show Live Response Count</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Display the total number of responses on the presentation screen</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-survey-show-count" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="settings-toggle-row" style="margin-top: 16px;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;">Auto-Advance Slides</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Automatically move to the next slide when the timer ends</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="set-survey-auto-advance">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Response Management</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Export and manage survey response data.</p>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="btn-create" id="btn-export-survey-responses" style="width: fit-content; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export All Responses (CSV)
+              </button>
+            </div>
+            <div class="settings-toggle-row" style="padding: 16px; background: rgba(239,68,68,0.05); border-radius: 12px; margin-top: 20px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ef4444;">Clear All Survey Responses</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Permanently delete all response data from all surveys</div>
+              </div>
+              <button class="btn-danger" id="btn-clear-survey-responses" style="width: fit-content; padding: 8px 20px; font-size: 0.85rem; white-space: nowrap;">Clear Responses</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ DATA MANAGEMENT ══ -->
+        <div class="settings-panel" id="settings-tab-data">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Export & Backup</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Download a backup of all your quizzes and data.</p>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="btn-create" id="btn-export-json" style="width: fit-content; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export All Quizzes (JSON)
+              </button>
+              <button class="btn-back" id="btn-export-csv" style="width: fit-content; border-radius: 9999px; gap: 8px; display: flex; align-items: center;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export Attempts (CSV)
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Import Data</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Restore quizzes from a previously exported JSON backup.</p>
+            <div style="border: 2px dashed var(--section-divider); border-radius: 16px; padding: 32px; text-align: center; cursor: pointer; transition: border-color 0.2s;" id="import-drop-zone">
+              <svg viewBox="0 0 24 24" width="32" height="32" stroke="var(--text-secondary)" stroke-width="1.5" fill="none" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <div style="font-weight: 700; font-size: 0.95rem;">Drop JSON file here or click to browse</div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Supports .json backup files</div>
+              <input type="file" id="import-file-input" accept=".json" style="display: none;">
+            </div>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 0; border-color: rgba(239,68,68,0.3);">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; color: #ef4444;">Danger Zone</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Irreversible actions. Proceed with extreme caution.</p>
+            <div class="settings-toggle-row" style="padding: 16px; background: rgba(239,68,68,0.05); border-radius: 12px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ef4444;">Clear All Quiz Attempts</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Permanently delete all student attempt data from all quizzes</div>
+              </div>
+              <button class="btn-danger" id="btn-clear-all-attempts" style="width: fit-content; padding: 8px 20px; font-size: 0.85rem; white-space: nowrap;">Clear Attempts</button>
+            </div>
+            <div class="settings-toggle-row" style="padding: 16px; background: rgba(239,68,68,0.05); border-radius: 12px; margin-top: 12px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ef4444;">Delete All Quizzes</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Permanently remove every quiz. This cannot be undone.</div>
+              </div>
+              <button class="btn-danger" id="btn-delete-all-quizzes" style="width: fit-content; padding: 8px 20px; font-size: 0.85rem; white-space: nowrap;">Delete All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ ABOUT ══ -->
+        <div class="settings-panel" id="settings-tab-about">
+          <div class="settings-card" style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+              <img src="qs_logo.png" alt="QS Logo" style="height: 48px;">
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 2px;">Quizzing Society IITGN</h3>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">Admin Panel v2.0</div>
+              </div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              Built for the Quizzing Society at IIT Gandhinagar. This platform enables seamless quiz creation, live tournament deployment, real-time analytics, and student performance tracking.
+            </p>
+          </div>
+
+          <div class="settings-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 16px;">Quick Stats</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px;">
+              <div style="text-align: center; padding: 16px; background: var(--settings-input-bg); border-radius: 12px;">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #0ea5e9;" id="about-total-quizzes">0</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Quizzes</div>
+              </div>
+              <div style="text-align: center; padding: 16px; background: var(--settings-input-bg); border-radius: 12px;">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #10B981;" id="about-total-questions">0</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Questions</div>
+              </div>
+              <div style="text-align: center; padding: 16px; background: var(--settings-input-bg); border-radius: 12px;">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #8B5CF6;" id="about-total-attempts">0</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Attempts</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -582,9 +1026,15 @@
 
 <div class="screen editor-screen" id="screen-editor">
   <div class="editor-topbar">
-    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center" id="editor-title">Edit Quiz</div>
-    <div class="right"></div>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
+    </div>
   </div>
   <div class="editor-body">
     
@@ -817,9 +1267,13 @@ integer,"Vertices in triangle?","",3,30,Math
 <!-- ═══════════════════════ SURVEY DASHBOARD SCREEN ═══════════════════════ -->
 <div class="screen surveys-screen" id="screen-surveys-dashboard" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
-    <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
+    <div class="left"><img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span></div>
     <div class="center">Surveys Dashboard (Menti)</div>
-    <div class="right" style="display: flex; justify-content: flex-end;">
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
@@ -842,12 +1296,19 @@ integer,"Vertices in triangle?","",3,30,Math
 <div class="screen surveys-screen" id="screen-survey-dashboard-detail" style="flex-direction: column; min-height: 100vh;">
   <div class="dash-topbar">
     <div class="left">
+      <img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span>
+      <div style="width: 1px; height: 24px; background: var(--section-divider); margin: 0 16px;"></div>
       <button class="btn-back" id="btn-survey-detail-back" style="margin-right: 16px;">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
       <span id="detail-survey-title" style="font-weight: 700; font-size: 1.25rem;">Survey Title</span>
     </div>
-    <div class="right" style="display: flex; justify-content: flex-end;">
+    <div class="center"></div>
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
@@ -874,16 +1335,24 @@ integer,"Vertices in triangle?","",3,30,Math
 <div class="screen editor-screen" id="screen-survey-editor" style="flex-direction: column; height: 100vh; overflow: hidden; background: #f8fafc;">
   <div class="dash-topbar" style="background: white; border-bottom: 1px solid var(--section-divider); flex-shrink: 0;">
     <div class="left">
+      <img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span>
+      <div style="width: 1px; height: 24px; background: var(--section-divider); margin: 0 16px;"></div>
       <button class="btn-back" id="btn-survey-editor-back" style="margin-right: 16px;">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
       <div style="font-size: 1.25rem; font-weight: 700; color: var(--text);">Survey Editor</div>
     </div>
-    <div class="right" style="display: flex; gap: 12px; align-items: center;">
+    <div class="center"></div>
+    <div class="right" style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
       <div style="display: flex; align-items: center; gap: 6px; margin-right: 16px;">
         <input type="checkbox" id="survey-require-name" style="width: 18px; height: 18px; cursor: pointer;">
         <label for="survey-require-name" style="font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer;">Require Participant Name</label>
       </div>
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
   
@@ -1051,6 +1520,8 @@ integer,"Vertices in triangle?","",3,30,Math
   </div>
   <div class="dash-topbar" style="background: white; border-bottom: 1px solid var(--section-divider);">
     <div class="left">
+      <img src="qs_logo.png" alt="QS" style="height: 36px; margin-right: 8px;"><span>QS IITGN</span>
+      <div style="width: 1px; height: 24px; background: var(--section-divider); margin: 0 16px;"></div>
       <button class="btn-back" id="btn-live-survey-back" style="margin-right: 16px;">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
@@ -1066,6 +1537,11 @@ integer,"Vertices in triangle?","",3,30,Math
         0
       </div>
       <button class="btn-danger" id="btn-end-live-survey" style="width: auto; margin: 0; padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; white-space: nowrap;">End Survey</button>
+      <button class="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-logout" onclick="document.getElementById('btn-logout').click()">Logout</button>
     </div>
   </div>
   
@@ -1187,15 +1663,15 @@ integer,"Vertices in triangle?","",3,30,Math
   </button>
   <script>
     // Theme toggle logic for Admin Panel
-    const adminThemeToggle = document.getElementById('admin-theme-toggle');
-    if (adminThemeToggle) {
-      adminThemeToggle.addEventListener('click', () => {
+    const adminThemeToggles = document.querySelectorAll('.admin-theme-toggle');
+    adminThemeToggles.forEach(btn => {
+      btn.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('qs-theme', newTheme);
       });
-    }
+    });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {

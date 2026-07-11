@@ -1489,7 +1489,59 @@ globalCharts);
             openQuizAnalytics(quizId); // Refresh to update dropdown
           };
         }
-  
+        // Deploy status badge logic
+        const statusSpan = document.getElementById('qa-deploy-status');
+        if (statusSpan) {
+          if (window.deployStatusInterval) clearInterval(window.deployStatusInterval);
+          
+          const updateStatus = () => {
+            if (qObj.isDeployed && qObj.deployments && qObj.deployments.length > 0) {
+              const currentDep = qObj.deployments[qObj.deployments.length - 1];
+              const start = new Date(currentDep.startTime);
+              const diffMs = Math.max(0, Date.now() - start.getTime());
+              const hrs = Math.floor(diffMs / 3600000);
+              const mins = Math.floor((diffMs % 3600000) / 60000);
+              const secs = Math.floor((diffMs % 60000) / 1000);
+              const pad = n => n.toString().padStart(2, '0');
+              statusSpan.textContent = `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+              statusSpan.style.color = '#10B981';
+              statusSpan.style.fontSize = '2.2rem';
+            } else {
+              const dVal = dateInput ? dateInput.value : '';
+              const tVal = timeInput ? timeInput.value : '';
+              if (dVal && tVal) {
+                const targetTime = new Date(`${dVal}T${tVal}`).getTime();
+                const now = Date.now();
+                if (targetTime > now) {
+                  const diff = targetTime - now;
+                  const d = Math.floor(diff / 86400000);
+                  const h = Math.floor((diff % 86400000) / 3600000);
+                  const m = Math.floor((diff % 3600000) / 60000);
+                  const s = Math.floor((diff % 60000) / 1000);
+                  
+                  let timeStr = '';
+                  if (d > 0) timeStr += `${d}d `;
+                  if (h > 0 || d > 0) timeStr += `${h}h `;
+                  timeStr += `${m}m ${s}s`;
+                  
+                  statusSpan.innerHTML = `${timeStr}<br><span style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; line-height: 1.5;">left</span>`;
+                  statusSpan.style.color = '#0ea5e9';
+                  statusSpan.style.fontSize = '1.6rem';
+                  return;
+                }
+              }
+              statusSpan.textContent = 'Not Deployed';
+              statusSpan.style.color = 'var(--text-secondary)';
+              statusSpan.style.fontSize = '1.4rem';
+            }
+          };
+          updateStatus();
+          window.deployStatusInterval = setInterval(updateStatus, 1000);
+          
+          if (dateInput) dateInput.addEventListener('change', updateStatus);
+          if (timeInput) timeInput.addEventListener('change', updateStatus);
+        }
+
         // Also start live stats fetch for this tournament
         startLiveTournamentStats(quizId);
       } else {
@@ -1712,7 +1764,7 @@ globalCharts);
         container.style.marginTop = '32px';
         container.innerHTML = `
           <h3 style="margin-bottom:16px;">Student Attempts</h3>
-          <div style="background:white; border-radius:12px; overflow:hidden; border:1px solid var(--section-divider);">
+          <div style="background:var(--surface); border-radius:12px; overflow:hidden; border:1px solid var(--section-divider);">
             <table style="width:100%; border-collapse:collapse;">
               <thead style="background:var(--bg-alt); text-align:left;">
                 <tr>

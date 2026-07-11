@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard | Quizzing Society</title>
+  <script>
+    (function(){ const t = localStorage.getItem('qs-theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
+  </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,6 +115,29 @@
     }
     .history-card:hover {
       transform: translateY(-2px);
+    }
+    
+    /* Dark Theme Overrides */
+    [data-theme="dark"] .brand-header span,
+    [data-theme="dark"] h2,
+    [data-theme="dark"] h3,
+    [data-theme="dark"] .stat-box div:first-child {
+      color: #e8e8e8 !important;
+    }
+
+    [data-theme="dark"] #btn-login {
+      color: #041e49 !important;
+    }
+
+    [data-theme="dark"] #btn-logout {
+      background: #2e3033 !important;
+      color: #bbbfc4 !important;
+    }
+
+    [data-theme="dark"] .input-field {
+      background: #121212 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
     }
   </style>
 </head>

@@ -1,9 +1,125 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); font-family: 'Google Sans','Inter',sans-serif; color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
+    /* Admin specific dark theme overrides */
+    [data-theme="dark"] {
+      --bg: #121212 !important;
+      --bg-alt: #1a1a1a !important;
+      --surface: #212121 !important;
+      --text: #ffffff !important;
+      --text-secondary: #e0e0e0 !important;
+      --text-tertiary: #a0a0a0 !important;
+      --section-divider: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    [data-theme="dark"] .dash-topbar .center,
+    [data-theme="dark"] .editor-topbar .center,
+    [data-theme="dark"] .section-title {
+      color: #e8e8e8 !important;
+    }
+
+    [data-theme="dark"] .btn-create,
+    [data-theme="dark"] .btn-sky,
+    [data-theme="dark"] .btn-add-q,
+    [data-theme="dark"] .btn-save-quiz,
+    [data-theme="dark"] .mobile-sidebar-toggle {
+      color: #041e49 !important;
+    }
+
+    [data-theme="dark"] .btn-back,
+    [data-theme="dark"] a.btn-logout[style*="f1f5f9"],
+    [data-theme="dark"] button[style*="f1f5f9"] {
+      background: #2e3033 !important;
+      color: #bbbfc4 !important;
+    }
+
+    /* ── Additional User Requested Dark Mode Elements ── */
+    [data-theme="dark"] #screen-survey-live-admin,
+    [data-theme="dark"] #screen-survey-editor,
+    [data-theme="dark"] #screen-editor,
+    [data-theme="dark"] #screen-attempts,
+    [data-theme="dark"] #screen-quiz-analytics,
+    [data-theme="dark"] .custom-modal[style*="f8fafc"] {
+      background: #121212 !important;
+    }
+
+    [data-theme="dark"] .custom-modal,
+    [data-theme="dark"] .live-floating-control,
+    [data-theme="dark"] #rich-text-toolbar,
+    [data-theme="dark"] #style-toolbar,
+    [data-theme="dark"] .settings-card,
+    [data-theme="dark"] .stat-box,
+    [data-theme="dark"] div[style*="background: white"],
+    [data-theme="dark"] div[style*="background: #ffffff"],
+    [data-theme="dark"] div[style*="background:#ffffff"] {
+      background: #212121 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    [data-theme="dark"] #btn-qa-toggle-code,
+    [data-theme="dark"] #btn-qa-show-qr {
+      background: #2e3033 !important;
+      color: #bbbfc4 !important;
+      border: none !important;
+    }
+
+    [data-theme="dark"] .custom-modal h2,
+    [data-theme="dark"] .custom-modal h3,
+    [data-theme="dark"] .settings-card h4,
+    [data-theme="dark"] #qa-live-stats-panel h3 {
+      color: #e8e8e8 !important;
+    }
+
+    [data-theme="dark"] #qa-meta-dynamic {
+      color: #a0a0a0 !important;
+    }
+    
+    [data-theme="dark"] #qa-dynamic-header hr {
+      border-top-color: rgba(255,255,255,0.1) !important;
+    }
+
+    [data-theme="dark"] .fg input,
+    [data-theme="dark"] .fg select,
+    [data-theme="dark"] .fg textarea,
+    [data-theme="dark"] .opt-row input[type="text"],
+    [data-theme="dark"] #ed-instructions,
+    [data-theme="dark"] #ed-allowed-attempts,
+    [data-theme="dark"] #modal-paste-text,
+    [data-theme="dark"] #modal-paste-type,
+    [data-theme="dark"] #live-chat-input,
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="number"],
+    [data-theme="dark"] input[type="date"],
+    [data-theme="dark"] input[type="time"],
+    [data-theme="dark"] input[style*="f3f4f6"],
+    [data-theme="dark"] input[style*="f0f2f5"],
+    [data-theme="dark"] div[style*="background: #f3f4f6"],
+    [data-theme="dark"] div[style*="background: #f0f2f5"] {
+      background: #121212 !important;
+      color: #ffffff !important;
+      border: none !important;
+    }
+    
+    [data-theme="dark"] .code-display {
+      background: rgba(139, 92, 246, 0.2) !important;
+    }
+
     /* ── Screens ── */
     .screen { display: none; }
     .screen.active { display: flex; }
+
+    /* Admin Theme Toggle */
+    .admin-theme-toggle {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-alt); border: 1px solid var(--section-divider); border-radius: 50%;
+      color: var(--text); cursor: pointer; transition: all 0.2s ease;
+    }
+    .admin-theme-toggle:hover { background: rgba(14,165,233,0.1); color: #0ea5e9; border-color: #0ea5e9; }
+    .admin-theme-toggle .icon-moon { display: none; }
+    .admin-theme-toggle .icon-sun  { display: block; }
+    [data-theme="dark"] .admin-theme-toggle .icon-moon { display: block; }
+    [data-theme="dark"] .admin-theme-toggle .icon-sun  { display: none; }
 
     /* ── SIDEBAR ── */
     .admin-sidebar {
@@ -12,7 +128,7 @@
       border-right: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 4px 0 24px rgba(0,0,0,0.02);
       transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: none; flex-direction: column; z-index: 9999;
     }
-    [data-theme="dark"] .admin-sidebar { background: rgba(15, 23, 42, 0.85); border-right-color: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .admin-sidebar { background: #212121; border-right-color: rgba(255,255,255,0.05); }
     .admin-sidebar.collapsed { width: 80px; }
     .admin-sidebar .sb-header {
       padding: 24px 20px; border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -63,7 +179,7 @@
       border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.5) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.05) !important;
       text-align: center;
     }
-    [data-theme="dark"] .login-card { background: rgba(30,41,59,0.7) !important; border-color: rgba(255,255,255,0.05) !important; }
+    [data-theme="dark"] .login-card { background: #212121 !important; border-color: rgba(255,255,255,0.05) !important; }
     .login-card h2 { color: #000; font-weight: 800; font-size: 2.25rem; margin-bottom: 12px; }
     .login-card .sub { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 24px; }
     .login-card .fg { margin-bottom: 16px; text-align: left; }
@@ -72,7 +188,7 @@
       width: 100%; font-size: 1rem; border-radius: 9999px !important; border: none !important; box-shadow: none !important;
       background: #f0f2f5 !important; padding: 18px 24px !important; outline: none !important; color: #111827 !important; font-family: inherit;
     }
-    [data-theme="dark"] .login-card input { background: #1E293B !important; color: #F1F5F9 !important; }
+    [data-theme="dark"] .login-card input { background: #121212 !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.1) !important; }
     .login-card .err { color: #EF4444; font-size: 0.8rem; margin-top: 8px; display: none; }
     .login-card .err.show { display: block; }
     .btn-sky {
@@ -121,7 +237,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
     }
     [data-theme="dark"] .quiz-card {
-      background: linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(30,41,59,0.4) 100%);
+      background: #212121;
       border: 1px solid rgba(255,255,255,0.05);
     }
     .quiz-card::before {
@@ -161,7 +277,40 @@
       padding: 8px 20px; background: #f1f5f9; color: #334155; border: none;
       border-radius: 9999px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit;
     }
-    [data-theme="dark"] .btn-back { background: #1E293B; color: #CBD5E1; }
+    
+    /* Deploy Schedule Layout Fixes */
+    #qa-live-stats-panel > div:nth-child(2) {
+      grid-template-columns: 1fr 1fr 1.1fr 1.4fr !important;
+    }
+    @media (max-width: 1024px) {
+      #qa-live-stats-panel > div:nth-child(2) {
+        grid-template-columns: 1fr 1fr 1fr 1.4fr !important;
+      }
+    }
+    @media (max-width: 768px) {
+      #qa-live-stats-panel > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    #deploy-schedule-container {
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+    }
+    #deploy-schedule-container > div {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+    }
+    #deploy-date, #deploy-time {
+      border-radius: 9999px !important;
+      min-width: 0 !important;
+    }
+    @media (max-width: 768px) {
+      #deploy-schedule-container {
+        flex-direction: column !important;
+      }
+    }
+    [data-theme="dark"] .btn-back { background: #2a2a2a; color: #ffffff; }
     
     .editor-body { flex: 1; padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
     .editor-left { display: flex; flex-direction: column; gap: 24px; }

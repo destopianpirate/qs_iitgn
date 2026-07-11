@@ -129,7 +129,11 @@
   <div class="dash-topbar">
     <div class="left"><img src="qs_logo.png" alt="QS"><span>QS IITGN</span></div>
     <div class="center">Admin Panel</div>
-    <div class="right" style="display: flex; justify-content: flex-end; align-items: center;">
+    <div class="right" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+      <button class="admin-theme-toggle" id="admin-theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="btn-logout" id="btn-logout">Logout</button>
     </div>
   </div>
@@ -335,15 +339,19 @@
           <div style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Avg. Completion</div>
           <div id="live-avg-completion" style="font-size: 3.5rem; font-weight: 800; color: #10b981; line-height: 1; margin-top: 8px;">0%</div>
         </div>
+        <div style="text-align: center; border-left: 1px solid var(--section-divider); padding-left: 24px;">
+          <div style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Deploy Status</div>
+          <div id="qa-deploy-status" style="font-size: 1.4rem; font-weight: 800; color: var(--text-secondary); line-height: 1.2; margin-top: 16px;">Not Deployed</div>
+        </div>
         <div style="text-align: center; border-left: 1px solid var(--section-divider); padding-left: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <div id="deploy-schedule-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;">
             <div style="position: relative; width: 100%;">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              <input type="date" id="deploy-date" style="width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit;">
+              <input type="date" id="deploy-date" onclick="this.showPicker()" style="width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit; cursor: pointer;">
             </div>
             <div style="position: relative; width: 100%;">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <input type="time" id="deploy-time" style="width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit;">
+              <input type="time" id="deploy-time" onclick="this.showPicker()" style="width: 100%; padding: 10px 10px 10px 36px; border: 1px solid var(--section-divider); border-radius: 8px; outline: none; font-family: inherit; cursor: pointer;">
             </div>
           </div>
           <button id="btn-qa-deploy" style="background: #10B981; border: none; border-radius: 9999px; padding: 12px 24px; color: white; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3); width: 100%; transition: all 0.2s;">Deploy Quiz</button>
@@ -1177,6 +1185,18 @@ integer,"Vertices in triangle?","",3,30,Math
   <button id="floating-back-btn" style="position: fixed; top: 16px; left: 16px; width: 44px; height: 44px; border-radius: 50%; background: white; color: #0ea5e9; border: 1px solid #e2e8f0; z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer;">
     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
   </button>
+  <script>
+    // Theme toggle logic for Admin Panel
+    const adminThemeToggle = document.getElementById('admin-theme-toggle');
+    if (adminThemeToggle) {
+      adminThemeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('qs-theme', newTheme);
+      });
+    }
+  </script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const floatingBtn = document.getElementById('floating-back-btn');

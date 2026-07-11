@@ -1397,7 +1397,12 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
       } else if (state.userAnswers[idx] !== null) {
         box.classList.add('attempted');
       }
-      if (idx === state.currentIndex) box.classList.add('current');
+      if (idx === state.currentIndex) {
+        box.classList.add('current');
+        setTimeout(() => {
+          box.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }, 50);
+      }
 
       box.textContent = idx + 1;
 

@@ -19,6 +19,45 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <!-- Firebase Config -->
   <script src="js/firebase.js"></script>
+
+  <style>
+    /* Dark Theme Overrides matching the dashboard */
+    [data-theme="dark"] .glass-card {
+      background: #1e1e1e !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    /* Remove the sky blue glow on hover for the join card */
+    .glass-card:hover {
+      box-shadow: var(--shadow-lg) !important;
+    }
+    
+    [data-theme="dark"] .glass-card h2,
+    [data-theme="dark"] .glass-card h3,
+    [data-theme="dark"] .glass-card p,
+    [data-theme="dark"] .form-label {
+      color: #e8e8e8 !important;
+    }
+    
+    [data-theme="dark"] .form-field {
+      background: #121212 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    [data-theme="dark"] .form-field::placeholder {
+      color: #888888 !important;
+    }
+
+    [data-theme="dark"] .submit-btn {
+      color: #ffffff !important;
+    }
+    
+    [data-theme="dark"] .join-channel {
+      background: #1e1e1e !important;
+      border-color: rgba(255,255,255,0.1) !important;
+    }
+  </style>
 </head>
 <body class="subpage">
 

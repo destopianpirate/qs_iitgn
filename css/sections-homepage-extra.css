@@ -138,30 +138,42 @@
 }
 
 /* ── Knowledge Pulse Badges ── */
-.knowledge-badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-3);
+.knowledge-badges-marquee {
+  width: 100%;
+  overflow: hidden;
   margin-top: var(--space-6);
+  position: relative;
+  /* fade edges */
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.knowledge-badges-track {
+  display: flex;
+  width: max-content;
+  gap: var(--space-8);
+  animation: kb-scroll 20s linear infinite;
 }
 .k-badge {
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-alt);
-  border: 1px solid var(--section-divider);
-  border-radius: var(--radius-full);
-  font-size: var(--fs-xs);
-  color: var(--text-secondary);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 2rem;
+  color: var(--text-tertiary);
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.3s, transform 0.3s;
   cursor: default;
 }
 .k-badge:hover {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
-  transform: scale(1.08);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+@keyframes kb-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - (var(--space-8) / 2))); }
 }
 
 /* ── Fun Facts Grid (replaces empty space) ── */

@@ -421,8 +421,8 @@
 }
 
 .npc-character {
-  width: 120px;
-  height: 120px;
+  width: 90px;
+  height: 90px;
   pointer-events: auto;
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -456,21 +456,28 @@
 .npc-speech-bubble {
   background: var(--surface);
   color: var(--text);
-  padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 var(--radius-xl);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 var(--radius-lg);
   font-family: var(--font-heading);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
-  box-shadow: var(--shadow-lg), 0 0 20px rgba(14,143,224,0.2);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(14,143,224,0.15);
   margin-bottom: var(--space-2);
-  margin-right: var(--space-4);
-  max-width: 200px;
+  margin-right: var(--space-3);
+  max-width: 160px;
   text-align: center;
-  border: 1.5px solid var(--primary-border);
+  border: 1px solid var(--primary-border);
   opacity: 0;
   transform: translateY(10px) scale(0.9);
   transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
   pointer-events: auto;
+}
+
+[data-theme="dark"] .npc-speech-bubble {
+  background: #1e1e1e !important;
+  color: #e8e8e8 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 15px rgba(76,181,245,0.1) !important;
 }
 
 .npc-speech-bubble.is-visible {
@@ -560,13 +567,13 @@
     right: max(1rem, env(safe-area-inset-right, 10px));
   }
   .npc-character {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
   }
   .npc-speech-bubble {
-    font-size: 11px;
-    padding: var(--space-2) var(--space-3);
-    max-width: 140px;
+    font-size: 10px;
+    padding: var(--space-1) var(--space-2);
+    max-width: 120px;
   }
 }
 
@@ -575,7 +582,7 @@
    ──────────────────────────────────────────── */
 .daily-challenge-widget {
   background: var(--surface);
-  border: 1px solid var(--primary-border);
+  border: none;
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
   margin-top: var(--space-12);

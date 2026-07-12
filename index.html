@@ -35,6 +35,63 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <!-- Firebase Config -->
   <script src="js/firebase.js"></script>
+
+  <style>
+    /* Dark Theme Overrides matching the dashboard */
+    [data-theme="dark"] .bento-card,
+    [data-theme="dark"] .pillar-card,
+    [data-theme="dark"] .stat-card,
+    [data-theme="dark"] .hiw-step,
+    [data-theme="dark"] .testimonial-card,
+    [data-theme="dark"] .daily-challenge-widget {
+      background: #1e1e1e !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      box-shadow: none !important;
+    }
+    
+    [data-theme="dark"] .section-title,
+    [data-theme="dark"] h3,
+    [data-theme="dark"] h4,
+    [data-theme="dark"] p,
+    [data-theme="dark"] .testimonial-quote,
+    [data-theme="dark"] .dc-question,
+    [data-theme="dark"] .bento-card h3,
+    [data-theme="dark"] .bento-card h4,
+    [data-theme="dark"] .stat-label {
+      color: #e8e8e8 !important;
+    }
+
+    [data-theme="dark"] .section-subtitle,
+    [data-theme="dark"] .testimonial-info p,
+    [data-theme="dark"] .bento-card p,
+    [data-theme="dark"] .pillar-card p,
+    [data-theme="dark"] .hiw-step p,
+    [data-theme="dark"] .dc-timer {
+      color: #a0a0a0 !important;
+    }
+
+    [data-theme="dark"] .dc-option {
+      background: #121212 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    [data-theme="dark"] .dc-option:hover {
+      background: #2a2a2a !important;
+    }
+
+    [data-theme="dark"] .dc-option.correct {
+      background: rgba(16,185,129,0.2) !important;
+      border-color: #10b981 !important;
+      color: #10b981 !important;
+    }
+
+    [data-theme="dark"] .dc-option.wrong {
+      background: rgba(239,68,68,0.2) !important;
+      border-color: #ef4444 !important;
+      color: #ef4444 !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -347,34 +404,46 @@
             <p>Participate in weekly tournaments, inter-college contests, and climb the hall of fame leaderboard.</p>
           </div>
         </div>
-        <div class="knowledge-badges" data-scroll="fade-up">
-          <span class="k-badge">Science</span>
-          <span class="k-badge">History</span>
-          <span class="k-badge">Geography</span>
-          <span class="k-badge">Pop Culture</span>
-          <span class="k-badge">Sports</span>
-          <span class="k-badge">Literature</span>
-          <span class="k-badge">Technology</span>
-          <span class="k-badge">Arts</span>
-          <span class="k-badge">Mathematics</span>
-          <span class="k-badge">IITGN Special</span>
+        <div class="knowledge-badges-marquee" data-scroll="fade-up">
+          <div class="knowledge-badges-track">
+            <!-- First Set -->
+            <span class="k-badge">Science</span>
+            <span class="k-badge">History</span>
+            <span class="k-badge">Geography</span>
+            <span class="k-badge">Pop Culture</span>
+            <span class="k-badge">Sports</span>
+            <span class="k-badge">Literature</span>
+            <span class="k-badge">Technology</span>
+            <span class="k-badge">Arts</span>
+            <span class="k-badge">Mathematics</span>
+            <span class="k-badge">IITGN Special</span>
+            <!-- Second Set for seamless loop -->
+            <span class="k-badge">Science</span>
+            <span class="k-badge">History</span>
+            <span class="k-badge">Geography</span>
+            <span class="k-badge">Pop Culture</span>
+            <span class="k-badge">Sports</span>
+            <span class="k-badge">Literature</span>
+            <span class="k-badge">Technology</span>
+            <span class="k-badge">Arts</span>
+            <span class="k-badge">Mathematics</span>
+            <span class="k-badge">IITGN Special</span>
+          </div>
         </div>
         
         <!-- Daily Challenge Widget -->
         <div class="daily-challenge-widget" id="daily-challenge" data-scroll="fade-up">
           <div class="dc-header">
-            <h3>🔥 Daily Challenge</h3>
+            <h3>Daily Challenge</h3>
             <span class="dc-timer">Resets in <span id="dc-countdown">08:45:12</span></span>
           </div>
           <div class="dc-body">
-            <p class="dc-question">What was the first feature-length animated movie ever released?</p>
-            <div class="dc-options">
-              <button class="dc-option" data-correct="false">Pinocchio</button>
-              <button class="dc-option" data-correct="true">Snow White and the Seven Dwarfs</button>
-              <button class="dc-option" data-correct="false">Fantasia</button>
-              <button class="dc-option" data-correct="false">Gulliver's Travels</button>
+            <p class="dc-question" id="dc-question-text">Loading question...</p>
+            <div class="dc-options" id="dc-options-container">
+              <!-- Options injected by JS -->
             </div>
             <div class="dc-result" id="dc-result" style="display: none;"></div>
+            <button id="dc-reset-btn" class="btn btn-outline" style="margin-top: 1rem; display: none;">Reset</button>
           </div>
         </div>
 
@@ -398,8 +467,8 @@
             <div class="testimonial-author">
               <div class="testimonial-avatar">A</div>
               <div class="testimonial-info">
-                <h4>Aditya Verma</h4>
-                <p>Alumnus, Class of 2024</p>
+                <h4>Vinay Godara</h4>
+                <p>Class of 2025</p>
               </div>
             </div>
           </div>
@@ -408,8 +477,8 @@
             <div class="testimonial-author">
               <div class="testimonial-avatar">N</div>
               <div class="testimonial-info">
-                <h4>Neha Sharma</h4>
-                <p>Current Member</p>
+                <h4>Krishn Kumar</h4>
+                <p>Current member</p>
               </div>
             </div>
           </div>
@@ -418,8 +487,8 @@
             <div class="testimonial-author">
               <div class="testimonial-avatar">R</div>
               <div class="testimonial-info">
-                <h4>Rahul Krishnan</h4>
-                <p>Team Captain, 2025</p>
+                <h4>Prashant Jangir</h4>
+                <p>Club Secratory</p>
               </div>
             </div>
           </div>
@@ -568,6 +637,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="js/scroll.js"></script>
   <script src="js/buzzer.js"></script>
+  <script src="js/questions.js"></script>
   <script src="js/main.js"></script>
   <!-- Firebase Auth Observer & UI Logic -->
   <script src="js/quiz.js"></script>

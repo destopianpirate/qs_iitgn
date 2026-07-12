@@ -268,10 +268,31 @@
 
   /* ── Daily Challenge ── */
   function initDailyChallenge() {
-    const options = document.querySelectorAll('.dc-option');
+    const questionTextEl = document.getElementById('dc-question-text');
+    const optionsContainer = document.getElementById('dc-options-container');
     const resultDiv = document.getElementById('dc-result');
+    const resetBtn = document.getElementById('dc-reset-btn');
     const npcChar = document.getElementById('npc-character');
     const npcBubble = document.getElementById('npc-speech-bubble');
+    const countdownEl = document.getElementById('dc-countdown');
+    
+    // Countdown Timer Logic
+    if (countdownEl) {
+      function updateCountdown() {
+        const now = new Date();
+        const midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0); // Next midnight
+        const diffMs = midnight - now;
+        
+        const h = Math.floor(diffMs / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const s = Math.floor((diffMs % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        
+        countdownEl.textContent = `${h}:${m}:${s}`;
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
     
     // Inject confetti keyframes dynamically
     if (!document.getElementById('confetti-styles')) {
@@ -286,50 +307,87 @@
       document.head.appendChild(style);
     }
     
-    if (!options.length || !resultDiv) return;
+    if (!questionTextEl || !optionsContainer) {
+      console.error("Missing DOM elements for Daily Challenge", {questionTextEl, optionsContainer});
+      return;
+    }
+    
+    // Explicitly fallback to window object if needed
+    const getQuestion = typeof getQuestionOfTheDay === 'function' ? getQuestionOfTheDay : window.getQuestionOfTheDay;
+    if (typeof getQuestion !== 'function') {
+      console.error("getQuestionOfTheDay is not a function. Check if js/questions.js loaded successfully.");
+      return;
+    }
 
-    options.forEach(btn => {
-      btn.addEventListener('click', function() {
-        options.forEach(b => b.disabled = true); // Disable all
+    let currentQuestionData = getQuestion();
+
+    function renderQuestion() {
+      questionTextEl.textContent = currentQuestionData.question;
+      optionsContainer.innerHTML = '';
+      resultDiv.style.display = 'none';
+      if (resetBtn) resetBtn.style.display = 'none';
+
+      currentQuestionData.options.forEach((optText, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'dc-option';
+        btn.textContent = optText;
+        btn.setAttribute('data-correct', index === currentQuestionData.correctIndex ? 'true' : 'false');
         
-        const isCorrect = this.getAttribute('data-correct') === 'true';
-        this.classList.add(isCorrect ? 'correct' : 'wrong');
-        resultDiv.style.display = 'block';
-        
-        if (isCorrect) {
-          resultDiv.textContent = "Correct! You earned 50 Knowledge Points.";
-          resultDiv.style.color = "#10b981";
-          if (npcChar && npcBubble) {
-            npcChar.className = 'npc-character npc-state-cheer';
-            npcBubble.textContent = "You nailed it!";
-            npcBubble.classList.add('is-visible');
+        btn.addEventListener('click', function() {
+          const allOptions = optionsContainer.querySelectorAll('.dc-option');
+          allOptions.forEach(b => b.disabled = true);
+          
+          const isCorrect = this.getAttribute('data-correct') === 'true';
+          this.classList.add(isCorrect ? 'correct' : 'wrong');
+          resultDiv.style.display = 'block';
+          if (resetBtn) resetBtn.style.display = 'block'; // Show reset button after answering
+          
+          if (isCorrect) {
+            resultDiv.textContent = "Correct! Great job!";
+            resultDiv.style.color = "#10b981";
+            if (npcChar && npcBubble) {
+              npcChar.className = 'npc-character npc-state-cheer';
+              npcBubble.textContent = "You nailed it!";
+              npcBubble.classList.add('is-visible');
+            }
+            for (let i = 0; i < 40; i++) {
+              const confetti = document.createElement('div');
+              confetti.className = 'confetti-piece';
+              confetti.style.left = Math.random() * 100 + '%';
+              confetti.style.backgroundColor = ['#38bdf8', '#f43f5e', '#fbbf24', '#10b981'][Math.floor(Math.random() * 4)];
+              confetti.style.animation = `confetti-fall ${Math.random() * 2 + 2}s linear forwards`;
+              document.body.appendChild(confetti);
+              setTimeout(() => confetti.remove(), 4000);
+            }
+          } else {
+            resultDiv.textContent = "Incorrect. Try again!";
+            resultDiv.style.color = "#ef4444";
+            const correctBtn = optionsContainer.querySelector('.dc-option[data-correct="true"]');
+            if (correctBtn) correctBtn.classList.add('correct');
+            if (npcChar && npcBubble) {
+              npcChar.className = 'npc-character npc-state-facepalm';
+              npcBubble.textContent = "Oh no... better luck next time!";
+              npcBubble.classList.add('is-visible');
+            }
           }
-          // Confetti
-          for (let i = 0; i < 40; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti-piece';
-            confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.backgroundColor = ['#38bdf8', '#f43f5e', '#fbbf24', '#10b981'][Math.floor(Math.random() * 4)];
-            confetti.style.animation = `confetti-fall ${Math.random() * 2 + 2}s linear forwards`;
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 4000);
-          }
-        } else {
-          resultDiv.textContent = "Incorrect. The right answer was Snow White.";
-          resultDiv.style.color = "#ef4444";
-          document.querySelector('.dc-option[data-correct="true"]').classList.add('correct'); // Highlight correct
-          if (npcChar && npcBubble) {
-            npcChar.className = 'npc-character npc-state-facepalm';
-            npcBubble.textContent = "Oh no... try again tomorrow!";
-            npcBubble.classList.add('is-visible');
-          }
-        }
-        
-        setTimeout(() => {
-          if(npcBubble) npcBubble.classList.remove('is-visible');
-        }, 4000);
+          
+          setTimeout(() => {
+            if(npcBubble) npcBubble.classList.remove('is-visible');
+          }, 4000);
+        });
+
+        optionsContainer.appendChild(btn);
       });
-    });
+    }
+
+    renderQuestion();
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        // Just re-render to reset the state
+        renderQuestion();
+      });
+    }
   }
 
   /* ── Easter Egg: Matrix Mode ── */
@@ -384,8 +442,39 @@
     }
   }
 
+  /* ── Highlight Current Nav Item ── */
+  function highlightCurrentNav() {
+    const path = window.location.pathname;
+    let page = path.split('/').pop();
+    if (page === '' || page === '/') page = 'index.html';
+    
+    const navLinks = document.querySelectorAll('.pill');
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      // Some hrefs might be just 'index.html', check if it matches
+      if (href && href.includes(page)) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  /* ── Global Background Injection ── */
+  function injectGlobalBackground() {
+    if (document.getElementById('global-premium-bg')) return;
+    
+    const bgContainer = document.createElement('div');
+    bgContainer.id = 'global-premium-bg';
+    bgContainer.innerHTML = `
+      <div class="bg-orb bg-orb-1"></div>
+      <div class="bg-orb bg-orb-2"></div>
+      <div class="bg-grid-overlay"></div>
+    `;
+    document.body.prepend(bgContainer);
+  }
+
   /* ── Initialize ── */
   function init() {
+    injectGlobalBackground();
     initTheme();
     initMobileNav();
     initPageLoader();
@@ -397,6 +486,7 @@
     initNPCScrollEffects();
     initDailyChallenge();
     initEasterEgg();
+    highlightCurrentNav();
   }
 
   if (document.readyState === 'loading') {

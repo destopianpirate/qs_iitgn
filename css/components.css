@@ -154,16 +154,17 @@ body.subpage .navbar {
   will-change: transform, opacity;
 }
 
-.pill.is-active {
-  background: var(--neo-bg) !important;
-  color: var(--primary) !important;
-  box-shadow: var(--neo-shadow-flat) !important;
-  border-radius: 9999px;
+.pill.is-active,
+.pill.active {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .pill.is-active .pill-label,
-.pill.is-active .pill-label-hover {
-  color: var(--primary) !important;
+.pill.is-active .pill-label-hover,
+.pill.active .pill-label,
+.pill.active .pill-label-hover {
+  color: #38bdf8 !important; /* Sky blue */
 }
 
 /* Navbar Actions */

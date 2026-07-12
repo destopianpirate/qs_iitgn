@@ -52,7 +52,6 @@
       border-radius: 12px;
       padding: 32px;
       margin-bottom: 24px;
-      border-top: 4px solid #0ea5e9;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .form-title-card h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
@@ -78,11 +77,18 @@
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      transition: border 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transition: border 0.2s, box-shadow 0.2s;
       border: 1px solid transparent;
     }
+    [data-theme="dark"] .question-card { box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
     .question-card.error { border-color: #ef4444; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    .question-card.shake { animation: shake 0.4s ease-in-out; }
     .question-card .q-label {
       font-size: 1rem;
       font-weight: 600;
@@ -105,12 +111,24 @@
       background: #f1f5f9;
       color: var(--text);
       outline: none;
-      transition: border 0.2s, background 0.2s;
+      transition: border 0.2s, background 0.2s, box-shadow 0.2s;
     }
-    .form-input:focus { border-color: #0ea5e9; background: var(--bg); }
-    [data-theme="dark"] .form-input { background: var(--bg); border-color: var(--section-divider); border-width: 1px; }
-    [data-theme="dark"] .form-input:focus { border-color: #0ea5e9; }
-    textarea.form-input { resize: vertical; min-height: 100px; }
+    input[type="text"].form-input, input[type="email"].form-input, input[type="number"].form-input, input[type="url"].form-input, input[type="tel"].form-input {
+      border-radius: 9999px;
+    }
+    .form-input:focus { border-color: #0ea5e9; background: var(--bg); box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15); }
+    [data-theme="dark"] .form-input { 
+      background: rgba(255, 255, 255, 0.03); 
+      border-color: rgba(255, 255, 255, 0.1); 
+      border-width: 1px; 
+      color: var(--text); 
+    }
+    [data-theme="dark"] .form-input:focus { 
+      border-color: #0ea5e9; 
+      background: rgba(14, 165, 233, 0.05); 
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.25); 
+    }
+    textarea.form-input { resize: vertical; min-height: 100px; border-radius: 12px; }
 
     .word-counter { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; text-align: right; }
     .word-counter.warn { color: #f59e0b; }
@@ -119,14 +137,14 @@
     .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
     .radio-group label, .checkbox-group label {
       display: flex; align-items: center; gap: 10px; cursor: pointer;
-      padding: 10px 14px; border-radius: 8px; border: 2px solid transparent;
-      transition: all 0.2s; font-size: 0.95rem; background: #f1f5f9;
+      padding: 12px 14px; border-radius: 8px; border: none;
+      transition: all 0.2s; font-size: 0.95rem; background: transparent; color: var(--text);
     }
-    .radio-group label:hover, .checkbox-group label:hover { background: #e2e8f0; }
+    .radio-group label:hover, .checkbox-group label:hover { background: rgba(0,0,0,0.04); }
     [data-theme="dark"] .radio-group label, [data-theme="dark"] .checkbox-group label {
-      background: var(--bg); border-color: var(--section-divider); border-width: 1px;
+      background: transparent; color: #e5e7eb;
     }
-    [data-theme="dark"] .radio-group label:hover, [data-theme="dark"] .checkbox-group label:hover { background: var(--bg-alt); }
+    [data-theme="dark"] .radio-group label:hover, [data-theme="dark"] .checkbox-group label:hover { background: rgba(255,255,255,0.08); }
     .radio-group input[type="radio"], .checkbox-group input[type="checkbox"] {
       width: 18px; height: 18px; accent-color: #0ea5e9; flex-shrink: 0;
     }
@@ -307,6 +325,19 @@
       let answers = {};
       let currentResponseId = sessionStorage.getItem('qs_form_edit_' + formId);
 
+      function saveDraft() {
+        if (!formId || currentResponseId) return;
+        localStorage.setItem(`qs_draft_${formId}`, JSON.stringify(answers));
+      }
+
+      function loadDraft() {
+        if (!formId || currentResponseId) return;
+        try {
+          const draft = localStorage.getItem(`qs_draft_${formId}`);
+          if (draft) answers = JSON.parse(draft) || {};
+        } catch(e) {}
+      }
+
       async function loadForm() {
         if (!window.db) {
           setTimeout(loadForm, 300);
@@ -352,6 +383,7 @@
           document.getElementById('form-loading').style.display = 'none';
           document.getElementById('form-content').style.display = 'block';
 
+          loadDraft();
           renderPage();
         } catch (e) {
           console.error('Error loading form:', e);
@@ -378,6 +410,13 @@
 
         // Attach listeners
         page.questions.forEach(q => attachQuestionListeners(q));
+
+        // Auto-save listeners
+        const inputs = container.querySelectorAll('input, textarea, select');
+        inputs.forEach(el => {
+          el.addEventListener('input', () => { collectAnswers(); saveDraft(); });
+          el.addEventListener('change', () => { collectAnswers(); saveDraft(); });
+        });
 
         // Nav buttons
         const btnPrev = document.getElementById('btn-prev-page');
@@ -525,91 +564,82 @@
         collectAnswers();
         const page = formData.pages[currentPage];
         let valid = true;
+        let firstErrorCard = null;
+
+        const setError = (card, errEl, msg) => {
+          errEl.textContent = msg;
+          errEl.style.display = 'block';
+          card.classList.add('error');
+          if (!firstErrorCard) firstErrorCard = card;
+          valid = false;
+        };
 
         (page.questions || []).forEach(q => {
           const errEl = document.getElementById('err-' + q.id);
           const card = document.getElementById('card-' + q.id);
           if (!errEl || !card) return;
           errEl.style.display = 'none';
-          card.classList.remove('error');
+          card.classList.remove('error', 'shake');
 
           const val = answers[q.id];
           const v = q.validation || {};
 
-          // Required check
-          if (q.required) {
-            let empty = false;
-            if (Array.isArray(val)) empty = val.length === 0;
-            else if (val == null || val === '') empty = true;
-            if (empty) {
-              errEl.textContent = 'This field is required.';
-              errEl.style.display = 'block';
-              card.classList.add('error');
-              valid = false;
-              return;
-            }
+          let empty = false;
+          if (Array.isArray(val)) empty = val.length === 0;
+          else if (val == null || val === '') empty = true;
+          
+          if (q.required && empty) {
+            setError(card, errEl, 'This required field must be filled to continue.');
+            return;
           }
 
           if (val == null || val === '' || (Array.isArray(val) && val.length === 0)) return;
 
-          // Type-specific validation
           if (q.type === 'email' && typeof val === 'string') {
-            if (!val.includes('@')) {
-              errEl.textContent = 'Please enter a valid email address.';
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
-            if (v.emailDomain && !val.toLowerCase().endsWith('@' + v.emailDomain.toLowerCase())) {
-              errEl.textContent = 'Email must end with @' + v.emailDomain;
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
+            if (!val.includes('@')) { setError(card, errEl, 'Please enter a valid email address.'); return; }
+            if (v.emailDomain && !val.toLowerCase().endsWith('@' + v.emailDomain.toLowerCase())) { setError(card, errEl, 'Email must end with @' + v.emailDomain); return; }
           }
 
           if (q.type === 'long_text' && typeof val === 'string') {
             const words = val.trim().split(/\s+/).length;
-            if (v.minWords && words < v.minWords) {
-              errEl.textContent = `Please write at least ${v.minWords} words (currently ${words}).`;
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
-            if (v.maxWords && words > v.maxWords) {
-              errEl.textContent = `Please write no more than ${v.maxWords} words (currently ${words}).`;
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
+            if (v.minWords && words < v.minWords) { setError(card, errEl, `Please write at least ${v.minWords} words (currently ${words}).`); return; }
+            if (v.maxWords && words > v.maxWords) { setError(card, errEl, `Please write no more than ${v.maxWords} words (currently ${words}).`); return; }
           }
 
           if (['short_text', 'paragraph'].includes(q.type) && typeof val === 'string') {
-            if (v.minLength && val.length < v.minLength) {
-              errEl.textContent = `Minimum ${v.minLength} characters required.`;
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
-            if (v.maxLength && val.length > v.maxLength) {
-              errEl.textContent = `Maximum ${v.maxLength} characters allowed.`;
-              errEl.style.display = 'block'; card.classList.add('error'); valid = false; return;
-            }
+            if (v.minLength && val.length < v.minLength) { setError(card, errEl, `Minimum ${v.minLength} characters required.`); return; }
+            if (v.maxLength && val.length > v.maxLength) { setError(card, errEl, `Maximum ${v.maxLength} characters allowed.`); return; }
           }
 
           if (q.type === 'number') {
             const num = Number(val);
-            if (isNaN(num)) { errEl.textContent = 'Please enter a valid number.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
-            if (v.integerOnly && !Number.isInteger(num)) { errEl.textContent = 'Please enter a whole number.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
-            if (v.min != null && num < v.min) { errEl.textContent = `Minimum value is ${v.min}.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
-            if (v.max != null && num > v.max) { errEl.textContent = `Maximum value is ${v.max}.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (isNaN(num)) { setError(card, errEl, 'Please enter a valid number.'); return; }
+            if (v.integerOnly && !Number.isInteger(num)) { setError(card, errEl, 'Please enter a whole number.'); return; }
+            if (v.min != null && num < v.min) { setError(card, errEl, `Minimum value is ${v.min}.`); return; }
+            if (v.max != null && num > v.max) { setError(card, errEl, `Maximum value is ${v.max}.`); return; }
           }
 
           if (q.type === 'phone' && typeof val === 'string') {
             const digits = val.replace(/\D/g, '');
-            if (v.min && digits.length < v.min) { errEl.textContent = `Please enter at least ${v.min} digits.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
-            if (v.max && digits.length > v.max) { errEl.textContent = `Please enter no more than ${v.max} digits.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.min && digits.length < v.min) { setError(card, errEl, `Please enter at least ${v.min} digits.`); return; }
+            if (v.max && digits.length > v.max) { setError(card, errEl, `Please enter no more than ${v.max} digits.`); return; }
           }
 
           if (q.type === 'checkbox' && Array.isArray(val)) {
-            if (v.min && val.length < v.min) { errEl.textContent = `Please select at least ${v.min} options.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
-            if (v.max && val.length > v.max) { errEl.textContent = `Please select no more than ${v.max} options.`; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            if (v.min && val.length < v.min) { setError(card, errEl, `Please select at least ${v.min} options.`); return; }
+            if (v.max && val.length > v.max) { setError(card, errEl, `Please select no more than ${v.max} options.`); return; }
           }
 
           if (q.type === 'url' && typeof val === 'string') {
-            try { new URL(val); } catch { errEl.textContent = 'Please enter a valid URL.'; errEl.style.display = 'block'; card.classList.add('error'); valid = false; return; }
+            try { new URL(val); } catch { setError(card, errEl, 'Please enter a valid URL.'); return; }
           }
         });
+
+        if (firstErrorCard) {
+          firstErrorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          void firstErrorCard.offsetWidth; // trigger reflow
+          firstErrorCard.classList.add('shake');
+        }
 
         return valid;
       }
@@ -678,6 +708,8 @@
               responseCount: firebase.firestore.FieldValue.increment(1)
             });
           }
+
+          localStorage.removeItem(`qs_draft_${formId}`);
 
           document.getElementById('form-content').style.display = 'none';
           document.getElementById('form-success').style.display = 'block';

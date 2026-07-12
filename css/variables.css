@@ -215,8 +215,8 @@
   --nav-base:        #FFFFFF;
   --nav-pill-bg:     rgba(255,255,255,0.9);
   --nav-pill-text:   var(--slate-700);
-  --nav-hover-text:  var(--brand-deep);
-  --nav-hover-bg:    rgba(0,71,171,0.08);
+  --nav-hover-text:  var(--brand-sky);
+  --nav-hover-bg:    rgba(14,143,224,0.08);
 }
 
 
@@ -264,12 +264,12 @@
   --glass-shadow:  0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* Footer */
-  --footer-bg:     var(--slate-800);
-  --footer-text:   var(--slate-400);
-  --footer-heading: var(--slate-100);
-  --footer-link:   var(--slate-500);
+  --footer-bg:     #121212;
+  --footer-text:   #a0a0a0;
+  --footer-heading: #e8e8e8;
+  --footer-link:   #888888;
   --footer-link-hover: var(--brand-sky);
-  --footer-border: rgba(76,181,245,0.12);
+  --footer-border: rgba(255,255,255,0.1);
 
   /* Pill Nav tokens */
   --neo-bg:          rgba(17,30,54,0.95);

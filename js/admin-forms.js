@@ -6,7 +6,7 @@
   'use strict';
 
   // ── State ──
-  let forms = [];
+  let forms = JSON.parse(localStorage.getItem('qs_admin_forms') || '[]');
   let currentForm = null;
   let currentPageIndex = 0;
   let selectedQuestionId = null;
@@ -83,10 +83,12 @@
     try {
       const snap = await window.db.collection('forms')
         .where('adminId', '==', firebase.auth().currentUser.uid).get();
-      forms = [];
-      snap.forEach(doc => forms.push({ id: doc.id, ...doc.data() }));
+      let newForms = [];
+      snap.forEach(doc => newForms.push({ id: doc.id, ...doc.data() }));
       // Sort client-side to avoid needing a Firestore composite index
-      forms.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      newForms.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      forms = newForms;
+      localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
       formsLoaded = true;
     } catch (e) {
       console.error('Error loading forms:', e);
@@ -111,15 +113,7 @@
   }
 
   // ── Dashboard ──
-  window.renderFormsDashboard = async function() {
-    const grid = document.getElementById('grid-forms');
-    if (grid && !formsLoaded) {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary); font-weight: 600;">Loading forms...</div>';
-    }
-    
-    await loadForms();
-    if (!grid) return;
-
+  function _drawFormsGrid(grid) {
     if (forms.length === 0) {
       grid.innerHTML = `
         <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
@@ -148,6 +142,22 @@
           </div>
         </div>`;
     }).join('');
+  }
+
+  window.renderFormsDashboard = async function() {
+    const grid = document.getElementById('grid-forms');
+    if (!grid) return;
+
+    if (forms.length > 0) {
+      _drawFormsGrid(grid);
+    } else if (!formsLoaded) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary); font-weight: 600;">Loading forms...</div>';
+    }
+    
+    if (!formsLoaded) {
+      await loadForms();
+      _drawFormsGrid(grid);
+    }
   };
 
   // ── Form Overview ──
@@ -234,6 +244,7 @@
     await saveFormToDB(currentForm);
     const idx = forms.findIndex(f => f.id === currentForm.id);
     if (idx >= 0) forms[idx] = JSON.parse(JSON.stringify(currentForm));
+    localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
     
     // Refresh overview UI
     window.openFormOverview(currentForm.id);
@@ -245,6 +256,7 @@
     if (!confirm('Are you sure you want to delete this form? This cannot be undone.')) return;
     await deleteFormFromDB(currentForm.id);
     forms = forms.filter(f => f.id !== currentForm.id);
+    localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
     if (window.showScreen) window.showScreen('screen-forms-dashboard');
     window.renderFormsDashboard();
   };
@@ -289,6 +301,7 @@
     if (!confirm('Are you sure you want to delete this form? This cannot be undone.')) return;
     await deleteFormFromDB(formId);
     forms = forms.filter(f => f.id !== formId);
+    localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
     window.renderFormsDashboard();
   };
 
@@ -725,6 +738,7 @@
     const idx = forms.findIndex(f => f.id === currentForm.id);
     if (idx >= 0) forms[idx] = JSON.parse(JSON.stringify(currentForm));
     else forms.unshift(JSON.parse(JSON.stringify(currentForm)));
+    localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
     alert('Form saved!');
   }
 
@@ -794,6 +808,7 @@
       const idx = forms.findIndex(f => f.id === currentForm.id);
       if (idx >= 0) forms[idx] = JSON.parse(JSON.stringify(currentForm));
       else forms.unshift(JSON.parse(JSON.stringify(currentForm)));
+      localStorage.setItem('qs_admin_forms', JSON.stringify(forms));
       updatePublishButton();
       alert(currentForm.isPublished ? 'Form published! Respondents can now fill it out.' : 'Form unpublished.');
     });

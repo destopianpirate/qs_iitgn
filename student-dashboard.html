@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="css/variables.css">
+  <script src="js/qs-alert.js"></script>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/sections.css">
@@ -222,9 +223,33 @@
       try {
         if (!window.db) throw new Error("Firebase not connected.");
         
-        const snap = await window.db.collection('quiz_attempts').where('studentName', '==', username).get();
+        const lowerUsername = username.toLowerCase();
+        
+        // Fetch quizzes to know which ones are currently active
+        const quizzesDoc = await window.db.collection('global').doc('allQuizzes').get();
+        const quizzes = quizzesDoc.exists ? JSON.parse(quizzesDoc.data().data || '[]') : [];
+
+        const snap = await window.db.collection('quiz_attempts').get();
         let attempts = [];
-        snap.forEach(doc => attempts.push({ id: doc.id, ...doc.data() }));
+        snap.forEach(doc => {
+          const d = doc.data();
+          const name = (d.studentName || d.participantName || '').trim().toLowerCase();
+          
+          if (name === lowerUsername) {
+            let isActiveTournament = false;
+            if (d.mode === 'tournament' && d.quizId) {
+              const q = quizzes.find(qz => qz.id === d.quizId);
+              if (q && q.isDeployed) {
+                if (!d.deploymentId || q.currentDeploymentId === d.deploymentId) {
+                  isActiveTournament = true;
+                }
+              }
+            }
+            if (!isActiveTournament) {
+              attempts.push({ id: doc.id, ...d });
+            }
+          }
+        });
 
         attempts.sort((a,b) => new Date(a.submittedAt) - new Date(b.submittedAt));
 

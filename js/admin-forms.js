@@ -12,20 +12,20 @@
   let selectedQuestionId = null;
 
   const QUESTION_TYPES = [
-    { value: 'short_text', label: 'Short Text', icon: '✏️' },
-    { value: 'long_text', label: 'Long Text', icon: '📝' },
-    { value: 'paragraph', label: 'Paragraph', icon: '📄' },
-    { value: 'mcq', label: 'Multiple Choice', icon: '🔘' },
-    { value: 'checkbox', label: 'Checkboxes', icon: '☑️' },
-    { value: 'dropdown', label: 'Dropdown', icon: '📋' },
-    { value: 'linear_scale', label: 'Linear Scale', icon: '📊' },
-    { value: 'number', label: 'Number', icon: '🔢' },
-    { value: 'email', label: 'Email', icon: '📧' },
-    { value: 'phone', label: 'Phone Number', icon: '📱' },
-    { value: 'date', label: 'Date', icon: '📅' },
-    { value: 'time', label: 'Time', icon: '🕐' },
-    { value: 'url', label: 'URL', icon: '🔗' },
-    { value: 'rating', label: 'Rating', icon: '⭐' }
+    { value: 'short_text', label: 'Short Text', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="17" y1="3" x2="21" y2="7"/><path d="M21 7 9 19 3 21l2-6 12-12"/></svg>' },
+    { value: 'long_text', label: 'Long Text', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>' },
+    { value: 'paragraph', label: 'Paragraph', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="3" y2="12"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' },
+    { value: 'mcq', label: 'Multiple Choice', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>' },
+    { value: 'checkbox', label: 'Checkboxes', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polyline points="9 11 12 14 22 4"/></svg>' },
+    { value: 'dropdown', label: 'Dropdown', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polyline points="8 10 12 14 16 10"/></svg>' },
+    { value: 'linear_scale', label: 'Linear Scale', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>' },
+    { value: 'number', label: 'Number', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>' },
+    { value: 'email', label: 'Email', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>' },
+    { value: 'phone', label: 'Phone Number', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' },
+    { value: 'date', label: 'Date', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' },
+    { value: 'time', label: 'Time', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+    { value: 'url', label: 'URL', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' },
+    { value: 'rating', label: 'Rating', icon: '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' }
   ];
 
   function generateId() {
@@ -66,25 +66,30 @@
     };
   }
 
+  function getFormUrl(formId) {
+    let path = window.location.pathname;
+    if (path.endsWith('admin.html')) path = path.replace('admin.html', 'form.html');
+    else if (path.endsWith('admin')) path = path.replace(/admin$/, 'form');
+    else path = '/form.html';
+    return window.location.origin + path + '?id=' + formId;
+  }
+
+  let formsLoaded = false;
+
   // ── Firestore Helpers ──
-  async function loadForms() {
+  async function loadForms(force = false) {
     if (!window.db || !firebase.auth().currentUser) return;
+    if (formsLoaded && !force) return; // Skip if already loaded in memory
     try {
       const snap = await window.db.collection('forms')
-        .where('adminId', '==', firebase.auth().currentUser.uid)
-        .orderBy('updatedAt', 'desc').get();
+        .where('adminId', '==', firebase.auth().currentUser.uid).get();
       forms = [];
       snap.forEach(doc => forms.push({ id: doc.id, ...doc.data() }));
+      // Sort client-side to avoid needing a Firestore composite index
+      forms.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      formsLoaded = true;
     } catch (e) {
       console.error('Error loading forms:', e);
-      // If index not ready, try without orderBy
-      try {
-        const snap = await window.db.collection('forms')
-          .where('adminId', '==', firebase.auth().currentUser.uid).get();
-        forms = [];
-        snap.forEach(doc => forms.push({ id: doc.id, ...doc.data() }));
-        forms.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
-      } catch (e2) { console.error('Fallback load failed:', e2); }
     }
   }
 
@@ -107,8 +112,12 @@
 
   // ── Dashboard ──
   window.renderFormsDashboard = async function() {
-    await loadForms();
     const grid = document.getElementById('grid-forms');
+    if (grid && !formsLoaded) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary); font-weight: 600;">Loading forms...</div>';
+    }
+    
+    await loadForms();
     if (!grid) return;
 
     if (forms.length === 0) {
@@ -128,20 +137,116 @@
       const status = f.isPublished ? '<span style="background:#10B981;color:white;padding:3px 10px;border-radius:9999px;font-size:0.75rem;font-weight:700;">Published</span>' : '<span style="background:var(--bg-alt);color:var(--text-secondary);padding:3px 10px;border-radius:9999px;font-size:0.75rem;font-weight:700;">Draft</span>';
       const date = f.createdAt ? new Date(f.createdAt).toLocaleDateString() : '';
       return `
-        <div class="quiz-card" style="cursor: default;">
+        <div class="quiz-card" onclick="window.openFormOverview('${f.id}')" style="cursor: pointer; transition: transform 0.2s; border: 2px solid transparent;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
             <h3 style="margin:0; font-size:1.15rem; font-weight:700; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${f.title || 'Untitled Form'}</h3>
             ${status}
           </div>
           <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:16px;">${qCount} question${qCount !== 1 ? 's' : ''} · ${f.responseCount || 0} response${(f.responseCount || 0) !== 1 ? 's' : ''} · ${date}</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button onclick="window.openFormEditor('${f.id}')" style="flex:1; padding:8px 12px; border-radius:8px; background:rgba(14,165,233,0.1); color:#0ea5e9; font-weight:600; border:none; cursor:pointer; font-size:0.85rem;">Edit</button>
-            <button onclick="window.openFormResponses('${f.id}')" style="flex:1; padding:8px 12px; border-radius:8px; background:rgba(16,185,129,0.1); color:#10B981; font-weight:600; border:none; cursor:pointer; font-size:0.85rem;">Responses</button>
-            <button onclick="window.shareForm('${f.id}')" style="padding:8px 12px; border-radius:8px; background:var(--bg-alt); color:var(--text-secondary); font-weight:600; border:none; cursor:pointer; font-size:0.85rem;">Share</button>
-            <button onclick="window.deleteForm('${f.id}')" style="padding:8px 12px; border-radius:8px; background:rgba(239,68,68,0.1); color:#ef4444; font-weight:600; border:none; cursor:pointer; font-size:0.85rem;">Delete</button>
+          <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--section-divider); padding-top:12px; margin-top:auto;">
+            <span style="font-size:0.85rem; font-weight:600; color:#0ea5e9;">Manage Form →</span>
           </div>
         </div>`;
     }).join('');
+  };
+
+  // ── Form Overview ──
+  window.openFormOverview = async function(formId) {
+    let form = forms.find(f => f.id === formId);
+    if (!form) {
+      await loadForms();
+      form = forms.find(f => f.id === formId);
+      if (!form) return;
+    }
+    currentForm = JSON.parse(JSON.stringify(form));
+    
+    document.getElementById('ov-form-title').textContent = form.title || 'Untitled Form';
+    document.getElementById('ov-form-desc').textContent = form.description || '';
+    
+    const qCount = (form.pages || []).reduce((s, p) => s + (p.questions || []).length, 0);
+    document.getElementById('ov-form-questions-count').textContent = qCount;
+    document.getElementById('ov-form-date').textContent = form.createdAt ? new Date(form.createdAt).toLocaleDateString() : '—';
+    document.getElementById('ov-form-responses-count').textContent = form.responseCount || 0;
+    
+    const statusEl = document.getElementById('ov-form-status');
+    const pubBtn = document.getElementById('ov-btn-publish');
+    const pubBtnTxt = document.getElementById('ov-txt-publish');
+    
+    if (form.isPublished) {
+      statusEl.textContent = 'Published';
+      statusEl.style.color = '#10B981';
+      pubBtnTxt.textContent = 'Unpublish';
+      pubBtn.style.background = 'rgba(239,68,68,0.1)';
+      pubBtn.style.color = '#ef4444';
+      pubBtn.style.borderColor = 'rgba(239,68,68,0.2)';
+    } else {
+      statusEl.textContent = 'Draft';
+      statusEl.style.color = 'var(--text-secondary)';
+      pubBtnTxt.textContent = 'Publish';
+      pubBtn.style.background = 'rgba(14,165,233,0.1)';
+      pubBtn.style.color = '#0ea5e9';
+      pubBtn.style.borderColor = 'rgba(14,165,233,0.2)';
+    }
+    
+    if (window.showScreen) window.showScreen('screen-form-overview');
+  };
+
+  window.ovActionEdit = function() {
+    if (currentForm) window.openFormEditor(currentForm.id);
+  };
+  
+  window.ovActionResponses = function() {
+    if (currentForm) window.openFormResponses(currentForm.id);
+  };
+  
+  window.ovActionPreview = function() {
+    if (!currentForm) return;
+    const url = getFormUrl(currentForm.id) + '&preview=1';
+    window.open(url, '_blank');
+  };
+  
+  window.ovActionShare = function() {
+    if (!currentForm) return;
+    window.shareForm(currentForm.id);
+  };
+  
+  window.ovActionQR = function() {
+    if (!currentForm) return;
+    const url = getFormUrl(currentForm.id);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+    document.getElementById('form-qr-img').src = qrUrl;
+    document.getElementById('form-qr-modal').style.display = 'flex';
+  };
+  
+  window.ovActionExport = function() {
+    if (!currentForm) return;
+    // We need to load responses first, then export
+    // For simplicity, just route to Responses screen and auto-click export, or do it silently.
+    // Easiest is to go to responses screen
+    window.openFormResponses(currentForm.id).then(() => {
+      document.getElementById('btn-form-export-csv').click();
+    });
+  };
+  
+  window.ovActionPublish = async function() {
+    if (!currentForm) return;
+    currentForm.isPublished = !currentForm.isPublished;
+    await saveFormToDB(currentForm);
+    const idx = forms.findIndex(f => f.id === currentForm.id);
+    if (idx >= 0) forms[idx] = JSON.parse(JSON.stringify(currentForm));
+    
+    // Refresh overview UI
+    window.openFormOverview(currentForm.id);
+    alert(currentForm.isPublished ? 'Form published! Respondents can now fill it out.' : 'Form unpublished.');
+  };
+  
+  window.ovActionDelete = async function() {
+    if (!currentForm) return;
+    if (!confirm('Are you sure you want to delete this form? This cannot be undone.')) return;
+    await deleteFormFromDB(currentForm.id);
+    forms = forms.filter(f => f.id !== currentForm.id);
+    if (window.showScreen) window.showScreen('screen-forms-dashboard');
+    window.renderFormsDashboard();
   };
 
   // ── Form Actions ──
@@ -162,16 +267,21 @@
     selectedQuestionId = null;
     document.getElementById('form-title-input').value = currentForm.title;
     document.getElementById('form-description-input').value = currentForm.description || '';
+    
+    // Load Settings
+    if (!currentForm.settings) currentForm.settings = {};
+    const allowEditCb = document.getElementById('form-setting-allow-edit');
+    if (allowEditCb) allowEditCb.checked = !!currentForm.settings.allowEditResponse;
+
     updatePublishButton();
     renderPagesPanel();
     renderQuestions();
     hideQuestionSettings();
     if (window.showScreen) window.showScreen('screen-form-editor');
-    if (window.hideSidebar) window.hideSidebar();
   };
 
   window.shareForm = function(formId) {
-    const url = window.location.origin + window.location.pathname.replace('admin.html', 'form.html') + '?id=' + formId;
+    const url = getFormUrl(formId);
     navigator.clipboard.writeText(url).then(() => alert('Form link copied to clipboard!\n\n' + url));
   };
 
@@ -249,7 +359,9 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
             <div style="display:flex; align-items:center; gap:8px; flex:1;">
               <span style="font-size:0.8rem; background:var(--bg-alt); padding:2px 8px; border-radius:6px; font-weight:600; color:var(--text-secondary);">${i + 1}</span>
-              <span style="font-size:0.75rem; background:rgba(14,165,233,0.1); color:#0ea5e9; padding:2px 10px; border-radius:9999px; font-weight:600;">${typeInfo.icon} ${typeInfo.label}</span>
+              <span style="font-size:0.75rem; background:rgba(14,165,233,0.1); color:#0ea5e9; padding:4px 10px; border-radius:9999px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                ${typeInfo.icon} ${typeInfo.label}
+              </span>
               ${q.required ? '<span style="color:#ef4444; font-weight:700; font-size:0.8rem;">Required</span>' : ''}
             </div>
             <div style="display:flex; gap:4px;">
@@ -335,7 +447,7 @@
       <div style="margin-bottom:16px;">
         <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Question Type</label>
         <select id="qs-type" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--section-divider); font-size:0.9rem; background:var(--bg); color:var(--text);">
-          ${QUESTION_TYPES.map(t => `<option value="${t.value}" ${t.value === q.type ? 'selected' : ''}>${t.icon} ${t.label}</option>`).join('')}
+          ${QUESTION_TYPES.map(t => `<option value="${t.value}" ${t.value === q.type ? 'selected' : ''}>${t.label}</option>`).join('')}
         </select>
       </div>
       <div style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
@@ -510,7 +622,10 @@
   window.updateFormOption = function(index, value) {
     const page = currentForm.pages[currentPageIndex];
     const q = page.questions.find(x => x.id === selectedQuestionId);
-    if (q && q.options) { q.options[index] = value; }
+    if (q && q.options) { 
+      q.options[index] = value; 
+      renderQuestions();
+    }
   };
 
   window.removeFormOption = function(index) {
@@ -519,6 +634,7 @@
     if (q && q.options && q.options.length > 1) {
       q.options.splice(index, 1);
       renderQuestionSettings();
+      renderQuestions();
     }
   };
 
@@ -529,6 +645,7 @@
       if (!q.options) q.options = [];
       q.options.push('Option ' + (q.options.length + 1));
       renderQuestionSettings();
+      renderQuestions();
     }
   };
 
@@ -540,7 +657,6 @@
 
     document.getElementById('form-responses-title').textContent = form.title + ' — Responses';
     if (window.showScreen) window.showScreen('screen-form-responses');
-    if (window.hideSidebar) window.hideSidebar();
 
     // Load responses
     const thead = document.getElementById('form-responses-thead');
@@ -598,6 +714,12 @@
     if (!currentForm) return;
     currentForm.title = document.getElementById('form-title-input')?.value || 'Untitled Form';
     currentForm.description = document.getElementById('form-description-input')?.value || '';
+    
+    // Save Settings
+    if (!currentForm.settings) currentForm.settings = {};
+    const allowEditCb = document.getElementById('form-setting-allow-edit');
+    if (allowEditCb) currentForm.settings.allowEditResponse = allowEditCb.checked;
+
     await saveFormToDB(currentForm);
     // Update local forms list
     const idx = forms.findIndex(f => f.id === currentForm.id);
@@ -642,20 +764,23 @@
     const btnSave = document.getElementById('btn-save-form');
     if (btnSave) btnSave.addEventListener('click', saveCurrentForm);
 
+    // Back from overview
+    const btnOvBack = document.getElementById('btn-form-overview-back');
+    if (btnOvBack) btnOvBack.addEventListener('click', () => {
+      if (window.showScreen) window.showScreen('screen-forms-dashboard');
+      window.renderFormsDashboard();
+    });
+
     // Back from editor
     const btnBack = document.getElementById('btn-form-editor-back');
     if (btnBack) btnBack.addEventListener('click', () => {
-      if (window.showScreen) window.showScreen('screen-forms-dashboard');
-      if (window.initSidebar) window.initSidebar();
-      window.renderFormsDashboard();
+      if (window.showScreen) window.showScreen('screen-form-overview');
     });
 
     // Back from responses
     const btnRespBack = document.getElementById('btn-form-responses-back');
     if (btnRespBack) btnRespBack.addEventListener('click', () => {
-      if (window.showScreen) window.showScreen('screen-forms-dashboard');
-      if (window.initSidebar) window.initSidebar();
-      window.renderFormsDashboard();
+      if (window.showScreen) window.showScreen('screen-form-overview');
     });
 
     // Publish/unpublish
@@ -677,7 +802,7 @@
     const btnPreview = document.getElementById('btn-form-preview');
     if (btnPreview) btnPreview.addEventListener('click', () => {
       if (!currentForm) return;
-      const url = window.location.origin + window.location.pathname.replace('admin.html', 'form.html') + '?id=' + currentForm.id + '&preview=1';
+      const url = getFormUrl(currentForm.id) + '&preview=1';
       window.open(url, '_blank');
     });
 

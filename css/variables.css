@@ -231,18 +231,18 @@
   --primary-surface:  rgba(76,181,245,0.08);
   --primary-border:   rgba(76,181,245,0.2);
 
-  --bg:               var(--navy-900);
-  --bg-alt:           var(--navy-800);
-  --bg-elevated:      var(--navy-700);
+  --bg:               #121212;
+  --bg-alt:           #1a1a1a;
+  --bg-elevated:      #212121;
 
-  --surface:          var(--navy-700);
-  --surface-hover:    var(--navy-600);
-  --surface-border:   transparent;
+  --surface:          #212121;
+  --surface-hover:    #2a2a2a;
+  --surface-border:   rgba(255, 255, 255, 0.1);
 
-  --text:             var(--slate-100);
-  --text-secondary:   var(--slate-400);
-  --text-tertiary:    var(--slate-500);
-  --text-on-primary:  var(--navy-900);
+  --text:             #ffffff;
+  --text-secondary:   #e0e0e0;
+  --text-tertiary:    #a0a0a0;
+  --text-on-primary:  #121212;
 
   --shadow-sm:   0 1px 3px rgba(0,0,0,0.3);
   --shadow-md:   0 4px 12px rgba(0,0,0,0.35);

@@ -241,7 +241,10 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 24px; color: var(--text-secondary);">No tests taken yet.</td></tr>';
         return;
       }
-      
+      // Fetch quizzes to know which ones are currently active
+      const quizzesDoc = await window.db.collection('global').doc('allQuizzes').get();
+      const quizzes = quizzesDoc.exists ? JSON.parse(quizzesDoc.data().data || '[]') : [];
+
       let totalTests = 0;
       let sumScores = 0;
       let sumQuestions = 0;
@@ -249,21 +252,33 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
 
       snap.forEach(doc => {
         const d = doc.data();
-        totalTests++;
-        sumScores += (d.score || 0);
-        sumQuestions += (d.totalQuestions || 0);
+        let isActiveTournament = false;
+        if (d.mode === 'tournament' && d.quizId) {
+          const q = quizzes.find(qz => qz.id === d.quizId);
+          if (q && q.isDeployed) {
+            if (!d.deploymentId || q.currentDeploymentId === d.deploymentId) {
+              isActiveTournament = true;
+            }
+          }
+        }
         
-        const dateStr = new Date(d.submittedAt).toLocaleDateString();
-        const modeColor = d.mode === 'tournament' ? '#8B5CF6' : '#10B981';
-        
-        rows.push(`
-          <tr style="border-bottom: 1px solid var(--section-divider);">
-            <td style="padding: 12px;">${dateStr}</td>
-            <td style="padding: 12px; font-weight: 600; color: var(--text);">${d.quizName || 'Unknown'}</td>
-            <td style="padding: 12px;"><span style="background: ${modeColor}22; color: ${modeColor}; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">${d.mode}</span></td>
-            <td style="padding: 12px; font-weight: 700;">${d.score}/${d.totalQuestions}</td>
-          </tr>
-        `);
+        if (!isActiveTournament) {
+          totalTests++;
+          sumScores += (d.score || 0);
+          sumQuestions += (d.totalQuestions || 0);
+          
+          const dateStr = new Date(d.submittedAt).toLocaleDateString();
+          const modeColor = d.mode === 'tournament' ? '#8B5CF6' : '#10B981';
+          
+          rows.push(`
+            <tr style="border-bottom: 1px solid var(--section-divider);">
+              <td style="padding: 12px;">${dateStr}</td>
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">${d.quizName || 'Unknown'}</td>
+              <td style="padding: 12px;"><span style="background: ${modeColor}22; color: ${modeColor}; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">${d.mode}</span></td>
+              <td style="padding: 12px; font-weight: 700;">${d.score}/${d.totalQuestions}</td>
+            </tr>
+          `);
+        }
       });
 
       totalEl.textContent = totalTests.toString();
@@ -640,7 +655,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
         document.getElementById('lobby-quiz-name').textContent = matchingQuiz.name || 'Tournament';
         
         const qCount = matchingQuiz.questions ? matchingQuiz.questions.length : 0;
-        const totalTime = matchingQuiz.questions ? matchingQuiz.questions.reduce((sum, q) => sum + (parseInt(q.timeLimit) || 30), 0) : 0;
+        const totalTime = matchingQuiz.questions ? matchingQuiz.questions.reduce((sum, q) => sum + (parseInt(q.timer) || 30), 0) : 0;
         const minutes = Math.floor(totalTime / 60);
         const metaEl = document.getElementById('lobby-quiz-meta');
         if(metaEl) metaEl.textContent = `${qCount} questions • ${minutes} min`;
@@ -686,7 +701,7 @@ document.addEventListener('DOMContentLoaded', syncOfflineAttempts);
   let mySessionUnsubscribe = null;
 
   async function joinLobby(quizId) {
-    const mySid = getStudentId();
+    const mySid = getOrCreateStudentId();
     window.currentLiveSessionId = `live_${quizId}_${mySid}`;
     
     if (!window.db) return;

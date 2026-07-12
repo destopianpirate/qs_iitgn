@@ -204,6 +204,15 @@
         });
       }
     }
+    function logQuizEdit(quizId, actionDescription) {
+      const q = quizzes.find(x => x.id === quizId);
+      if (q) {
+        if (!q.history) q.history = [];
+        const user = sessionStorage.getItem('qs_admin_id') || 'Unknown';
+        q.history.unshift({ date: new Date().toISOString(), action: actionDescription, user: user });
+      }
+    }
+    
     function genId() {
       return Math.floor(10000000 + Math.random() * 90000000).toString();
     }
@@ -262,7 +271,15 @@
           renderDashboard();
         } catch(e) {
           console.error(e);
-          loginErr.textContent = e.message || 'Invalid credentials. Please try again.';
+          let msg = e.message || 'Invalid credentials. Please try again.';
+          if (e.code === 'auth/user-not-found') {
+            msg = "Account doesn't exist , Please Signup";
+          } else if (e.code === 'auth/wrong-password') {
+            msg = "password wrong";
+          } else if (e.code === 'auth/invalid-credential') {
+            msg = "Account doesn't exist, Please Signup, or password wrong";
+          }
+          loginErr.textContent = msg;
           loginErr.classList.add('show');
           inpPass.value = '';
           inpPass.focus();
@@ -395,6 +412,7 @@
           created_at: new Date().toISOString()
         };
         quizzes.push(newQuiz);
+        logQuizEdit(newQuiz.id, "Quiz Created");
         save();
         openEditor(newQuiz.id);
       } catch (e) {
@@ -622,6 +640,7 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       } else {
         quiz.questions.push(qData);
       }
+      logQuizEdit(currentQuizId, editingQuestionIdx !== null ? "Updated a question" : "Added a question");
       save();
       renderQuestionList(quiz);
       resetAddForm();
@@ -698,6 +717,7 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
       
       quiz.isPublic = quiz.visibility === 'public'; // backwards compatibility
       if (quiz.visibility === 'private' && !quiz.accessCode) quiz.accessCode = genCode();
+      logQuizEdit(currentQuizId, "Updated quiz settings/details");
       save();
       alert('Quiz saved!');
       showScreen('screen-dash');
@@ -927,6 +947,15 @@ parseInt(document.getElementById('aq-timer').value) || 30 };
     window.initSidebar = function() {
       sidebar.style.display = 'flex';
       body.classList.add('has-sidebar');
+      
+      const sbNavApps = document.getElementById('sb-nav-apps');
+      if (sbNavApps) {
+        if (sessionStorage.getItem('qs_admin_id') === 'singh.ayush@iitgn.ac.in') {
+          sbNavApps.style.display = '';
+        } else {
+          sbNavApps.style.display = 'none';
+        }
+      }
     };
     window.hideSidebar = function() {
       sidebar.style.display = 'none';
@@ -1126,7 +1155,21 @@ now.getFullYear();
       try {
         const snap = await window.db.collection('quiz_attempts').get();
         globalAttempts = [];
-        snap.forEach(doc => globalAttempts.push({ id: doc.id, ...doc.data() }));
+        snap.forEach(doc => {
+          const d = doc.data();
+          let isActiveTournament = false;
+          if (d.mode === 'tournament' && d.quizId) {
+            const q = typeof quizzes !== 'undefined' ? quizzes.find(qz => qz.id === d.quizId) : null;
+            if (q && q.isDeployed) {
+              if (!d.deploymentId || q.currentDeploymentId === d.deploymentId) {
+                isActiveTournament = true;
+              }
+            }
+          }
+          if (!isActiveTournament) {
+            globalAttempts.push({ id: doc.id, ...d });
+          }
+        });
         renderGlobalAnalytics();
       } catch (e) {
         console.error("Error fetching analytics", e);
@@ -1228,6 +1271,28 @@ globalCharts);
       }
     });
 
+    document.getElementById('btn-qa-history').addEventListener('click', () => {
+      const quiz = quizzes.find(q => q.id === currentQAQuizId);
+      if (quiz) {
+        const listDiv = document.getElementById('quiz-history-list');
+        if (!quiz.history || quiz.history.length === 0) {
+          listDiv.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 20px;">No history recorded for this quiz.</div>';
+        } else {
+          listDiv.innerHTML = quiz.history.map(h => {
+            const dateStr = new Date(h.date).toLocaleString();
+            return `<div style="background: var(--surface); padding: 16px; border-radius: 12px; font-size: 0.95rem; border: 1px solid var(--section-divider); display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-weight: 800; color: var(--text);">${h.action}</div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                ${h.user} &nbsp;•&nbsp; ${dateStr}
+              </div>
+            </div>`;
+          }).join('');
+        }
+        document.getElementById('quiz-history-modal').style.display = 'flex';
+      }
+    });
+
     const btnQaLive = document.getElementById('btn-qa-live');
     if (btnQaLive) {
       btnQaLive.addEventListener('click', () => {
@@ -1325,60 +1390,56 @@ globalCharts);
             .where('quizId', '==', currentQAQuizId)
             .get();
           
-          if (snap.empty) {
-            alert('No past attempts found for this quiz to generate a report.');
+          const qObj = typeof quizzes !== 'undefined' ? quizzes.find(qz => qz.id === currentQAQuizId) : null;
+          const validAttempts = [];
+          
+          snap.forEach(doc => {
+            const data = doc.data();
+            let isActiveTournament = false;
+            if (data.mode === 'tournament' && qObj && qObj.isDeployed) {
+              if (!data.deploymentId || qObj.currentDeploymentId === data.deploymentId) {
+                isActiveTournament = true;
+              }
+            }
+            if (!isActiveTournament) {
+              validAttempts.push(data);
+            }
+          });
+
+          if (validAttempts.length === 0) {
+            alert('No past attempts found for this quiz to generate a report. Note: Ongoing tournaments are not included until ended.');
             return;
           }
           
-          const qStats = {};
-          snap.forEach(doc => {
-            const data = doc.data();
-            if (data.analysis) {
-              data.analysis.forEach(a => {
-                const qText = a.q || 'Untitled';
-                if (!qStats[qText]) qStats[qText] = { total: 0, correct: 0, time: 0 };
-                qStats[qText].total++;
-                if (a.status === 'correct') qStats[qText].correct++;
-                qStats[qText].time += (a.timeSpent || 0);
-              });
-            }
-          });
-          
-          let hardestQ = 'N/A', easiestQ = 'N/A', fastestQ = 'N/A';
-          let minCorrectRate = 100, maxCorrectRate = -1, minAvgTime = 999999;
-          
-          Object.keys(qStats).forEach(qText => {
-            const stat = qStats[qText];
-            if (stat.total === 0) return;
-            const correctRate = (stat.correct / stat.total) * 100;
-            const avgTime = stat.time / stat.total;
-            
-            if (correctRate < minCorrectRate) { minCorrectRate = correctRate; hardestQ = qText; }
-            if (correctRate > maxCorrectRate) { maxCorrectRate = correctRate; easiestQ = qText; }
-            if (avgTime < minAvgTime) { minAvgTime = avgTime; fastestQ = qText; }
-          });
-
-          let csv = '--- QUESTION ANALYTICS SUMMARY ---\\n';
-          csv += `Most Difficult Question,${hardestQ} (${minCorrectRate === 100 ? 0 : minCorrectRate.toFixed(1)}% correct)\\n`;
-          csv += `Easiest Question,${easiestQ} (${maxCorrectRate === -1 ? 0 : maxCorrectRate.toFixed(1)}% correct)\\n`;
-          csv += `Fastest Answered Question,${fastestQ} (${minAvgTime === 999999 ? 0 : minAvgTime.toFixed(1)}s avg)\\n`;
-          csv += '------------------------------------\\n\\n';
-          
-          csv += 'Name,UID,Score,Attempted,Skipped,Time Taken (s),Tab Switches,Minimizes,Timestamp\\n';
-          snap.forEach(doc => {
-            const data = doc.data();
+          let csv = 'Name,UID,PID,Score,Attempted,Skipped,Time Taken,Tab Switches,Minimizes,Date,Time\n\n';
+          validAttempts.forEach(data => {
             const name = data.participantName || data.studentName || 'Anonymous';
-            const uid = data.uid || data.sid || doc.id;
+            const uid = data.uid || data.sid || data.studentId || 'N/A';
+            const pid = data.pid || 'N/A';
             const score = data.score || 0;
-            const att = data.attemptedCount || data.totalQuestions || 0;
+            const tQs = data.totalQuestions || (qObj && qObj.questions ? qObj.questions.length : '?');
+            const attCount = typeof data.attemptedCount !== 'undefined' ? data.attemptedCount : 0;
+            const att = `${attCount}/${tQs}`;
             const skip = data.skippedCount || 0;
             const time = data.timeTaken || 0;
+            const tTime = data.totalQuizTime || (qObj && qObj.totalTime ? qObj.totalTime : '?');
+            const timeStr = `${time}/${tTime}s`;
             const tabs = data.tabSwitches || 0;
             const mins = data.minimizes || 0;
-            const ts = data.submittedAt || (data.timestamp ? new Date(data.timestamp.toMillis()).toLocaleString() : '');
+            
+            let dObj = null;
+            if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
+              dObj = new Date(data.timestamp.toMillis());
+            } else if (data.timestamp) {
+              dObj = new Date(data.timestamp);
+            } else if (data.submittedAt) {
+              dObj = new Date(data.submittedAt);
+            }
+            const dStr = dObj && !isNaN(dObj.getTime()) ? dObj.toLocaleDateString() : '';
+            const tStr = dObj && !isNaN(dObj.getTime()) ? dObj.toLocaleTimeString() : '';
             
             const cleanName = '"' + name.replace(/"/g, '""') + '"';
-            csv += `${cleanName},${uid},${score},${att},${skip},${time},${tabs},${mins},"${ts}"\\n`;
+            csv += `${cleanName},${uid},${pid},${score},"${att}",${skip},"${timeStr}",${tabs},${mins},"${dStr}","${tStr}"\n`;
           });
           
           const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2431,7 +2492,18 @@ globalCharts);
           let csv = 'Quiz Name,Student Name,Score,Total Questions,Time Taken,Tab Switches,Minimizes,Submitted At\n';
           snap.forEach(doc => {
             const d = doc.data();
-            csv += `"${(d.quizName||'').replace(/"/g,'""')}","${(d.studentName||d.participantName||'Anonymous').replace(/"/g,'""')}",${d.score||0},${d.totalQuestions||0},${d.timeTaken||0},${d.tabSwitches||0},${d.minimizes||0},"${d.submittedAt||''}"\n`;
+            let isActiveTournament = false;
+            if (d.mode === 'tournament' && d.quizId) {
+              const q = typeof quizzes !== 'undefined' ? quizzes.find(qz => qz.id === d.quizId) : null;
+              if (q && q.isDeployed) {
+                if (!d.deploymentId || q.currentDeploymentId === d.deploymentId) {
+                  isActiveTournament = true;
+                }
+              }
+            }
+            if (!isActiveTournament) {
+              csv += `"${(d.quizName||'').replace(/"/g,'""')}","${(d.studentName||d.participantName||'Anonymous').replace(/"/g,'""')}",${d.score||0},${d.totalQuestions||0},${d.timeTaken||0},${d.tabSwitches||0},${d.minimizes||0},"${d.submittedAt||''}"\n`;
+            }
           });
           const blob = new Blob([csv], { type: 'text/csv' });
           const url = URL.createObjectURL(blob);

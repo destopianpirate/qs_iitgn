@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700;800&family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/variables.css">
+  <script src="js/qs-alert.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -97,16 +98,18 @@
     .form-input {
       width: 100%;
       padding: 12px 16px;
-      border: 1px solid var(--section-divider);
+      border: 2px solid transparent;
       border-radius: 8px;
       font-family: inherit;
       font-size: 0.95rem;
-      background: var(--bg);
+      background: #f1f5f9;
       color: var(--text);
       outline: none;
-      transition: border 0.2s;
+      transition: border 0.2s, background 0.2s;
     }
-    .form-input:focus { border-color: #0ea5e9; }
+    .form-input:focus { border-color: #0ea5e9; background: var(--bg); }
+    [data-theme="dark"] .form-input { background: var(--bg); border-color: var(--section-divider); border-width: 1px; }
+    [data-theme="dark"] .form-input:focus { border-color: #0ea5e9; }
     textarea.form-input { resize: vertical; min-height: 100px; }
 
     .word-counter { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; text-align: right; }
@@ -116,10 +119,14 @@
     .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
     .radio-group label, .checkbox-group label {
       display: flex; align-items: center; gap: 10px; cursor: pointer;
-      padding: 10px 14px; border-radius: 8px; border: 1px solid var(--section-divider);
-      transition: all 0.2s; font-size: 0.95rem;
+      padding: 10px 14px; border-radius: 8px; border: 2px solid transparent;
+      transition: all 0.2s; font-size: 0.95rem; background: #f1f5f9;
     }
-    .radio-group label:hover, .checkbox-group label:hover { background: var(--bg-alt); }
+    .radio-group label:hover, .checkbox-group label:hover { background: #e2e8f0; }
+    [data-theme="dark"] .radio-group label, [data-theme="dark"] .checkbox-group label {
+      background: var(--bg); border-color: var(--section-divider); border-width: 1px;
+    }
+    [data-theme="dark"] .radio-group label:hover, [data-theme="dark"] .checkbox-group label:hover { background: var(--bg-alt); }
     .radio-group input[type="radio"], .checkbox-group input[type="checkbox"] {
       width: 18px; height: 18px; accent-color: #0ea5e9; flex-shrink: 0;
     }
@@ -165,6 +172,44 @@
 
     .form-loading { text-align: center; padding: 80px 20px; color: var(--text-secondary); }
 
+    /* Navbar Tools */
+    .nav-tools { display: flex; align-items: center; gap: 12px; }
+    .tool-btn {
+      background: none; border: none; cursor: pointer; color: var(--text-secondary);
+      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tool-btn:hover { background: var(--bg-alt); color: var(--text); }
+    
+    .theme-toggle-btn .icon-sun { display: none; }
+    .theme-toggle-btn .icon-moon { display: block; }
+    [data-theme="dark"] .theme-toggle-btn .icon-sun { display: block; }
+    [data-theme="dark"] .theme-toggle-btn .icon-moon { display: none; }
+
+    .dropdown { position: relative; }
+    .dropdown-menu {
+      position: absolute; top: 100%; right: 0; margin-top: 8px;
+      background: var(--surface); border: 1px solid var(--section-divider); border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 200px;
+      display: none; flex-direction: column; padding: 8px 0; z-index: 100;
+    }
+    .dropdown.active .dropdown-menu { display: flex; }
+    .dropdown-item {
+      padding: 10px 16px; font-size: 0.95rem; color: var(--text); background: none; border: none;
+      text-align: left; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 10px;
+    }
+    .dropdown-item:hover { background: var(--bg-alt); }
+    .dropdown-item.danger { color: #ef4444; }
+    .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+
+    @media print {
+      .form-header, .form-nav, .form-page-indicator { display: none !important; }
+      body { background: white; color: black; }
+      .form-container { padding: 0; max-width: 100%; }
+      .question-card, .form-title-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+      .form-input { border-color: #ccc; }
+    }
+
     @media (max-width: 600px) {
       .form-container { padding: 16px 12px 40px; }
       .form-title-card { padding: 20px; }
@@ -180,6 +225,29 @@
     <div class="brand">
       <img src="qs_logo.png" alt="QS">
       <span>QS IITGN</span>
+    </div>
+    <div class="nav-tools">
+      <button class="tool-btn theme-toggle-btn" id="btn-toggle-theme" title="Toggle Theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      
+      <div class="dropdown" id="tools-dropdown">
+        <button class="tool-btn" id="btn-tools-menu" title="More Tools">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" id="btn-tool-print">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print Form
+          </button>
+          <button class="dropdown-item" id="btn-tool-refresh">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Reload Form
+          </button>
+          <button class="dropdown-item danger" id="btn-tool-clear">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Clear Form
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -210,7 +278,10 @@
       </div>
       <h2>Response Submitted!</h2>
       <p>Thank you for filling out this form.</p>
-      <button onclick="location.reload()" class="btn-form-nav btn-form-next" style="margin:0 auto;">Submit Another Response</button>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button id="btn-edit-response" class="btn-form-nav btn-form-prev" style="display:none; margin: 0;">Edit Your Response</button>
+        <button onclick="sessionStorage.removeItem('qs_form_edit_' + new URLSearchParams(window.location.search).get('id')); location.reload()" class="btn-form-nav btn-form-next" style="margin: 0;">Submit Another Response</button>
+      </div>
     </div>
 
     <div id="form-not-found" style="display:none; text-align:center; padding:80px 20px;">
@@ -234,6 +305,7 @@
       let formData = null;
       let currentPage = 0;
       let answers = {};
+      let currentResponseId = sessionStorage.getItem('qs_form_edit_' + formId);
 
       async function loadForm() {
         if (!window.db) {
@@ -253,6 +325,22 @@
             document.getElementById('form-loading').style.display = 'none';
             document.getElementById('form-not-found').style.display = 'block';
             return;
+          }
+
+          // Fetch previous answers if editing is allowed and they have a session
+          if (currentResponseId && formData.settings && formData.settings.allowEditResponse) {
+            try {
+              const pastDoc = await window.db.collection('form_responses').doc(formId).collection('responses').doc(currentResponseId).get();
+              if (pastDoc.exists) {
+                const pastData = pastDoc.data().answers || {};
+                // Reconstruct answers ensuring __other__ prefix is handled if necessary, but we saved it clean
+                // The renderer expects clean values, but for MCQ/Checkbox "Other" it might need __other__:
+                // Actually, our collect/validate logic uses clean values too mostly.
+                answers = pastData;
+              }
+            } catch (e) {
+              console.warn("Could not load previous response:", e);
+            }
           }
 
           document.title = formData.title + ' | QS IITGN';
@@ -553,6 +641,14 @@
         btn.disabled = true;
 
         try {
+          // Security check: verify the form is still published right at the moment of submission
+          const latestDoc = await window.db.collection('forms').doc(formId).get();
+          if (!latestDoc.exists || (!latestDoc.data().isPublished && !isPreview)) {
+            alert('Sorry, this form is no longer accepting responses as it has just been closed by the admin.');
+            btn.textContent = 'Submit';
+            btn.disabled = false;
+            return;
+          }
           // Clean up __other__ prefixes
           const cleanAnswers = {};
           Object.keys(answers).forEach(k => {
@@ -562,18 +658,33 @@
             cleanAnswers[k] = v;
           });
 
-          await window.db.collection('form_responses').doc(formId).collection('responses').add({
-            answers: cleanAnswers,
-            submittedAt: new Date().toISOString()
-          });
+          if (currentResponseId && formData.settings && formData.settings.allowEditResponse) {
+            // Update existing response
+            await window.db.collection('form_responses').doc(formId).collection('responses').doc(currentResponseId).set({
+              answers: cleanAnswers,
+              updatedAt: new Date().toISOString()
+            }, { merge: true });
+          } else {
+            // Add new response
+            const resRef = await window.db.collection('form_responses').doc(formId).collection('responses').add({
+              answers: cleanAnswers,
+              submittedAt: new Date().toISOString()
+            });
+            currentResponseId = resRef.id;
+            sessionStorage.setItem('qs_form_edit_' + formId, currentResponseId);
 
-          // Increment response count
-          await window.db.collection('forms').doc(formId).update({
-            responseCount: firebase.firestore.FieldValue.increment(1)
-          });
+            // Increment response count
+            await window.db.collection('forms').doc(formId).update({
+              responseCount: firebase.firestore.FieldValue.increment(1)
+            });
+          }
 
           document.getElementById('form-content').style.display = 'none';
           document.getElementById('form-success').style.display = 'block';
+          
+          if (formData.settings && formData.settings.allowEditResponse) {
+            document.getElementById('btn-edit-response').style.display = 'inline-block';
+          }
         } catch (e) {
           console.error('Error submitting form:', e);
           alert('Error submitting form. Please try again.');
@@ -585,6 +696,47 @@
       // Theme
       const savedTheme = localStorage.getItem('qs-theme');
       if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+      // Tools Logic
+      const themeBtn = document.getElementById('btn-toggle-theme');
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('qs-theme', newTheme);
+      });
+
+      const toolsMenuBtn = document.getElementById('btn-tools-menu');
+      const toolsDropdown = document.getElementById('tools-dropdown');
+      toolsMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toolsDropdown.classList.toggle('active');
+      });
+      document.addEventListener('click', () => toolsDropdown.classList.remove('active'));
+
+      document.getElementById('btn-tool-print').addEventListener('click', () => window.print());
+      document.getElementById('btn-tool-refresh').addEventListener('click', () => location.reload());
+      
+      document.getElementById('btn-tool-clear').addEventListener('click', () => {
+        if(confirm('Are you sure you want to clear all your answers? This cannot be undone.')) {
+          answers = {};
+          currentPage = 0;
+          sessionStorage.removeItem('qs_form_edit_' + formId);
+          currentResponseId = null;
+          renderPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if(window.qsAlert) window.qsAlert('Form cleared successfully.');
+          else alert('Form cleared successfully.');
+        }
+      });
+
+      document.getElementById('btn-edit-response').addEventListener('click', () => {
+        document.getElementById('form-success').style.display = 'none';
+        document.getElementById('form-content').style.display = 'block';
+        currentPage = 0;
+        renderPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
 
       // Load
       if (window.db) loadForm();

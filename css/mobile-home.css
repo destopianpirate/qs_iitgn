@@ -1,0 +1,374 @@
+/* ════════════════════════════════════════════════════════════
+   MOBILE HOME — Premium Layout Overhaul (≤ 768px)
+   Makes the homepage feel dynamic, varied, and alive on phones
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Reduce massive vertical padding on mobile ── */
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-14, 56px) 0;
+  }
+  .section-header {
+    margin-bottom: var(--space-8);
+  }
+  .section-title {
+    font-size: var(--fs-2xl) !important;
+    line-height: 1.2;
+  }
+  .section-subtitle {
+    font-size: var(--fs-sm) !important;
+    margin-top: var(--space-2);
+  }
+}
+
+
+/* ════════════════════════════════════════
+   ABOUT / BENTO — Side-by-side on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .about-bento {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-4) !important;
+    margin-bottom: var(--space-8) !important;
+  }
+
+  /* Main text card: compact */
+  .bento-main {
+    grid-column: span 1 !important;
+    padding: var(--space-5) !important;
+  }
+  .bento-main h3 {
+    font-size: var(--fs-xl) !important;
+    margin-bottom: var(--space-2) !important;
+  }
+  .bento-main p {
+    font-size: var(--fs-sm) !important;
+  }
+
+  /* Logo card: much smaller, inline feel */
+  .bento-visual {
+    grid-column: span 1 !important;
+    min-height: 120px !important;
+    padding: var(--space-4) !important;
+  }
+  .about-logo-wrapper {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  .about-logo-wrapper img {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  .about-logo-ring { inset: 5px !important; }
+  .about-logo-ring-2 { inset: -8px !important; }
+
+  /* Side cards: 2-column grid layout for variety */
+  .bento-side {
+    grid-column: span 1 !important;
+    padding: var(--space-5) !important;
+  }
+}
+
+/* Make bento-side cards sit in a 2-column mini-grid on mobile */
+@media (max-width: 600px) {
+  .about-bento {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-3) !important;
+  }
+  .bento-main {
+    grid-column: 1 / -1 !important;
+  }
+  .bento-visual {
+    grid-column: 1 / -1 !important;
+    min-height: 100px !important;
+  }
+  .bento-side {
+    grid-column: span 1 !important;
+    padding: var(--space-4) !important;
+    text-align: center;
+  }
+  .bento-icon {
+    margin: 0 auto var(--space-2) !important;
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .bento-side h4 {
+    font-size: var(--fs-sm) !important;
+    margin-bottom: var(--space-1) !important;
+  }
+  .bento-side p {
+    font-size: var(--fs-xs) !important;
+    line-height: 1.4;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   STATS — Horizontal scrolling row on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: var(--space-2) !important;
+  }
+  .stat-card {
+    padding: var(--space-4) var(--space-2) !important;
+    border-radius: var(--radius-xl) !important;
+  }
+  .stat-icon svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .stat-number {
+    font-size: var(--fs-2xl) !important;
+  }
+  .stat-label {
+    font-size: 10px !important;
+    letter-spacing: 0 !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   PILLARS — Horizontal scroll cards on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .pillars-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-4) !important;
+    margin-top: var(--space-6) !important;
+  }
+  .pillar-card {
+    padding: var(--space-6) !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: auto auto !important;
+    text-align: left !important;
+    gap: 0 var(--space-4) !important;
+  }
+  .pillar-icon {
+    grid-row: 1 / 3;
+    align-self: center;
+    margin-bottom: 0 !important;
+    font-size: 2rem !important;
+  }
+  .pillar-icon svg {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .pillar-card h3 {
+    font-size: var(--fs-base) !important;
+    margin-bottom: var(--space-1) !important;
+    align-self: end;
+  }
+  .pillar-card p {
+    font-size: var(--fs-xs) !important;
+    align-self: start;
+    line-height: 1.4;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   HOW IT WORKS — Compact timeline on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .how-it-works-grid {
+    gap: var(--space-3) !important;
+  }
+  .hiw-step {
+    padding: var(--space-4) !important;
+    flex-direction: row !important;
+    text-align: left !important;
+    gap: var(--space-4) !important;
+    align-items: center !important;
+  }
+  .hiw-number {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px;
+    font-size: var(--fs-base) !important;
+    box-shadow: 0 2px 12px rgba(76,181,245,0.2) !important;
+  }
+  .hiw-step h4 {
+    font-size: var(--fs-sm) !important;
+    margin: 0 0 2px !important;
+  }
+  .hiw-step p {
+    font-size: var(--fs-xs) !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+  }
+  /* Stack title and description vertically next to number */
+  .hiw-step {
+    flex-wrap: wrap !important;
+  }
+  .hiw-step h4, .hiw-step p {
+    flex: 0 0 calc(100% - 56px);
+  }
+}
+
+
+/* ════════════════════════════════════════
+   DAILY CHALLENGE — Compact on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .daily-challenge-widget {
+    padding: var(--space-5) !important;
+    border-radius: var(--radius-xl) !important;
+  }
+  .dc-header h3 {
+    font-size: var(--fs-base) !important;
+  }
+  .dc-question {
+    font-size: var(--fs-sm) !important;
+  }
+  .dc-option {
+    padding: var(--space-3) var(--space-4) !important;
+    font-size: var(--fs-sm) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   TESTIMONIALS — Horizontal scroll on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .testimonial-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-4) !important;
+    margin-top: var(--space-6) !important;
+    padding-bottom: var(--space-4);
+    /* Hide scrollbar for clean look */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .testimonial-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .testimonial-card {
+    min-width: 280px !important;
+    max-width: 300px;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+    padding: var(--space-5) !important;
+  }
+  .testimonial-quote {
+    font-size: var(--fs-sm) !important;
+    margin-bottom: var(--space-4) !important;
+    line-height: 1.5 !important;
+  }
+  .testimonial-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: var(--fs-xs) !important;
+  }
+  .testimonial-info h4 {
+    font-size: var(--fs-sm) !important;
+  }
+  .testimonial-info p {
+    font-size: var(--fs-xs) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   CTA BANNER — Tighter on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .cta-banner {
+    padding: var(--space-8) var(--space-4) !important;
+    margin: var(--space-8) 0 !important;
+    border-radius: var(--radius-xl) !important;
+  }
+  .cta-banner h2 {
+    font-size: var(--fs-xl) !important;
+    margin-bottom: var(--space-3) !important;
+  }
+  .cta-banner p {
+    font-size: var(--fs-sm) !important;
+    margin-bottom: var(--space-4) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   FLOATING ICONS — Smaller on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .floating-icons-section {
+    padding: var(--space-4) 0 !important;
+    min-height: 80px !important;
+  }
+  .floating-icons-track {
+    gap: var(--space-4) !important;
+  }
+  .float-icon svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .float-icon-label {
+    font-size: 8px !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   TICKER — Tighter on mobile
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .ticker {
+    padding: var(--space-3) 0 !important;
+  }
+  .ticker-item {
+    font-size: var(--fs-xs) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   KNOWLEDGE BADGES MARQUEE — Mobile sizing
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .k-badge {
+    font-size: 1.2rem !important;
+  }
+  .knowledge-badges-marquee {
+    margin-top: var(--space-4) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   DARK THEME — Mobile-specific refinements
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  [data-theme="dark"] .bento-card,
+  [data-theme="dark"] .pillar-card,
+  [data-theme="dark"] .stat-card,
+  [data-theme="dark"] .hiw-step,
+  [data-theme="dark"] .testimonial-card,
+  [data-theme="dark"] .daily-challenge-widget {
+    border-color: rgba(255,255,255,0.06) !important;
+  }
+}
+
+
+/* ════════════════════════════════════════
+   LIGHT THEME — Mobile card refinements
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  [data-theme="light"] .bento-card,
+  [data-theme="light"] .pillar-card,
+  [data-theme="light"] .stat-card,
+  [data-theme="light"] .hiw-step,
+  [data-theme="light"] .testimonial-card,
+  [data-theme="light"] .daily-challenge-widget {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+    border: none !important;
+  }
+}

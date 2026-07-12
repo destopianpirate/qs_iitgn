@@ -12,8 +12,9 @@
     margin-bottom: var(--space-8);
   }
   .section-title {
-    font-size: var(--fs-2xl) !important;
-    line-height: 1.2;
+    font-size: var(--fs-6xl) !important;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
   .section-subtitle {
     font-size: var(--fs-sm) !important;
@@ -27,14 +28,15 @@
    ════════════════════════════════════════ */
 @media (max-width: 900px) {
   .about-bento {
-    grid-template-columns: 1fr !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: var(--space-4) !important;
     margin-bottom: var(--space-8) !important;
   }
 
   /* Main text card: compact */
   .bento-main {
-    grid-column: span 1 !important;
+    grid-column: 1 / -1 !important;
     padding: var(--space-5) !important;
   }
   .bento-main h3 {
@@ -45,44 +47,7 @@
     font-size: var(--fs-sm) !important;
   }
 
-  /* Logo card: much smaller, inline feel */
-  .bento-visual {
-    grid-column: span 1 !important;
-    min-height: 120px !important;
-    padding: var(--space-4) !important;
-  }
-  .about-logo-wrapper {
-    width: 100px !important;
-    height: 100px !important;
-  }
-  .about-logo-wrapper img {
-    width: 64px !important;
-    height: 64px !important;
-  }
-  .about-logo-ring { inset: 5px !important; }
-  .about-logo-ring-2 { inset: -8px !important; }
-
   /* Side cards: 2-column grid layout for variety */
-  .bento-side {
-    grid-column: span 1 !important;
-    padding: var(--space-5) !important;
-  }
-}
-
-/* Make bento-side cards sit in a 2-column mini-grid on mobile */
-@media (max-width: 600px) {
-  .about-bento {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: var(--space-3) !important;
-  }
-  .bento-main {
-    grid-column: 1 / -1 !important;
-  }
-  .bento-visual {
-    grid-column: 1 / -1 !important;
-    min-height: 100px !important;
-  }
   .bento-side {
     grid-column: span 1 !important;
     padding: var(--space-4) !important;
@@ -175,13 +140,20 @@
    ════════════════════════════════════════ */
 @media (max-width: 768px) {
   .how-it-works-grid {
-    gap: var(--space-3) !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-8) var(--space-3) !important;
+    position: relative !important;
   }
+  .hiw-step:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .hiw-step:nth-child(2) { grid-column: 2; grid-row: 1; }
+  .hiw-step:nth-child(3) { grid-column: 1 / -1; grid-row: 2; width: 85%; margin: 0 auto; }
+
   .hiw-step {
     padding: var(--space-4) !important;
-    flex-direction: row !important;
-    text-align: left !important;
-    gap: var(--space-4) !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: var(--space-3) !important;
     align-items: center !important;
   }
   .hiw-number {
@@ -193,20 +165,59 @@
   }
   .hiw-step h4 {
     font-size: var(--fs-sm) !important;
-    margin: 0 0 2px !important;
+    margin: 0 !important;
   }
   .hiw-step p {
     font-size: var(--fs-xs) !important;
     line-height: 1.4 !important;
     margin: 0 !important;
   }
-  /* Stack title and description vertically next to number */
-  .hiw-step {
-    flex-wrap: wrap !important;
+
+  /* Hide original arrows */
+  .hiw-arrow { display: none !important; }
+
+  /* New mobile arrows (Canva style dashed loop, clear solid pointer, black) */
+  .hiw-step:nth-child(1)::after {
+    content: '';
+    position: absolute;
+    top: 25px; /* Aligned with number circle */
+    right: -25px; /* Bridging the gap */
+    width: 35px;
+    height: 35px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23000000'%3E%3Cpath d='M10,60 Q50,20 85,60' stroke-width='6' stroke-dasharray='8 12' stroke-linecap='round'/%3E%3Cpath d='M70,45 L87,62 L65,72' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 2;
+    animation: arrowPulseMobile 2s infinite;
   }
-  .hiw-step h4, .hiw-step p {
-    flex: 0 0 calc(100% - 56px);
+  
+  .hiw-step:nth-child(2)::after {
+    /* 1-round dashed loop connecting 2 (right) to 3 (center below) */
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -20px;
+    width: 50px;
+    height: 50px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23000000'%3E%3Cpath d='M90,10 C90,40 30,30 40,60 C50,90 90,70 70,50 C50,30 20,60 20,85' stroke-width='6' stroke-dasharray='8 10' stroke-linecap='round'/%3E%3Cpath d='M8,70 L20,87 L35,75' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 2;
+    animation: arrowPulseMobile 2s infinite 1s; /* Delayed pulse */
   }
+}
+
+/* Make arrows white in dark theme */
+@media (max-width: 768px) {
+  [data-theme="dark"] .hiw-step:nth-child(1)::after,
+  [data-theme="dark"] .hiw-step:nth-child(2)::after {
+    filter: invert(1) opacity(0.9);
+  }
+}
+
+@keyframes arrowPulseMobile {
+  0%, 100% { opacity: 0.4; transform: scale(0.9) rotate(-3deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(3deg); }
 }
 
 
@@ -232,29 +243,11 @@
 
 
 /* ════════════════════════════════════════
-   TESTIMONIALS — Horizontal scroll on mobile
+   TESTIMONIALS — Mobile Sizing
    ════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .testimonial-grid {
-    display: flex !important;
-    overflow-x: auto !important;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    gap: var(--space-4) !important;
-    margin-top: var(--space-6) !important;
-    padding-bottom: var(--space-4);
-    /* Hide scrollbar for clean look */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .testimonial-grid::-webkit-scrollbar {
-    display: none;
-  }
   .testimonial-card {
-    min-width: 280px !important;
-    max-width: 300px;
-    scroll-snap-align: center;
-    flex-shrink: 0;
+    width: 280px !important;
     padding: var(--space-5) !important;
   }
   .testimonial-quote {
@@ -370,5 +363,15 @@
   [data-theme="light"] .daily-challenge-widget {
     box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
     border: none !important;
+  }
+}
+
+/* ════════════════════════════════════════
+   HERO / BACKGROUND GLOW ENHANCEMENTS
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .floating-shapes .shape {
+    opacity: 0.25 !important;
+    filter: blur(40px);
   }
 }

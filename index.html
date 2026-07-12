@@ -49,6 +49,16 @@
       border: 1px solid rgba(255,255,255,0.1) !important;
       box-shadow: none !important;
     }
+
+    [data-theme="dark"] .about-split-card {
+      background: #1e1e1e !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    [data-theme="dark"] .about-pill {
+      background: #121212 !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
     
     [data-theme="dark"] .section-title,
     [data-theme="dark"] h3,
@@ -286,18 +296,13 @@
         </div>
 
         <div class="about-bento" data-scroll="fade-up">
-          <div class="bento-card hover-elevate bento-main">
-            <h3>More Than Just Questions</h3>
+          <div class="bento-card hover-elevate bento-main" style="grid-column: span 12; display: block;">
+            <img src="qs_logo.png" alt="Quizzing Society Emblem" style="float: right; margin: 20px 0 20px 30px; width: 150px; height: 150px; object-fit: contain;">
+            <h3 style="color: var(--text);">More Than Just <span style="color: var(--brand-sky);">Questions</span></h3>
             <p>
               Born from a shared love of trivia and intellectual sparring, the Quizzing Society has grown into one of the most vibrant communities at IITGN. We cultivate a culture of curiosity that spans every discipline, from astrophysics to Bollywood, from ancient history to cutting-edge technology.
             </p>
-          </div>
-          <div class="bento-card hover-elevate bento-visual">
-            <div class="about-logo-wrapper">
-              <div class="about-logo-ring" aria-hidden="true"></div>
-              <div class="about-logo-ring-2" aria-hidden="true"></div>
-              <img src="qs_logo.png" alt="Quizzing Society Emblem">
-            </div>
+            <div style="clear: both;"></div>
           </div>
           <div class="bento-card hover-elevate bento-side">
             <svg viewBox="0 0 24 24" class="bento-icon"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -462,35 +467,98 @@
           <p class="section-subtitle">What our members say about the society.</p>
         </div>
         
-        <div class="testimonial-grid">
-          <div class="testimonial-card hover-elevate" data-scroll="fade-up" data-scroll-delay="100">
-            <p class="testimonial-quote">"Quizzing here isn't just about knowing obscure facts; it's about connecting dots you never knew existed. It completely changed how I consume information."</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">A</div>
-              <div class="testimonial-info">
-                <h4>Vinay Godara</h4>
-                <p>Class of 2025</p>
-              </div>
+        <div class="testimonial-marquee">
+          <div class="testimonial-track">
+            <!-- Set 1 -->
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Quizzing here isn't just about knowing obscure facts; it's about connecting dots you never knew existed. It completely changed how I consume information."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">V</div><div class="testimonial-info"><h4>Vinay Godara</h4><p>Class of 2025</p></div></div>
             </div>
-          </div>
-          <div class="testimonial-card hover-elevate" data-scroll="fade-up" data-scroll-delay="200">
-            <p class="testimonial-quote">"The adrenaline rush of hitting the buzzer milliseconds before the opposing team is unmatched. The community here is my second family."</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">N</div>
-              <div class="testimonial-info">
-                <h4>Krishn Kumar</h4>
-                <p>Current member</p>
-              </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The adrenaline rush of hitting the buzzer milliseconds before the opposing team is unmatched. The community here is my second family."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">K</div><div class="testimonial-info"><h4>Krishn Kumar</h4><p>Current member</p></div></div>
             </div>
-          </div>
-          <div class="testimonial-card hover-elevate" data-scroll="fade-up" data-scroll-delay="300">
-            <p class="testimonial-quote">"From barely knowing the rules to captaining our college team at nationals — the society's mentorship and practice sessions made it all possible."</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">R</div>
-              <div class="testimonial-info">
-                <h4>Prashant Jangir</h4>
-                <p>Club Secratory</p>
-              </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"From barely knowing the rules to captaining our college team at nationals — the society's mentorship and practice sessions made it all possible."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">P</div><div class="testimonial-info"><h4>Prashant Jangir</h4><p>Club Secretary</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Participating in the Freshers' Quiz was an absolute blast. The energy in the room and the quality of questions were incredible!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Akshit Kumar</h4><p>Event Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I attended the Sci-Tech trivia night just for fun, but the competitive thrill was amazing. Definitely coming to the next one!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">M</div><div class="testimonial-info"><h4>Mehul Patil</h4><p>Quiz Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The buzzer rounds were intense! Even though my team didn't win, I learned so many fascinating facts in just two hours."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">C</div><div class="testimonial-info"><h4>Charan Tej</h4><p>Tournament Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I always loved trivia, but competing against other colleges at their flagship event took it to a whole new level."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Ashutosh Kumar</h4><p>Inter-College Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The questions were crafted so brilliantly. You didn't just need to know facts, you had to connect the dots on the spot."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">S</div><div class="testimonial-info"><h4>Shivansh Gohil</h4><p>Event Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Sitting in the audience and trying to crack the answers before the teams on stage was so much fun. A highly engaging experience!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Avnish Yadav</h4><p>Audience Member</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The sports quiz they organized was top-notch. It was great to connect with other sports geeks on campus during the event."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Ashish</h4><p>Quiz Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I came in not knowing what to expect, and left completely mind-blown by the trivia. It’s the most fun I've had on a weekend."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">D</div><div class="testimonial-info"><h4>Dharamveer</h4><p>Past Participant</p></div></div>
+            </div>
+
+            <!-- Set 2 for seamless loop -->
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Quizzing here isn't just about knowing obscure facts; it's about connecting dots you never knew existed. It completely changed how I consume information."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">V</div><div class="testimonial-info"><h4>Vinay Godara</h4><p>Class of 2025</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The adrenaline rush of hitting the buzzer milliseconds before the opposing team is unmatched. The community here is my second family."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">K</div><div class="testimonial-info"><h4>Krishn Kumar</h4><p>Current member</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"From barely knowing the rules to captaining our college team at nationals — the society's mentorship and practice sessions made it all possible."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">P</div><div class="testimonial-info"><h4>Prashant Jangir</h4><p>Club Secretary</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Participating in the Freshers' Quiz was an absolute blast. The energy in the room and the quality of questions were incredible!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Akshit Kumar</h4><p>Event Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I attended the Sci-Tech trivia night just for fun, but the competitive thrill was amazing. Definitely coming to the next one!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">M</div><div class="testimonial-info"><h4>Mehul Patil</h4><p>Quiz Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The buzzer rounds were intense! Even though my team didn't win, I learned so many fascinating facts in just two hours."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">C</div><div class="testimonial-info"><h4>Charan Tej</h4><p>Tournament Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I always loved trivia, but competing against other colleges at their flagship event took it to a whole new level."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Ashutosh Kumar</h4><p>Inter-College Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The questions were crafted so brilliantly. You didn't just need to know facts, you had to connect the dots on the spot."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">S</div><div class="testimonial-info"><h4>Shivansh Gohil</h4><p>Event Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"Sitting in the audience and trying to crack the answers before the teams on stage was so much fun. A highly engaging experience!"</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Avnish Yadav</h4><p>Audience Member</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"The sports quiz they organized was top-notch. It was great to connect with other sports geeks on campus during the event."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">A</div><div class="testimonial-info"><h4>Ashish</h4><p>Quiz Participant</p></div></div>
+            </div>
+            <div class="testimonial-card hover-elevate">
+              <p class="testimonial-quote">"I came in not knowing what to expect, and left completely mind-blown by the trivia. It’s the most fun I've had on a weekend."</p>
+              <div class="testimonial-author"><div class="testimonial-avatar">D</div><div class="testimonial-info"><h4>Dharamveer</h4><p>Past Participant</p></div></div>
             </div>
           </div>
         </div>
@@ -506,7 +574,7 @@
       <div class="container">
         <div class="cta-banner animated-gradient-bg" data-scroll="fade-up">
           <h2>Ready to Step into the Arena?</h2>
-          <p>Join the team to participate in daily trivia, get updates on upcoming events, and connect with fellow quizzers.</p>
+          <p>Join the Quizzing Society team to help orchestrate our flagship events, connect with nationwide quizzing circuits, and bring premier trivia experiences right to our campus.</p>
           <a href="join.html" class="btn btn-lg" style="margin-top: var(--space-4);">Join the Team</a>
         </div>
       </div>

@@ -108,9 +108,39 @@
       font-weight: 600;
     }
     .links-row a:hover { text-decoration: underline; }
+
+    /* Night Mode Overrides */
+    [data-theme="dark"] {
+      --bg: #121212;
+      --bg-alt: #1a1a1a;
+      --surface: #212121;
+      --text: #ffffff;
+      --text-secondary: #e0e0e0;
+    }
+    [data-theme="dark"] .signup-container {
+      background: #212121;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    [data-theme="dark"] .input-field {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    [data-theme="dark"] .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    [data-theme="dark"] .input-field:focus {
+      border-color: #0ea5e9;
+      background: rgba(14, 165, 233, 0.05);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    }
   </style>
 </head>
 <body>
+  <script>
+    (function(){ const t = localStorage.getItem('qs-theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+
 
   <div class="brand-header">
     <img src="qs_logo.png" alt="QS Logo">

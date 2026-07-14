@@ -188,8 +188,19 @@
       width: 100%; font-size: 1rem; border-radius: 9999px !important; border: none !important; box-shadow: none !important;
       background: #f0f2f5 !important; padding: 18px 24px !important; outline: none !important; color: #111827 !important; font-family: inherit;
     }
-    [data-theme="dark"] .login-card input { background: #121212 !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.1) !important; }
-    .login-card .err { color: #EF4444; font-size: 0.8rem; margin-top: 8px; display: none; }
+    [data-theme="dark"] .login-card input { 
+      background: rgba(255, 255, 255, 0.05) !important; 
+      color: #ffffff !important; 
+      border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+    }
+    [data-theme="dark"] .login-card input::placeholder { 
+      color: rgba(255, 255, 255, 0.4) !important; 
+    }
+    [data-theme="dark"] .login-card input:focus {
+      border-color: #0ea5e9 !important;
+      background: rgba(14, 165, 233, 0.05) !important;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+    }    .login-card .err { color: #EF4444; font-size: 0.8rem; margin-top: 8px; display: none; }
     .login-card .err.show { display: block; }
     .btn-sky {
       width: 100%; border-radius: 9999px; background: #0ea5e9; color: #fff; border: none;

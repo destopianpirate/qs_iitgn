@@ -191,16 +191,12 @@
     [data-theme="dark"] .login-card input { 
       background: rgba(255, 255, 255, 0.05) !important; 
       color: #ffffff !important; 
-      border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+      border: 1px solid rgba(255,255,255,0.1) !important; 
     }
-    [data-theme="dark"] .login-card input::placeholder { 
-      color: rgba(255, 255, 255, 0.4) !important; 
+    [data-theme="dark"] .login-card input::placeholder {
+      color: #a0a0a0 !important;
     }
-    [data-theme="dark"] .login-card input:focus {
-      border-color: #0ea5e9 !important;
-      background: rgba(14, 165, 233, 0.05) !important;
-      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
-    }    .login-card .err { color: #EF4444; font-size: 0.8rem; margin-top: 8px; display: none; }
+    .login-card .err { color: #EF4444; font-size: 0.8rem; margin-top: 8px; display: none; }
     .login-card .err.show { display: block; }
     .btn-sky {
       width: 100%; border-radius: 9999px; background: #0ea5e9; color: #fff; border: none;

@@ -108,26 +108,9 @@
       font-weight: 600;
     }
     .links-row a:hover { text-decoration: underline; }
-    [data-theme="dark"] .signup-container {
-      background: #212121;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    
-    [data-theme="dark"] .input-field {
-      background: rgba(255, 255, 255, 0.05) !important;
-      border-color: rgba(255,255,255,0.1) !important;
-    }
-    
-    [data-theme="dark"] .input-field::placeholder {
-      color: #a0a0a0 !important;
-    }
   </style>
 </head>
 <body>
-<script>
-  // Apply saved theme immediately
-  (function(){ const t = localStorage.getItem('qs-theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
-</script>
 
   <div class="brand-header">
     <img src="qs_logo.png" alt="QS Logo">

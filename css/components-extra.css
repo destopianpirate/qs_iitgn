@@ -585,10 +585,11 @@
   border: none;
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
-  margin-top: var(--space-12);
   box-shadow: var(--shadow-xl), inset 0 0 40px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .daily-challenge-widget::before {

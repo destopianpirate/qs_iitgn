@@ -28,22 +28,7 @@
 
   /* ── Mobile Navigation ── */
   
-  function initPageLoader() {
-    const loader = document.getElementById('page-loader');
-    if (!loader) return;
-    
-    if (localStorage.getItem('loaderShown')) {
-      loader.style.display = 'none';
-    } else {
-      setTimeout(() => {
-        loader.classList.add('is-hidden');
-        localStorage.setItem('loaderShown', 'true');
-        setTimeout(() => { loader.style.display = 'none'; }, 800);
-      }, 1500);
-    }
-  }
-
-  function initMobileNav() {
+  /* Removed old initPageLoader */  function initMobileNav() {
     const toggle = document.getElementById('mobile-menu-toggle');
     const menu = document.querySelector('.pill-nav');
     if (!toggle || !menu) return;
@@ -171,23 +156,69 @@
     setTimeout(type, 1000);
   }
 
-  /* ── Page Loader ── */
-  function initLoader() {
+  /* ── GSAP Landing Animation ── */
+  function initLandingAnimation() {
     const loader = document.getElementById('page-loader');
     if (!loader) return;
 
-    const hideLoader = () => {
-      setTimeout(() => {
-        loader.classList.add('is-hidden');
-        setTimeout(() => loader.remove(), 800);
-      }, 1800);
-    };
-
-    if (document.readyState !== 'loading') {
-      hideLoader();
-    } else {
-      document.addEventListener('DOMContentLoaded', hideLoader);
+    if (!window.gsap) {
+      loader.style.display = 'none';
+      return;
     }
+
+    if (sessionStorage.getItem('qs-landing-played')) {
+      loader.style.display = 'none';
+      return;
+    }
+    sessionStorage.setItem('qs-landing-played', 'true');
+
+    // Ensure elements are visible initially before we animate from hidden states
+    const tl = gsap.timeline();
+    
+    // 1. Warp Drive Exit
+    tl.to('.loader-orbit', {
+      scale: 20,
+      opacity: 0,
+      duration: 1.2,
+      ease: 'power4.inOut',
+      delay: 0.8
+    })
+    .to('.loader-text, .loader-progress', {
+      opacity: 0,
+      duration: 0.3
+    }, '<')
+    .to(loader, {
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+      onComplete: () => { loader.style.display = 'none'; }
+    }, '-=0.4')
+    // 2. Hero Stagger Entrance
+    .from(['.hero-logo', '.hero-logo-divider', '.hero-iitgn-logo'], {
+      y: -50,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'back.out(1.7)'
+    }, '-=0.2')
+    .from('.hero-title', {
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'back.out(1.5)'
+    }, '-=0.5')
+    .from('.hero-subtitle', {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, '-=0.6')
+    .from('.hero-cta-group', {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'back.out(2)'
+    }, '-=0.4');
   }
 
   /* ── Year in footer ── */
@@ -216,12 +247,13 @@
     gsap.registerPlugin(ScrollTrigger);
 
     const states = [
-      { id: '#hero', text: 'Welcome to the Arena!', className: 'npc-state-waving' },
-      { id: '#about', text: 'Let me look closely...', className: 'npc-state-glasses' },
-      { id: '#pillars', text: 'Brilliant ideas start here!', className: 'npc-state-idea' },
-      { id: '#how-it-works', text: 'Follow these steps!', className: 'npc-state-pointing' },
-      { id: '#testimonials', text: 'Listen to this!', className: '' },
-      { id: '#join-cta', text: 'Join us today!', className: 'npc-state-waving' }
+      { id: '#hero', text: 'Welcome to the Arena! Think you can beat the high score?', className: 'npc-state-waving' },
+      { id: '#about', text: 'Let me analyze your trivia potential...', className: 'npc-state-glasses' },
+      { id: '#pillars', text: 'Read these carefully. There WILL be a quiz later.', className: 'npc-state-idea' },
+      { id: '#how-it-works', text: 'Step 1: Join. Step 2: Panic. Step 3: Win!', className: 'npc-state-pointing' },
+      { id: '#testimonials', text: "Don't just take my word for it. They survived!", className: 'npc-state-party' },
+      { id: '#faq', text: 'Got questions? I have answers (mostly).', className: 'npc-state-glasses' },
+      { id: '#join-cta', text: 'Your destiny awaits. Join us today!', className: 'npc-state-cheer' }
     ];
 
     let bubbleTimeout;
@@ -472,21 +504,83 @@
     document.body.prepend(bgContainer);
   }
 
+  /* ── FAQ Accordion ── */
+  function initFAQ() {
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        // Close all others
+        faqQuestions.forEach(otherBtn => {
+          otherBtn.setAttribute('aria-expanded', 'false');
+          otherBtn.nextElementSibling.style.maxHeight = null;
+        });
+        
+        if (!isExpanded) {
+          btn.setAttribute('aria-expanded', 'true');
+          const answer = btn.nextElementSibling;
+          answer.style.maxHeight = answer.scrollHeight + "px";
+        }
+      });
+    });
+  }
+
+  /* ── On This Day Widget ── */
+  async function initOnThisDay() {
+    const dateEl = document.getElementById('otd-date');
+    const bodyEl = document.getElementById('otd-body');
+    if (!dateEl || !bodyEl) return;
+
+    const today = new Date();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    const displayDate = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    dateEl.textContent = displayDate;
+
+    try {
+      const res = await fetch('js/data/on-this-day.json');
+      if (!res.ok) throw new Error('Could not load local database');
+      const data = await res.json();
+      
+      const key = `${month}-${day}`;
+      const events = data[key] || [];
+      
+      bodyEl.innerHTML = '';
+      
+      if (events.length === 0) {
+        bodyEl.innerHTML = '<div class="otd-loading">No events found today.</div>';
+        return;
+      }
+      
+      events.forEach(ev => {
+        const item = document.createElement('div');
+        item.className = 'otd-item';
+        item.innerHTML = `<span class="otd-year">${ev.year}</span>: ${ev.text}`;
+        bodyEl.appendChild(item);
+      });
+    } catch (err) {
+      console.error("On This Day error:", err);
+      bodyEl.innerHTML = '<div class="otd-loading" style="color:var(--text-secondary);">Could not load history database right now.</div>';
+    }
+  }
+
   /* ── Initialize ── */
   function init() {
     injectGlobalBackground();
     initTheme();
     initMobileNav();
-    initPageLoader();
+    // initPageLoader(); removed
     initPillNavAnimation();
     initTypewriter();
-    initLoader();
+    initLandingAnimation();
     initFooterYear();
     initBackToTop();
     initNPCScrollEffects();
     initDailyChallenge();
     initEasterEgg();
     highlightCurrentNav();
+    initFAQ();
+    initOnThisDay();
   }
 
   if (document.readyState === 'loading') {

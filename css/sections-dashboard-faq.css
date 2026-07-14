@@ -1,0 +1,194 @@
+/* ============================================================
+   DAILY HUB GRID & WIDGETS
+   ============================================================ */
+
+.daily-hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  align-items: stretch;
+}
+
+.daily-challenge-widget, .on-this-day-widget {
+  height: 100%;
+}
+
+@media(max-width: 768px) {
+  .daily-hub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* On This Day Widget */
+.on-this-day-widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+[data-theme="dark"] .on-this-day-widget {
+  background: #1e1e1e !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.on-this-day-widget:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
+  border-color: var(--brand-sky);
+}
+
+.otd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .otd-header {
+  border-bottom-color: rgba(255,255,255,0.1);
+}
+
+.otd-header h3 {
+  font-size: var(--fs-lg);
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.otd-date {
+  font-size: var(--fs-sm);
+  color: var(--brand-cyan);
+  font-weight: 600;
+  background: var(--primary-surface);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.otd-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow-y: auto;
+  max-height: 250px;
+  padding-right: 8px; /* space for scrollbar */
+}
+
+/* Custom Scrollbar for OTD Body */
+.otd-body::-webkit-scrollbar {
+  width: 6px;
+}
+.otd-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.otd-body::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 10px;
+}
+[data-theme="dark"] .otd-body::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.otd-item {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+
+.otd-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-sky);
+}
+
+.otd-year {
+  font-weight: 700;
+  color: var(--text);
+  margin-right: 4px;
+}
+
+
+
+/* ============================================================
+   FAQ SECTION
+   ============================================================ */
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+[data-theme="dark"] .faq-item {
+  background: #1e1e1e !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.faq-item:hover {
+  border-color: var(--brand-sky);
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: inherit;
+}
+
+.faq-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.faq-question[aria-expanded="true"] .faq-icon {
+  transform: rotate(180deg);
+  color: var(--brand-sky);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-answer-inner {
+  padding: 0 var(--space-6) var(--space-5) var(--space-6);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
